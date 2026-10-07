@@ -1,0 +1,152 @@
+[
+  {
+    "model": "Persistence",
+    "slice": "overall",
+    "MAE": 1.2101,
+    "RMSE": 2.5551,
+    "R2": 0.9182,
+    "median_absolute_error": 0.0,
+    "sMAPE": 4.1192,
+    "sample_count": 30800
+  },
+  {
+    "model": "Historical Baseline",
+    "slice": "overall",
+    "MAE": 0.8354,
+    "RMSE": 1.568,
+    "R2": 0.9692,
+    "median_absolute_error": 0.3333,
+    "sMAPE": 2.8509,
+    "sample_count": 30800
+  },
+  {
+    "model": "LightGBM Regressor",
+    "slice": "overall",
+    "MAE": 0.934,
+    "RMSE": 1.6005,
+    "R2": 0.9679,
+    "median_absolute_error": 0.4269,
+    "sMAPE": 3.086,
+    "sample_count": 30800
+  },
+  {
+    "model": "Persistence",
+    "slice": "peak",
+    "MAE": 2.234,
+    "RMSE": 3.276,
+    "R2": 0.8562,
+    "median_absolute_error": 2.0,
+    "sMAPE": 8.0869,
+    "sample_count": 6300
+  },
+  {
+    "model": "Historical Baseline",
+    "slice": "peak",
+    "MAE": 1.3497,
+    "RMSE": 1.978,
+    "R2": 0.9476,
+    "median_absolute_error": 0.875,
+    "sMAPE": 4.9829,
+    "sample_count": 6300
+  },
+  {
+    "model": "LightGBM Regressor",
+    "slice": "peak",
+    "MAE": 1.3634,
+    "RMSE": 1.9642,
+    "R2": 0.9483,
+    "median_absolute_error": 0.9135,
+    "sMAPE": 4.9777,
+    "sample_count": 6300
+  },
+  {
+    "model": "Persistence",
+    "slice": "off_peak",
+    "MAE": 0.9469,
+    "RMSE": 2.334,
+    "R2": 0.9297,
+    "median_absolute_error": 0.0,
+    "sMAPE": 3.099,
+    "sample_count": 24500
+  },
+  {
+    "model": "Historical Baseline",
+    "slice": "off_peak",
+    "MAE": 0.7032,
+    "RMSE": 1.4439,
+    "R2": 0.9731,
+    "median_absolute_error": 0.0,
+    "sMAPE": 2.3026,
+    "sample_count": 24500
+  },
+  {
+    "model": "LightGBM Regressor",
+    "slice": "off_peak",
+    "MAE": 0.8236,
+    "RMSE": 1.4927,
+    "R2": 0.9713,
+    "median_absolute_error": 0.3944,
+    "sMAPE": 2.5996,
+    "sample_count": 24500
+  },
+  {
+    "model": "Persistence",
+    "slice": "weekday",
+    "MAE": 1.4653,
+    "RMSE": 2.7681,
+    "R2": 0.9052,
+    "median_absolute_error": 0.0,
+    "sMAPE": 5.0178,
+    "sample_count": 24500
+  },
+  {
+    "model": "Historical Baseline",
+    "slice": "weekday",
+    "MAE": 0.9488,
+    "RMSE": 1.6585,
+    "R2": 0.966,
+    "median_absolute_error": 0.5,
+    "sMAPE": 3.2794,
+    "sample_count": 24500
+  },
+  {
+    "model": "LightGBM Regressor",
+    "slice": "weekday",
+    "MAE": 1.0435,
+    "RMSE": 1.6908,
+    "R2": 0.9646,
+    "median_absolute_error": 0.4841,
+    "sMAPE": 3.5016,
+    "sample_count": 24500
+  },
+  {
+    "model": "Persistence",
+    "slice": "weekend",
+    "MAE": 0.2176,
+    "RMSE": 1.4552,
+    "R2": 0.9707,
+    "median_absolute_error": 0.0,
+    "sMAPE": 0.6246,
+    "sample_count": 6300
+  },
+  {
+    "model": "Historical Baseline",
+    "slice": "weekend",
+    "MAE": 0.3945,
+    "RMSE": 1.1503,
+    "R2": 0.9817,
+    "median_absolute_error": 0.0,
+    "sMAPE": 1.1843,
+    "sample_count": 6300
+  },
+  {
+    "model": "LightGBM Regressor",
+    "slice": "weekend",
+    "MAE": 0.5081,
+    "RMSE": 1.1857,
+    "R2": 0.9805,
+    "median_absolute_error": 0.2436,
+    "sMAPE": 1.4701,
+    "sample_count": 6300
+  }
+]

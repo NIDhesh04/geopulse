@@ -1,0 +1,4 @@
+route_length_bin,evaluation_count,mean_distance_m,mean_static_time_s,mean_lightgbm_time_s,mean_oracle_time_s,mean_saving_vs_static_s,mean_improvement_vs_static_pct,win_rate_vs_static_pct,mean_oracle_regret_s,mean_oracle_gap_pct
+Short (<5 km),112,4105.76,527.3,527.3,527.3,0.0,0.0,0.0,0.0,0.0
+Medium (5-8 km),240,6328.26,767.12,763.4,762.75,3.71,0.46,30.0,0.65,0.08
+Long (>8 km),448,12193.5,1362.24,1357.57,1353.76,4.67,0.34,45.76,3.81,0.26

@@ -1,0 +1,16 @@
+model,slice,MAE,RMSE,R2,median_absolute_error,sMAPE,sample_count
+Persistence,overall,1.2101,2.5551,0.9182,0.0,4.1192,30800
+Historical Baseline,overall,0.8354,1.568,0.9692,0.3333,2.8509,30800
+LightGBM Regressor,overall,0.934,1.6005,0.9679,0.4269,3.086,30800
+Persistence,peak,2.234,3.276,0.8562,2.0,8.0869,6300
+Historical Baseline,peak,1.3497,1.978,0.9476,0.875,4.9829,6300
+LightGBM Regressor,peak,1.3634,1.9642,0.9483,0.9135,4.9777,6300
+Persistence,off_peak,0.9469,2.334,0.9297,0.0,3.099,24500
+Historical Baseline,off_peak,0.7032,1.4439,0.9731,0.0,2.3026,24500
+LightGBM Regressor,off_peak,0.8236,1.4927,0.9713,0.3944,2.5996,24500
+Persistence,weekday,1.4653,2.7681,0.9052,0.0,5.0178,24500
+Historical Baseline,weekday,0.9488,1.6585,0.966,0.5,3.2794,24500
+LightGBM Regressor,weekday,1.0435,1.6908,0.9646,0.4841,3.5016,24500
+Persistence,weekend,0.2176,1.4552,0.9707,0.0,0.6246,6300
+Historical Baseline,weekend,0.3945,1.1503,0.9817,0.0,1.1843,6300
+LightGBM Regressor,weekend,0.5081,1.1857,0.9805,0.2436,1.4701,6300

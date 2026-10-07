@@ -1,0 +1,47 @@
+[
+  {
+    "event_id": 1,
+    "timestamp": "2026-01-15 14:00:00+00:00",
+    "source": "Cloud",
+    "target": "EdgeServer",
+    "type": "MODEL_UPDATE",
+    "summary": "Synthesized predicted weights (46,679 edges, 690 dynamic) from LightGBM-v1.0 (Iteration 112)",
+    "execution_time_ms": 12.653
+  },
+  {
+    "event_id": 2,
+    "timestamp": "2026-01-15 19:30:00+05:30",
+    "source": "EdgeServer",
+    "target": "Vehicle[veh_001]",
+    "type": "ROUTE_UPDATE",
+    "summary": "Dispatched initial route R0 (74 links, 1310.3s ETA)",
+    "execution_time_ms": 60.305
+  },
+  {
+    "event_id": 3,
+    "timestamp": "2026-01-15 20:00:00+05:30",
+    "source": "Vehicle[veh_001]",
+    "target": "EdgeServer",
+    "type": "POSITION_UPDATE",
+    "summary": "Vehicle progress: 20.3% at Node 3320289784 (Edge #15)",
+    "execution_time_ms": 0.002
+  },
+  {
+    "event_id": 4,
+    "timestamp": "2026-01-15 20:30:00+05:30",
+    "source": "TrafficSensorStream",
+    "target": "EdgeServer",
+    "type": "TRAFFIC_UPDATE",
+    "summary": "Updated real-time observed traffic weights across 700 sensors",
+    "execution_time_ms": 9.021
+  },
+  {
+    "event_id": 5,
+    "timestamp": "2026-01-15 20:30:00+05:30",
+    "source": "EdgeServer",
+    "target": "Vehicle[veh_001]",
+    "type": "ROUTE_UPDATE (REROUTE)",
+    "summary": "Reroute triggered: Saves 84.9s (9.2%). New route: 46 links.",
+    "execution_time_ms": 20.391
+  }
+]

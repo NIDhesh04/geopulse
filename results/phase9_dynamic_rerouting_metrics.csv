@@ -1,0 +1,2 @@
+total_scenarios,reroute_count,reroute_frequency_pct,beneficial_reroutes,mean_saving_s,median_saving_s,mean_improvement_pct,mean_saving_when_rerouted_s,mean_imp_when_rerouted_pct
+20,8,40.0,8,33.96,0.0,2.3520000000000003,84.9,5.880000000000001

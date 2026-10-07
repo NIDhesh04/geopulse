@@ -1,0 +1,1410 @@
+{
+  "scenario_id": 17,
+  "od_id": 7,
+  "period": "Off-Peak",
+  "origin_node": "8124118501",
+  "destination_node": "293464897",
+  "origin_name": "Dumduma",
+  "destination_name": "Old Town Lingaraj",
+  "departure_timestamp": "2026-01-16 22:30:00+05:30",
+  "observation_timestamp": "2026-01-16 23:30:00+05:30",
+  "decision_node": "3706277644",
+  "decision_step": 19,
+  "decision_frac": 0.328,
+  "elapsed_time_at_decision_s": 299.78,
+  "initial_route_distance_m": 6077.63,
+  "final_route_distance_m": 6077.63,
+  "initial_route_edges_count": 58,
+  "final_route_edges_count": 58,
+  "initial_route_nodes": [
+    "8124118501",
+    "3706277268",
+    "3706276768",
+    "10115843783",
+    "3706277346",
+    "8128279464",
+    "10706332785",
+    "3706277185",
+    "4712962586",
+    "4719354876",
+    "3706277467",
+    "3706277537",
+    "3706277550",
+    "3706277566",
+    "3706277583",
+    "9860065589",
+    "4712962736",
+    "2565956564",
+    "10166142320",
+    "3706277644",
+    "3706277656",
+    "3718264953",
+    "3718264965",
+    "4711071806",
+    "4712962697",
+    "4712962698",
+    "293463193",
+    "293463192",
+    "293465211",
+    "293465220",
+    "293465226",
+    "293465232",
+    "293465236",
+    "293465245",
+    "293465252",
+    "293465256",
+    "293457995",
+    "2955675649",
+    "2955675642",
+    "293457999",
+    "2955675651",
+    "2955675643",
+    "2955675644",
+    "8163243061",
+    "2833482016",
+    "2833482031",
+    "4576934214",
+    "2833450851",
+    "2833482043",
+    "2833482024",
+    "293452312",
+    "2833450843",
+    "1812432232",
+    "2955635989",
+    "2955635986",
+    "293454112",
+    "293454184",
+    "293454233",
+    "293464897"
+  ],
+  "initial_route_edges": [
+    [
+      "8124118501",
+      "3706277268",
+      0
+    ],
+    [
+      "3706277268",
+      "3706276768",
+      0
+    ],
+    [
+      "3706276768",
+      "10115843783",
+      0
+    ],
+    [
+      "10115843783",
+      "3706277346",
+      0
+    ],
+    [
+      "3706277346",
+      "8128279464",
+      0
+    ],
+    [
+      "8128279464",
+      "10706332785",
+      0
+    ],
+    [
+      "10706332785",
+      "3706277185",
+      0
+    ],
+    [
+      "3706277185",
+      "4712962586",
+      0
+    ],
+    [
+      "4712962586",
+      "4719354876",
+      0
+    ],
+    [
+      "4719354876",
+      "3706277467",
+      0
+    ],
+    [
+      "3706277467",
+      "3706277537",
+      0
+    ],
+    [
+      "3706277537",
+      "3706277550",
+      0
+    ],
+    [
+      "3706277550",
+      "3706277566",
+      0
+    ],
+    [
+      "3706277566",
+      "3706277583",
+      0
+    ],
+    [
+      "3706277583",
+      "9860065589",
+      0
+    ],
+    [
+      "9860065589",
+      "4712962736",
+      0
+    ],
+    [
+      "4712962736",
+      "2565956564",
+      0
+    ],
+    [
+      "2565956564",
+      "10166142320",
+      0
+    ],
+    [
+      "10166142320",
+      "3706277644",
+      0
+    ],
+    [
+      "3706277644",
+      "3706277656",
+      0
+    ],
+    [
+      "3706277656",
+      "3718264953",
+      0
+    ],
+    [
+      "3718264953",
+      "3718264965",
+      0
+    ],
+    [
+      "3718264965",
+      "4711071806",
+      0
+    ],
+    [
+      "4711071806",
+      "4712962697",
+      0
+    ],
+    [
+      "4712962697",
+      "4712962698",
+      0
+    ],
+    [
+      "4712962698",
+      "293463193",
+      0
+    ],
+    [
+      "293463193",
+      "293463192",
+      0
+    ],
+    [
+      "293463192",
+      "293465211",
+      0
+    ],
+    [
+      "293465211",
+      "293465220",
+      0
+    ],
+    [
+      "293465220",
+      "293465226",
+      0
+    ],
+    [
+      "293465226",
+      "293465232",
+      0
+    ],
+    [
+      "293465232",
+      "293465236",
+      0
+    ],
+    [
+      "293465236",
+      "293465245",
+      0
+    ],
+    [
+      "293465245",
+      "293465252",
+      0
+    ],
+    [
+      "293465252",
+      "293465256",
+      0
+    ],
+    [
+      "293465256",
+      "293457995",
+      0
+    ],
+    [
+      "293457995",
+      "2955675649",
+      0
+    ],
+    [
+      "2955675649",
+      "2955675642",
+      0
+    ],
+    [
+      "2955675642",
+      "293457999",
+      0
+    ],
+    [
+      "293457999",
+      "2955675651",
+      0
+    ],
+    [
+      "2955675651",
+      "2955675643",
+      0
+    ],
+    [
+      "2955675643",
+      "2955675644",
+      0
+    ],
+    [
+      "2955675644",
+      "8163243061",
+      0
+    ],
+    [
+      "8163243061",
+      "2833482016",
+      0
+    ],
+    [
+      "2833482016",
+      "2833482031",
+      0
+    ],
+    [
+      "2833482031",
+      "4576934214",
+      0
+    ],
+    [
+      "4576934214",
+      "2833450851",
+      0
+    ],
+    [
+      "2833450851",
+      "2833482043",
+      0
+    ],
+    [
+      "2833482043",
+      "2833482024",
+      0
+    ],
+    [
+      "2833482024",
+      "293452312",
+      0
+    ],
+    [
+      "293452312",
+      "2833450843",
+      0
+    ],
+    [
+      "2833450843",
+      "1812432232",
+      0
+    ],
+    [
+      "1812432232",
+      "2955635989",
+      0
+    ],
+    [
+      "2955635989",
+      "2955635986",
+      0
+    ],
+    [
+      "2955635986",
+      "293454112",
+      0
+    ],
+    [
+      "293454112",
+      "293454184",
+      0
+    ],
+    [
+      "293454184",
+      "293454233",
+      0
+    ],
+    [
+      "293454233",
+      "293464897",
+      0
+    ]
+  ],
+  "final_route_nodes": [
+    "8124118501",
+    "3706277268",
+    "3706276768",
+    "10115843783",
+    "3706277346",
+    "8128279464",
+    "10706332785",
+    "3706277185",
+    "4712962586",
+    "4719354876",
+    "3706277467",
+    "3706277537",
+    "3706277550",
+    "3706277566",
+    "3706277583",
+    "9860065589",
+    "4712962736",
+    "2565956564",
+    "10166142320",
+    "3706277644",
+    "3706277656",
+    "3718264953",
+    "3718264965",
+    "4711071806",
+    "4712962697",
+    "4712962698",
+    "293463193",
+    "293463192",
+    "293465211",
+    "293465220",
+    "293465226",
+    "293465232",
+    "293465236",
+    "293465245",
+    "293465252",
+    "293465256",
+    "293457995",
+    "2955675649",
+    "2955675642",
+    "293457999",
+    "2955675651",
+    "2955675643",
+    "2955675644",
+    "8163243061",
+    "2833482016",
+    "2833482031",
+    "4576934214",
+    "2833450851",
+    "2833482043",
+    "2833482024",
+    "293452312",
+    "2833450843",
+    "1812432232",
+    "2955635989",
+    "2955635986",
+    "293454112",
+    "293454184",
+    "293454233",
+    "293464897"
+  ],
+  "final_route_edges": [
+    [
+      "8124118501",
+      "3706277268",
+      0
+    ],
+    [
+      "3706277268",
+      "3706276768",
+      0
+    ],
+    [
+      "3706276768",
+      "10115843783",
+      0
+    ],
+    [
+      "10115843783",
+      "3706277346",
+      0
+    ],
+    [
+      "3706277346",
+      "8128279464",
+      0
+    ],
+    [
+      "8128279464",
+      "10706332785",
+      0
+    ],
+    [
+      "10706332785",
+      "3706277185",
+      0
+    ],
+    [
+      "3706277185",
+      "4712962586",
+      0
+    ],
+    [
+      "4712962586",
+      "4719354876",
+      0
+    ],
+    [
+      "4719354876",
+      "3706277467",
+      0
+    ],
+    [
+      "3706277467",
+      "3706277537",
+      0
+    ],
+    [
+      "3706277537",
+      "3706277550",
+      0
+    ],
+    [
+      "3706277550",
+      "3706277566",
+      0
+    ],
+    [
+      "3706277566",
+      "3706277583",
+      0
+    ],
+    [
+      "3706277583",
+      "9860065589",
+      0
+    ],
+    [
+      "9860065589",
+      "4712962736",
+      0
+    ],
+    [
+      "4712962736",
+      "2565956564",
+      0
+    ],
+    [
+      "2565956564",
+      "10166142320",
+      0
+    ],
+    [
+      "10166142320",
+      "3706277644",
+      0
+    ],
+    [
+      "3706277644",
+      "3706277656",
+      0
+    ],
+    [
+      "3706277656",
+      "3718264953",
+      0
+    ],
+    [
+      "3718264953",
+      "3718264965",
+      0
+    ],
+    [
+      "3718264965",
+      "4711071806",
+      0
+    ],
+    [
+      "4711071806",
+      "4712962697",
+      0
+    ],
+    [
+      "4712962697",
+      "4712962698",
+      0
+    ],
+    [
+      "4712962698",
+      "293463193",
+      0
+    ],
+    [
+      "293463193",
+      "293463192",
+      0
+    ],
+    [
+      "293463192",
+      "293465211",
+      0
+    ],
+    [
+      "293465211",
+      "293465220",
+      0
+    ],
+    [
+      "293465220",
+      "293465226",
+      0
+    ],
+    [
+      "293465226",
+      "293465232",
+      0
+    ],
+    [
+      "293465232",
+      "293465236",
+      0
+    ],
+    [
+      "293465236",
+      "293465245",
+      0
+    ],
+    [
+      "293465245",
+      "293465252",
+      0
+    ],
+    [
+      "293465252",
+      "293465256",
+      0
+    ],
+    [
+      "293465256",
+      "293457995",
+      0
+    ],
+    [
+      "293457995",
+      "2955675649",
+      0
+    ],
+    [
+      "2955675649",
+      "2955675642",
+      0
+    ],
+    [
+      "2955675642",
+      "293457999",
+      0
+    ],
+    [
+      "293457999",
+      "2955675651",
+      0
+    ],
+    [
+      "2955675651",
+      "2955675643",
+      0
+    ],
+    [
+      "2955675643",
+      "2955675644",
+      0
+    ],
+    [
+      "2955675644",
+      "8163243061",
+      0
+    ],
+    [
+      "8163243061",
+      "2833482016",
+      0
+    ],
+    [
+      "2833482016",
+      "2833482031",
+      0
+    ],
+    [
+      "2833482031",
+      "4576934214",
+      0
+    ],
+    [
+      "4576934214",
+      "2833450851",
+      0
+    ],
+    [
+      "2833450851",
+      "2833482043",
+      0
+    ],
+    [
+      "2833482043",
+      "2833482024",
+      0
+    ],
+    [
+      "2833482024",
+      "293452312",
+      0
+    ],
+    [
+      "293452312",
+      "2833450843",
+      0
+    ],
+    [
+      "2833450843",
+      "1812432232",
+      0
+    ],
+    [
+      "1812432232",
+      "2955635989",
+      0
+    ],
+    [
+      "2955635989",
+      "2955635986",
+      0
+    ],
+    [
+      "2955635986",
+      "293454112",
+      0
+    ],
+    [
+      "293454112",
+      "293454184",
+      0
+    ],
+    [
+      "293454184",
+      "293454233",
+      0
+    ],
+    [
+      "293454233",
+      "293464897",
+      0
+    ]
+  ],
+  "no_reroute_total_time_s": 847.97,
+  "dynamic_reroute_total_time_s": 847.97,
+  "time_saved_s": -0.0,
+  "improvement_pct": -0.0,
+  "route_overlap": 1.0,
+  "reroute_triggered": false,
+  "delta_T_s": 0.0,
+  "delta_T_pct": 0.0,
+  "threshold_seconds": 10.0,
+  "threshold_percent": 3.0,
+  "reroute_mode": "GeoPulse Dual Threshold",
+  "speed_metrics": {
+    "predicted_speed_kmh": 33.0,
+    "observed_speed_kmh": 33.0,
+    "speed_diff_kmh": 0.0,
+    "prediction_error_pct": 0.0,
+    "speed_drop_pct": -0.0
+  },
+  "eta_metrics": {
+    "initial_route_eta_s": 848.0,
+    "current_remaining_eta_s": 548.19,
+    "optimal_alternative_eta_s": 548.19
+  },
+  "execution_times_ms": {
+    "cloud_prediction_broadcast_ms": 5.898,
+    "edge_weight_synthesis_ms": 33.364,
+    "edge_initial_dijkstra_ms": 119.439,
+    "edge_traffic_ingest_ms": 35.767,
+    "edge_reroute_dijkstra_ms": 24.724,
+    "edge_decision_evaluation_ms": 0.006,
+    "total_edge_decision_ms": 24.819
+  },
+  "total_pipeline_time_s": 0.348,
+  "is_canonical": false,
+  "canonical_match": true,
+  "discrepancy_msg": "",
+  "timeline": [
+    {
+      "timestamp": "2026-01-16 22:30:00+05:30",
+      "event": "DEPARTURE",
+      "current_node": "8124118501",
+      "edge_index": 0,
+      "progress_pct": 0.0,
+      "elapsed_time_s": 0.0,
+      "accumulated_dist_m": 0.0,
+      "description": "Departed origin 8124118501 on initial route R0 (58 links)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "3706277268",
+      "edge_index": 1,
+      "progress_pct": 1.72,
+      "elapsed_time_s": 21.66,
+      "accumulated_dist_m": 159.93,
+      "description": "Traversed edge 8124118501 -> 3706277268 in 21.7s (159.9m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "3706276768",
+      "edge_index": 2,
+      "progress_pct": 3.45,
+      "elapsed_time_s": 33.27,
+      "accumulated_dist_m": 245.34,
+      "description": "Traversed edge 3706277268 -> 3706276768 in 11.6s (85.4m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "10115843783",
+      "edge_index": 3,
+      "progress_pct": 5.17,
+      "elapsed_time_s": 58.62,
+      "accumulated_dist_m": 432.49,
+      "description": "Traversed edge 3706276768 -> 10115843783 in 25.3s (187.1m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "3706277346",
+      "edge_index": 4,
+      "progress_pct": 6.9,
+      "elapsed_time_s": 69.14,
+      "accumulated_dist_m": 510.16,
+      "description": "Traversed edge 10115843783 -> 3706277346 in 10.5s (77.7m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "8128279464",
+      "edge_index": 5,
+      "progress_pct": 8.62,
+      "elapsed_time_s": 79.2,
+      "accumulated_dist_m": 584.4,
+      "description": "Traversed edge 3706277346 -> 8128279464 in 10.1s (74.2m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "10706332785",
+      "edge_index": 6,
+      "progress_pct": 10.34,
+      "elapsed_time_s": 82.95,
+      "accumulated_dist_m": 615.7,
+      "description": "Traversed edge 8128279464 -> 10706332785 in 3.8s (31.3m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "3706277185",
+      "edge_index": 7,
+      "progress_pct": 12.07,
+      "elapsed_time_s": 84.27,
+      "accumulated_dist_m": 626.66,
+      "description": "Traversed edge 10706332785 -> 3706277185 in 1.3s (11.0m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "4712962586",
+      "edge_index": 8,
+      "progress_pct": 13.79,
+      "elapsed_time_s": 84.88,
+      "accumulated_dist_m": 630.89,
+      "description": "Traversed edge 3706277185 -> 4712962586 in 0.6s (4.2m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "4719354876",
+      "edge_index": 9,
+      "progress_pct": 15.52,
+      "elapsed_time_s": 98.51,
+      "accumulated_dist_m": 725.55,
+      "description": "Traversed edge 4712962586 -> 4719354876 in 13.6s (94.7m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "3706277467",
+      "edge_index": 10,
+      "progress_pct": 17.24,
+      "elapsed_time_s": 110.21,
+      "accumulated_dist_m": 806.81,
+      "description": "Traversed edge 4719354876 -> 3706277467 in 11.7s (81.3m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "3706277537",
+      "edge_index": 11,
+      "progress_pct": 18.97,
+      "elapsed_time_s": 117.7,
+      "accumulated_dist_m": 858.85,
+      "description": "Traversed edge 3706277467 -> 3706277537 in 7.5s (52.0m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "3706277550",
+      "edge_index": 12,
+      "progress_pct": 20.69,
+      "elapsed_time_s": 122.95,
+      "accumulated_dist_m": 895.28,
+      "description": "Traversed edge 3706277537 -> 3706277550 in 5.2s (36.4m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "3706277566",
+      "edge_index": 13,
+      "progress_pct": 22.41,
+      "elapsed_time_s": 129.36,
+      "accumulated_dist_m": 939.78,
+      "description": "Traversed edge 3706277550 -> 3706277566 in 6.4s (44.5m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "3706277583",
+      "edge_index": 14,
+      "progress_pct": 24.14,
+      "elapsed_time_s": 137.18,
+      "accumulated_dist_m": 994.1,
+      "description": "Traversed edge 3706277566 -> 3706277583 in 7.8s (54.3m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "9860065589",
+      "edge_index": 15,
+      "progress_pct": 25.86,
+      "elapsed_time_s": 151.52,
+      "accumulated_dist_m": 1093.69,
+      "description": "Traversed edge 3706277583 -> 9860065589 in 14.3s (99.6m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "4712962736",
+      "edge_index": 16,
+      "progress_pct": 27.59,
+      "elapsed_time_s": 203.68,
+      "accumulated_dist_m": 1455.91,
+      "description": "Traversed edge 9860065589 -> 4712962736 in 52.2s (362.2m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "2565956564",
+      "edge_index": 17,
+      "progress_pct": 29.31,
+      "elapsed_time_s": 248.01,
+      "accumulated_dist_m": 1763.78,
+      "description": "Traversed edge 4712962736 -> 2565956564 in 44.3s (307.9m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "10166142320",
+      "edge_index": 18,
+      "progress_pct": 31.03,
+      "elapsed_time_s": 271.11,
+      "accumulated_dist_m": 1924.14,
+      "description": "Traversed edge 2565956564 -> 10166142320 in 23.1s (160.4m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "3706277644",
+      "edge_index": 19,
+      "progress_pct": 32.76,
+      "elapsed_time_s": 299.78,
+      "accumulated_dist_m": 2123.3,
+      "description": "Traversed edge 10166142320 -> 3706277644 in 28.7s (199.2m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "3706277656",
+      "edge_index": 20,
+      "progress_pct": 34.48,
+      "elapsed_time_s": 314.46,
+      "accumulated_dist_m": 2225.19,
+      "description": "Traversed edge 3706277644 -> 3706277656 in 14.7s (101.9m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "3718264953",
+      "edge_index": 21,
+      "progress_pct": 36.21,
+      "elapsed_time_s": 331.15,
+      "accumulated_dist_m": 2341.1,
+      "description": "Traversed edge 3706277656 -> 3718264953 in 16.7s (115.9m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "3718264965",
+      "edge_index": 22,
+      "progress_pct": 37.93,
+      "elapsed_time_s": 349.67,
+      "accumulated_dist_m": 2469.7,
+      "description": "Traversed edge 3718264953 -> 3718264965 in 18.5s (128.6m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "4711071806",
+      "edge_index": 23,
+      "progress_pct": 39.66,
+      "elapsed_time_s": 376.11,
+      "accumulated_dist_m": 2653.32,
+      "description": "Traversed edge 3718264965 -> 4711071806 in 26.4s (183.6m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "4712962697",
+      "edge_index": 24,
+      "progress_pct": 41.38,
+      "elapsed_time_s": 377.49,
+      "accumulated_dist_m": 2662.94,
+      "description": "Traversed edge 4711071806 -> 4712962697 in 1.4s (9.6m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "4712962698",
+      "edge_index": 25,
+      "progress_pct": 43.1,
+      "elapsed_time_s": 379.16,
+      "accumulated_dist_m": 2674.53,
+      "description": "Traversed edge 4712962697 -> 4712962698 in 1.7s (11.6m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "293463193",
+      "edge_index": 26,
+      "progress_pct": 44.83,
+      "elapsed_time_s": 383.24,
+      "accumulated_dist_m": 2702.84,
+      "description": "Traversed edge 4712962698 -> 293463193 in 4.1s (28.3m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "293463192",
+      "edge_index": 27,
+      "progress_pct": 46.55,
+      "elapsed_time_s": 389.73,
+      "accumulated_dist_m": 2747.91,
+      "description": "Traversed edge 293463193 -> 293463192 in 6.5s (45.1m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "293465211",
+      "edge_index": 28,
+      "progress_pct": 48.28,
+      "elapsed_time_s": 396.82,
+      "accumulated_dist_m": 2797.17,
+      "description": "Traversed edge 293463192 -> 293465211 in 7.1s (49.3m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "293465220",
+      "edge_index": 29,
+      "progress_pct": 50.0,
+      "elapsed_time_s": 408.36,
+      "accumulated_dist_m": 2877.27,
+      "description": "Traversed edge 293465211 -> 293465220 in 11.5s (80.1m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "293465226",
+      "edge_index": 30,
+      "progress_pct": 51.72,
+      "elapsed_time_s": 416.97,
+      "accumulated_dist_m": 2937.11,
+      "description": "Traversed edge 293465220 -> 293465226 in 8.6s (59.8m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "293465232",
+      "edge_index": 31,
+      "progress_pct": 53.45,
+      "elapsed_time_s": 427.76,
+      "accumulated_dist_m": 3011.99,
+      "description": "Traversed edge 293465226 -> 293465232 in 10.8s (74.9m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "293465236",
+      "edge_index": 32,
+      "progress_pct": 55.17,
+      "elapsed_time_s": 434.08,
+      "accumulated_dist_m": 3055.92,
+      "description": "Traversed edge 293465232 -> 293465236 in 6.3s (43.9m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "293465245",
+      "edge_index": 33,
+      "progress_pct": 56.9,
+      "elapsed_time_s": 446.22,
+      "accumulated_dist_m": 3140.23,
+      "description": "Traversed edge 293465236 -> 293465245 in 12.1s (84.3m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "293465252",
+      "edge_index": 34,
+      "progress_pct": 58.62,
+      "elapsed_time_s": 447.45,
+      "accumulated_dist_m": 3148.77,
+      "description": "Traversed edge 293465245 -> 293465252 in 1.2s (8.5m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "293465256",
+      "edge_index": 35,
+      "progress_pct": 60.34,
+      "elapsed_time_s": 455.78,
+      "accumulated_dist_m": 3206.62,
+      "description": "Traversed edge 293465252 -> 293465256 in 8.3s (57.8m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "293457995",
+      "edge_index": 36,
+      "progress_pct": 62.07,
+      "elapsed_time_s": 467.43,
+      "accumulated_dist_m": 3287.48,
+      "description": "Traversed edge 293465256 -> 293457995 in 11.6s (80.9m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "2955675649",
+      "edge_index": 37,
+      "progress_pct": 63.79,
+      "elapsed_time_s": 470.88,
+      "accumulated_dist_m": 3311.49,
+      "description": "Traversed edge 293457995 -> 2955675649 in 3.5s (24.0m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "2955675642",
+      "edge_index": 38,
+      "progress_pct": 65.52,
+      "elapsed_time_s": 482.89,
+      "accumulated_dist_m": 3394.85,
+      "description": "Traversed edge 2955675649 -> 2955675642 in 12.0s (83.4m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "293457999",
+      "edge_index": 39,
+      "progress_pct": 67.24,
+      "elapsed_time_s": 496.36,
+      "accumulated_dist_m": 3488.41,
+      "description": "Traversed edge 2955675642 -> 293457999 in 13.5s (93.6m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "2955675651",
+      "edge_index": 40,
+      "progress_pct": 68.97,
+      "elapsed_time_s": 500.25,
+      "accumulated_dist_m": 3515.44,
+      "description": "Traversed edge 293457999 -> 2955675651 in 3.9s (27.0m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "2955675643",
+      "edge_index": 41,
+      "progress_pct": 70.69,
+      "elapsed_time_s": 501.61,
+      "accumulated_dist_m": 3524.88,
+      "description": "Traversed edge 2955675651 -> 2955675643 in 1.4s (9.4m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "2955675644",
+      "edge_index": 42,
+      "progress_pct": 72.41,
+      "elapsed_time_s": 509.16,
+      "accumulated_dist_m": 3577.31,
+      "description": "Traversed edge 2955675643 -> 2955675644 in 7.5s (52.4m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "8163243061",
+      "edge_index": 43,
+      "progress_pct": 74.14,
+      "elapsed_time_s": 538.31,
+      "accumulated_dist_m": 3779.7,
+      "description": "Traversed edge 2955675644 -> 8163243061 in 29.1s (202.4m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "2833482016",
+      "edge_index": 44,
+      "progress_pct": 75.86,
+      "elapsed_time_s": 634.48,
+      "accumulated_dist_m": 4447.58,
+      "description": "Traversed edge 8163243061 -> 2833482016 in 96.2s (667.9m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "2833482031",
+      "edge_index": 45,
+      "progress_pct": 77.59,
+      "elapsed_time_s": 639.2,
+      "accumulated_dist_m": 4499.97,
+      "description": "Traversed edge 2833482016 -> 2833482031 in 4.7s (52.4m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "4576934214",
+      "edge_index": 46,
+      "progress_pct": 79.31,
+      "elapsed_time_s": 642.02,
+      "accumulated_dist_m": 4531.38,
+      "description": "Traversed edge 2833482031 -> 4576934214 in 2.8s (31.4m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "2833450851",
+      "edge_index": 47,
+      "progress_pct": 81.03,
+      "elapsed_time_s": 643.87,
+      "accumulated_dist_m": 4551.89,
+      "description": "Traversed edge 4576934214 -> 2833450851 in 1.8s (20.5m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "2833482043",
+      "edge_index": 48,
+      "progress_pct": 82.76,
+      "elapsed_time_s": 706.58,
+      "accumulated_dist_m": 5144.2,
+      "description": "Traversed edge 2833450851 -> 2833482043 in 62.7s (592.3m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "2833482024",
+      "edge_index": 49,
+      "progress_pct": 84.48,
+      "elapsed_time_s": 734.62,
+      "accumulated_dist_m": 5393.38,
+      "description": "Traversed edge 2833482043 -> 2833482024 in 28.0s (249.2m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "293452312",
+      "edge_index": 50,
+      "progress_pct": 86.21,
+      "elapsed_time_s": 737.69,
+      "accumulated_dist_m": 5427.5,
+      "description": "Traversed edge 2833482024 -> 293452312 in 3.1s (34.1m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "2833450843",
+      "edge_index": 51,
+      "progress_pct": 87.93,
+      "elapsed_time_s": 738.72,
+      "accumulated_dist_m": 5438.98,
+      "description": "Traversed edge 293452312 -> 2833450843 in 1.0s (11.5m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "1812432232",
+      "edge_index": 52,
+      "progress_pct": 89.66,
+      "elapsed_time_s": 742.74,
+      "accumulated_dist_m": 5466.92,
+      "description": "Traversed edge 2833450843 -> 1812432232 in 4.0s (27.9m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "2955635989",
+      "edge_index": 53,
+      "progress_pct": 91.38,
+      "elapsed_time_s": 747.63,
+      "accumulated_dist_m": 5500.85,
+      "description": "Traversed edge 1812432232 -> 2955635989 in 4.9s (33.9m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "2955635986",
+      "edge_index": 54,
+      "progress_pct": 93.1,
+      "elapsed_time_s": 761.55,
+      "accumulated_dist_m": 5597.52,
+      "description": "Traversed edge 2955635989 -> 2955635986 in 13.9s (96.7m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "293454112",
+      "edge_index": 55,
+      "progress_pct": 94.83,
+      "elapsed_time_s": 787.04,
+      "accumulated_dist_m": 5739.13,
+      "description": "Traversed edge 2955635986 -> 293454112 in 25.5s (141.6m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "293454184",
+      "edge_index": 56,
+      "progress_pct": 96.55,
+      "elapsed_time_s": 814.42,
+      "accumulated_dist_m": 5891.26,
+      "description": "Traversed edge 293454112 -> 293454184 in 27.4s (152.1m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "293454233",
+      "edge_index": 57,
+      "progress_pct": 98.28,
+      "elapsed_time_s": 824.05,
+      "accumulated_dist_m": 5944.75,
+      "description": "Traversed edge 293454184 -> 293454233 in 9.6s (53.5m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "LINK_TRAVERSAL",
+      "current_node": "293464897",
+      "edge_index": 58,
+      "progress_pct": 100.0,
+      "elapsed_time_s": 847.97,
+      "accumulated_dist_m": 6077.63,
+      "description": "Traversed edge 293454233 -> 293464897 in 23.9s (132.9m)"
+    },
+    {
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "event": "ARRIVAL",
+      "current_node": "293464897",
+      "edge_index": 58,
+      "progress_pct": 100.0,
+      "elapsed_time_s": 847.97,
+      "accumulated_dist_m": 6077.63,
+      "description": "Arrived at destination 293464897 in 848.0s (6077.6m)"
+    }
+  ],
+  "architecture_events": [
+    {
+      "event_id": 1,
+      "timestamp": "2026-01-16 17:00:00+00:00",
+      "source": "Cloud",
+      "target": "EdgeServer",
+      "type": "MODEL_UPDATE",
+      "summary": "Synthesized predicted weights (46,679 edges, 690 dynamic) from LightGBM-v1.0 (Iteration 112)",
+      "execution_time_ms": 33.364
+    },
+    {
+      "event_id": 2,
+      "timestamp": "2026-01-16 22:30:00+05:30",
+      "source": "EdgeServer",
+      "target": "Vehicle[veh_dashboard]",
+      "type": "ROUTE_UPDATE",
+      "summary": "Dispatched initial route R0 (58 links, 848.0s ETA)",
+      "execution_time_ms": 119.439
+    },
+    {
+      "event_id": 3,
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "source": "Vehicle[veh_dashboard]",
+      "target": "EdgeServer",
+      "type": "POSITION_UPDATE",
+      "summary": "Vehicle progress: 32.8% at Node 3706277644 (Edge #19)",
+      "execution_time_ms": 0.004
+    },
+    {
+      "event_id": 4,
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "source": "TrafficSensorStream",
+      "target": "EdgeServer",
+      "type": "TRAFFIC_UPDATE",
+      "summary": "Updated real-time observed traffic weights across 700 sensors",
+      "execution_time_ms": 35.767
+    },
+    {
+      "event_id": 5,
+      "timestamp": "2026-01-16 23:30:00+05:30",
+      "source": "EdgeServer",
+      "target": "Vehicle[veh_dashboard]",
+      "type": "ROUTE_CONFIRMED",
+      "summary": "No reroute triggered: Potential saving 0.0s below threshold.",
+      "execution_time_ms": 24.819
+    }
+  ]
+}

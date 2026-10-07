@@ -1,0 +1,5 @@
+period,evaluation_count,mean_static_time_s,mean_lightgbm_time_s,mean_historical_time_s,mean_oracle_time_s,mean_saving_vs_static_s,mean_improvement_vs_static_pct,win_rate_vs_static_pct,mean_oracle_regret_s,mean_oracle_gap_pct,replay_reroute_frequency_pct,replay_mean_saving_s
+Morning Peak,150,1060.51,1060.24,1060.05,1057.39,0.27,0.05,29.33,2.85,0.21,0.0,0.0
+Midday,200,1057.01,1055.42,1055.33,1051.48,1.59,0.16,27.5,3.94,0.3,0.0,0.0
+Evening Peak,250,1134.42,1125.85,1126.06,1123.26,8.57,0.69,45.6,2.59,0.18,100.0,84.9
+Off-Peak,200,996.84,994.42,994.45,994.41,2.41,0.25,32.0,0.01,0.0,0.0,0.0

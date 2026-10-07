@@ -1,0 +1,59 @@
+{
+  "model_type": "LightGBMRegressor",
+  "feature_cols": [
+    "hour",
+    "day_of_week",
+    "is_weekend",
+    "sin_hour",
+    "cos_hour",
+    "sin_dow",
+    "cos_dow",
+    "speed_lag_1h",
+    "speed_lag_2h",
+    "speed_lag_3h",
+    "speed_lag_6h",
+    "speed_lag_12h",
+    "speed_lag_24h",
+    "rolling_mean_3h",
+    "rolling_mean_6h",
+    "rolling_mean_24h",
+    "rolling_std_6h",
+    "rolling_std_24h",
+    "currentSpeed",
+    "freeFlowSpeed",
+    "speed_ratio",
+    "length_m",
+    "road_type_code",
+    "conf_code",
+    "hist_speed"
+  ],
+  "n_features": 25,
+  "best_iteration": 112,
+  "train_samples": 142799,
+  "val_samples": 30800,
+  "test_samples": 30800,
+  "train_date_range": [
+    "2026-01-05 00:00:00+00:00",
+    "2026-01-13 11:00:00+00:00"
+  ],
+  "val_date_range": [
+    "2026-01-13 12:00:00+00:00",
+    "2026-01-15 07:00:00+00:00"
+  ],
+  "test_date_range": [
+    "2026-01-15 08:00:00+00:00",
+    "2026-01-17 03:00:00+00:00"
+  ],
+  "speed_clipping": [
+    3.0,
+    120.0
+  ],
+  "peak_hours_ist": [
+    9,
+    10,
+    11,
+    17,
+    18,
+    19
+  ]
+}

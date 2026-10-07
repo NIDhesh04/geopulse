@@ -1,0 +1,6 @@
+variable_x,variable_y,pearson_r,pearson_p_value,spearman_rho,spearman_p_value,sample_size,statistical_interpretation
+Route Travel-Time Error (s),Oracle Regret (s),0.158,7.1518e-06,0.2757,2.04e-15,800,Statistically significant (positive correlation)
+Route Travel-Time Error (s),Improvement vs Static (s),0.0311,0.3798,0.0866,0.0143,800,Not significant (positive correlation)
+Network Speed MAE (km/h),Oracle Regret (s),0.1389,8.0692e-05,0.224,1.4808e-10,800,Statistically significant (positive correlation)
+Network Speed MAE (km/h),Oracle Gap (%),0.1469,3.0257e-05,0.2243,1.3966e-10,800,Statistically significant (positive correlation)
+Network Speed MAE (km/h),Improvement vs Static (%),-0.029,0.4128,-0.113,0.0014,800,Not significant (negative correlation)

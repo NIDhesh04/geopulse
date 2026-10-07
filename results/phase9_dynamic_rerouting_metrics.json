@@ -1,0 +1,29 @@
+{
+  "main_demo": {
+    "scenario_id": 0,
+    "od_id": 0,
+    "period": "Evening Peak",
+    "no_reroute_total_time_s": 1287.06,
+    "dynamic_reroute_total_time_s": 1202.15,
+    "time_saved_s": 84.9,
+    "improvement_pct": 6.6,
+    "initial_route_distance_m": 10981.64,
+    "final_route_distance_m": 10984.73,
+    "route_overlap": 0.6,
+    "decision_step": 15,
+    "reroute_triggered": true
+  },
+  "benchmark": {
+    "total_scenarios": 20,
+    "reroute_triggered_count": 8,
+    "reroute_frequency_pct": 40.0,
+    "beneficial_reroutes_count": 8,
+    "non_beneficial_reroutes_count": 0,
+    "mean_saving_seconds_overall": 33.96,
+    "median_saving_seconds_overall": 0.0,
+    "mean_improvement_pct_overall": 2.35,
+    "mean_saving_seconds_when_rerouted": 84.9,
+    "mean_improvement_pct_when_rerouted": 5.88,
+    "average_route_overlap": 0.8775
+  }
+}

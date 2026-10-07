@@ -1,0 +1,9 @@
+slice,count,mean_static_actual_time_s,median_static_actual_time_s,mean_ml_actual_time_s,median_ml_actual_time_s,mean_current_optimal_time_s,median_current_optimal_time_s,mean_improvement_over_static_pct,median_improvement_over_static_pct,ml_win_rate_pct,ml_match_oracle_pct,mean_oracle_regret_s,median_oracle_regret_s,mean_oracle_gap_pct,mean_static_ml_overlap,mean_ml_current_overlap,mean_distance_m,mean_dynamic_edge_fraction
+Overall,800,1066.81,1040.88,1063.08,1040.23,1060.75,1039.93,0.32,0.0,34.62,93.25,2.33,0.0,0.17,0.8797,0.9665,9276.25,0.353
+Period: Morning Peak,150,1060.51,1045.38,1060.24,1043.36,1057.39,1043.3,0.05,0.0,29.33,94.67,2.85,0.0,0.21,0.907,0.9654,9294.61,0.3563
+Period: Evening Peak,250,1134.42,1140.01,1125.85,1137.0,1123.26,1137.0,0.69,0.0,45.6,90.0,2.59,0.0,0.18,0.8239,0.9602,9234.3,0.3339
+Period: Midday,200,1057.01,1046.8,1055.42,1036.02,1051.48,1033.9,0.16,0.0,27.5,89.5,3.94,0.0,0.3,0.9043,0.9437,9289.47,0.358
+Period: Off-Peak,200,996.84,981.21,994.42,972.2,994.41,972.2,0.25,0.0,32.0,100.0,0.01,0.0,0.0,0.9043,0.9978,9301.7,0.3696
+Distance: Short (<4km),48,431.72,433.37,431.72,433.37,431.72,433.37,0.0,0.0,0.0,100.0,0.0,0.0,0.0,1.0,1.0,3172.28,0.1429
+Distance: Medium (4-8km),304,731.72,738.15,728.79,736.61,728.27,736.61,0.36,0.0,23.68,97.04,0.52,0.0,0.07,0.8719,0.9667,6029.51,0.3329
+Distance: Long (>8km),448,1362.24,1349.18,1357.57,1346.19,1353.76,1344.53,0.34,0.0,45.76,89.96,3.81,0.0,0.26,0.8721,0.9627,12133.4,0.3892

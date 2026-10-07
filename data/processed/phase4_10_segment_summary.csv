@@ -1,0 +1,11 @@
+segment_id,traffic_osmid,osmid_count,matching_edge_count,traffic_length_m,osm_total_length_m,length_ratio,direction_status,multi_id_connectivity,shared_osmid
+0,"[1209033472, 280421140, 1317533102]",3,1,3016.9979383186064,3017.0,1.0,clear,connected_chain,False
+4,873398460,1,4,1656.7999817793127,3947.45,2.38,ambiguous,single_id,True
+8,873398460,1,4,1452.9773308428084,3947.45,2.72,ambiguous,single_id,True
+17,26754491,1,7,1066.50914612262,2210.44,2.07,ambiguous,single_id,False
+19,464650412,1,7,1012.1732372373798,1554.81,1.54,ambiguous,single_id,False
+24,"[414500083, 875146659]",2,3,869.4487815342277,1392.81,1.6,ambiguous,connected_chain,False
+27,741818619,1,8,806.477181068368,2096.41,2.6,ambiguous,single_id,False
+33,"[364407161, 1317517332, 1318339357]",3,2,726.186014336685,1452.37,2.0,ambiguous,connected_chain,False
+40,279091485,1,1,592.3070665718152,592.31,1.0,clear,single_id,False
+51,"[279088741, 746487561, 746487564, 1317517914, 1317517916]",5,1,492.841002847525,492.84,1.0,clear,connected_chain,False

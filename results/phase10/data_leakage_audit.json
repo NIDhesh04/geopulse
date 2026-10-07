@@ -1,0 +1,23 @@
+{
+  "check_1_ml_feature_leakage": {
+    "status": "PASSED",
+    "details": "Features examined: 25. Forbidden tokens found: []",
+    "is_leak_free": true
+  },
+  "check_2_prediction_not_oracle": {
+    "status": "PASSED",
+    "details": "Total samples: 30800. Exact speed matches: 0. MAE: 0.9340 km/h.",
+    "is_leak_free": true
+  },
+  "check_3_route_planning_separation": {
+    "status": "PASSED",
+    "details": "Mean ML-Oracle route overlap: 0.9665 (demonstrates ML did not solve oracle directly).",
+    "is_leak_free": true
+  },
+  "check_4_dynamic_telemetry_quarantine": {
+    "status": "PASSED",
+    "details": "Mean divergence between t0 predicted plan and t1 actual observation: 17.79 s.",
+    "is_leak_free": true
+  },
+  "overall_leakage_audit_status": "ALL CHECKS PASSED"
+}

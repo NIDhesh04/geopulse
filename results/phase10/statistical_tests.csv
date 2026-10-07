@@ -1,0 +1,8 @@
+comparison,sample_size,mean_difference_s,median_difference_s,std_difference_s,ci95_lower_s,ci95_upper_s,cohens_d,normality_test_p_value,is_normal_distribution,paired_t_statistic,paired_t_p_value,wilcoxon_w_statistic,wilcoxon_p_value,recommended_primary_test,significance_verdict
+LightGBM Prediction vs Static Baseline,800,3.73,0.0,16.38,2.59,4.86,0.2276,4.5821e-45,False,6.4385,2.0804e-10,6272.0,2.7553e-31,Wilcoxon Signed-Rank Test,Statistically Significant (p < 0.01)
+Historical Baseline vs Static Baseline,800,3.72,0.0,16.47,2.57,4.86,0.2256,1.5655e-45,False,6.3806,2.985e-10,6044.0,1.2189e-32,Wilcoxon Signed-Rank Test,Statistically Significant (p < 0.01)
+Persistence Prediction vs Static Baseline,800,2.13,0.0,15.78,1.04,3.23,0.1353,3.2398e-43,False,3.8259,0.0001,13675.5,2.6655e-12,Wilcoxon Signed-Rank Test,Statistically Significant (p < 0.01)
+LightGBM Prediction vs Historical Baseline,800,0.01,0.0,2.0,-0.13,0.15,0.0065,0.0,False,0.1849,0.8533,68.0,0.1668,Wilcoxon Signed-Rank Test,Not Significant (p >= 0.05)
+LightGBM Prediction vs Persistence Prediction,800,1.59,0.0,10.16,0.89,2.3,0.1569,8.0813e-82,False,4.4368,1.041e-05,1489.0,7.6038e-13,Wilcoxon Signed-Rank Test,Statistically Significant (p < 0.01)
+Current-Traffic Oracle vs Static Baseline,800,6.06,0.0,13.52,5.12,7.0,0.4483,5.4209e-126,False,12.6795,1.0657e-33,0.0,1.431e-53,Wilcoxon Signed-Rank Test,Statistically Significant (p < 0.01)
+GeoPulse Dynamic Reroute vs No Rerouting (Baseline),20,33.96,0.0,42.68,15.26,52.67,0.7958,1.5949e-06,False,3.559,0.0021,0.0,0.0078,Wilcoxon Signed-Rank Test,Statistically Significant (p < 0.01)

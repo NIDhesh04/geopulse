@@ -1,0 +1,32 @@
+{
+  "scenario_id": "demo_scenario_0",
+  "origin_node": "3722327026",
+  "destination_node": "2443921849",
+  "departure_timestamp": "2026-01-15 19:30:00+05:30",
+  "observation_timestamp": "2026-01-15 20:30:00+05:30",
+  "decision_node": "3320289784",
+  "decision_step": 15,
+  "no_reroute_total_time_s": 1287.05,
+  "dynamic_reroute_total_time_s": 1202.15,
+  "time_saved_s": 84.9,
+  "improvement_pct": 6.6,
+  "initial_route_distance_m": 10981.64,
+  "final_route_distance_m": 10984.73,
+  "initial_route_edges": 74,
+  "final_route_edges": 46,
+  "route_overlap": 0.6,
+  "reroute_triggered": true,
+  "delta_T_s": 84.9,
+  "delta_T_pct": 9.23,
+  "threshold_seconds": 10.0,
+  "threshold_percent": 3.0,
+  "execution_times_ms": {
+    "cloud_prediction_broadcast_ms": 1.033,
+    "edge_weight_synthesis_ms": 12.653,
+    "edge_initial_dijkstra_ms": 60.305,
+    "edge_traffic_ingest_ms": 9.021,
+    "edge_reroute_dijkstra_ms": 20.327,
+    "edge_decision_evaluation_ms": 0.003,
+    "total_edge_decision_ms": 20.391
+  }
+}

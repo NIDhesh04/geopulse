@@ -1,0 +1,4 @@
+congestion_condition,evaluation_count,mean_network_speed_kmh,mean_static_time_s,mean_lightgbm_time_s,mean_oracle_time_s,mean_saving_vs_static_s,mean_improvement_vs_static_pct,win_rate_vs_static_pct,mean_oracle_regret_s,mean_oracle_gap_pct
+Low Congestion,250,34.76,1003.04,1000.87,1000.72,2.17,0.22,30.8,0.15,0.02
+Medium Congestion,250,31.55,1060.13,1059.1,1055.0,1.02,0.12,30.4,4.1,0.29
+High Congestion,300,29.1,1125.53,1118.25,1115.57,7.28,0.58,41.33,2.67,0.19

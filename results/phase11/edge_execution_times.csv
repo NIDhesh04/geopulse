@@ -1,0 +1,8 @@
+operation,execution_time_ms,tier
+cloud_prediction_broadcast_ms,1.033,Cloud
+edge_weight_synthesis_ms,12.653,Edge Server
+edge_initial_dijkstra_ms,60.305,Edge Server
+edge_traffic_ingest_ms,9.021,Edge Server
+edge_reroute_dijkstra_ms,20.327,Edge Server
+edge_decision_evaluation_ms,0.003,Edge Server
+total_edge_decision_ms,20.391,Edge Server

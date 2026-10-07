@@ -1,0 +1,20 @@
+{
+  "scenario_id": "demo_scenario_0",
+  "od_id": 0,
+  "source_node": "3722327026",
+  "destination_node": "2443921849",
+  "initial_timestamp": "2026-01-15 19:30:00+05:30",
+  "update_timestamp": "2026-01-15 20:30:00+05:30",
+  "decision_node": "3320289784",
+  "decision_step": 15,
+  "reroute_triggered": true,
+  "trigger_reason": "Degradation detected: Alternative saves 84.9s (9.2%), exceeding thresholds (10.0s / 3.0%).",
+  "total_time_no_reroute_s": 1287.06,
+  "total_time_dynamic_s": 1202.15,
+  "time_saved_s": 84.9,
+  "improvement_pct": 6.6,
+  "initial_route_edges": 74,
+  "new_route_edges": 46,
+  "changed_edges_count": 1,
+  "route_overlap": 0.6
+}

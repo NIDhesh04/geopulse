@@ -1,0 +1,203 @@
+{
+  "audit_status": "COMPLETE",
+  "project_name": "GeoPulse - AI-Based Dynamic Traffic Routing System",
+  "audit_scope": "Comprehensive Dataset and Project Folder Audit",
+  "canonical_dataset": "traffic_structured_v1.parquet",
+  "canonical_dataset_format": "Parquet",
+  "canonical_dataset_sha256": "039e07e43af8b79fd289b5644fc593a27f1fca993f0150e67030c8daff250447",
+  "archive_source": "geopulse smartroute/archive.zip",
+  "row_count": 275800,
+  "column_count": 17,
+  "observed_rows": 246399,
+  "missing_grid_rows": 29401,
+  "missing_percentage": 10.660261058738216,
+  "segment_count": 700,
+  "segment_id_min": 0,
+  "segment_id_max": 699,
+  "time_start_utc": "2025-12-31T19:00:00Z",
+  "time_end_utc": "2026-01-17T04:00:00Z",
+  "time_start_ist": "2026-01-01T00:30:00+05:30",
+  "time_end_ist": "2026-01-17T09:30:00+05:30",
+  "total_duration_hours": 393,
+  "temporal_frequency": "1 hour",
+  "hourly_buckets_count": 394,
+  "missing_global_hourly_buckets": 0,
+  "temporal_coverage_pattern": {
+    "front_loaded_missing_jan1_to_jan3": 29400,
+    "front_loaded_missing_percentage_of_all_nulls": 99.99659875514438,
+    "clean_window_start_ist": "2026-01-04T00:30:00+05:30",
+    "clean_window_end_ist": "2026-01-17T09:30:00+05:30",
+    "clean_window_duration_hours": 322,
+    "clean_window_total_cells": 225400,
+    "clean_window_observed_cells": 225399,
+    "clean_window_missing_cells": 1,
+    "clean_window_completeness_pct": 99.99955634427684
+  },
+  "traffic_speed_validation": {
+    "current_speed_min_kmh": 1.0,
+    "current_speed_max_kmh": 54.0,
+    "current_speed_mean_kmh": 33.13746,
+    "current_speed_median_kmh": 32.0,
+    "current_speed_std_kmh": 8.96991,
+    "free_flow_speed_min_kmh": 16.0,
+    "free_flow_speed_max_kmh": 55.0,
+    "free_flow_speed_mean_kmh": 35.05808,
+    "free_flow_speed_median_kmh": 34.0,
+    "free_flow_speed_std_kmh": 8.51863,
+    "zero_or_negative_speeds": 0,
+    "current_exceeds_free_flow_count": 0,
+    "current_equals_free_flow_count": 166828,
+    "current_equals_free_flow_pct": 67.70644361381336,
+    "road_closure_observed_count": 25374,
+    "road_closure_observed_pct": 10.297931403942385
+  },
+  "travel_time_validation": {
+    "consistency_status": "FAILED_PHYSICAL_CHECK",
+    "evaluation_formula": "length_m / (speed_kmh / 3.6)",
+    "current_travel_time_mae_sec": 1440.0072,
+    "current_travel_time_median_ae_sec": 1551.293,
+    "current_travel_time_max_ae_sec": 3202.7119,
+    "current_travel_time_median_relative_error": 90.6329,
+    "current_travel_time_correlation_with_physical": -0.1334,
+    "current_travel_time_within_10pct_pct": 0.1457,
+    "free_flow_travel_time_mae_sec": 1351.8345,
+    "free_flow_travel_time_median_ae_sec": 1376.7213,
+    "free_flow_travel_time_median_relative_error": 90.6329,
+    "free_flow_travel_time_correlation_with_physical": -0.1249,
+    "free_flow_travel_time_within_10pct_pct": 0.1457,
+    "recommendation": "DO NOT use stored travel-time columns for Dijkstra routing. Compute edge costs deterministically from validated edge length and predicted speed."
+  },
+  "graph_feasibility": true,
+  "graph_feasibility_details": {
+    "meaning": "A directed full-city route graph is available from the committed OSM GraphML; traffic data alone cannot define graph topology.",
+    "traffic_data_alone_sufficient": false,
+    "graph_present_in_current_working_tree": false,
+    "graph_available_in_git_head": true,
+    "graph_git_blob_sha1": "da960993ca28ce4443c674eb98799c86d0f3934f",
+    "graph_bytes": 18569800,
+    "restored_to_working_tree": false,
+    "rechecked_from_temporary_copy": true,
+    "full_directed_graph": {
+      "nodes": 18260,
+      "edges": 46679,
+      "weakly_connected_components": 1,
+      "largest_component_nodes": 18260,
+      "strongly_connected_components": 15,
+      "largest_strongly_connected_component_nodes": 18230,
+      "largest_scc_node_pct": 99.8357
+    },
+    "traffic_mapping": {
+      "candidate_segments_matched": 700,
+      "segments_with_osm_id_evidence": 700,
+      "road_class_match_pct": 100.0,
+      "centroid_to_candidate_edge_distance_m": {
+        "median": 0.135,
+        "p95": 6.4351,
+        "max": 87.4905
+      },
+      "matching_is_independent_validation": false,
+      "improved_best_edge_weak_components": 221,
+      "improved_best_edge_largest_edges": 19,
+      "improved_best_edge_largest_segments": 25,
+      "improved_best_edge_largest_segment_pct": 3.5714,
+      "all_supplied_osm_ids_weak_components": 44,
+      "all_supplied_osm_ids_largest_edges": 100,
+      "all_supplied_osm_ids_largest_segments": 59,
+      "all_supplied_osm_ids_largest_segment_pct": 8.4286,
+      "unique_mapped_directed_edges": 651,
+      "unique_mapped_undirected_endpoint_pairs": 648,
+      "mapped_physical_edges_pct_of_full_undirected_graph": 2.6446
+    },
+    "multi_osm_id_geometry_check": {
+      "segments_with_multiple_ids": 87,
+      "all_ids_present_in_graph_for_segments": 87,
+      "topologically_connected_id_groups": 85,
+      "groups_with_one_geometry_component": 0,
+      "disconnected_or_ambiguous_groups": 2,
+      "combined_geometry_to_traffic_length_ratio_median": 2.57,
+      "combined_geometry_to_traffic_length_ratio_min": 0.995,
+      "combined_geometry_to_traffic_length_ratio_max": 31.986
+    },
+    "duplicate_and_overlap_screen": {
+      "previous_mapping_repeated_directed_endpoint_pairs": 55,
+      "improved_mapping_repeated_directed_endpoint_pairs": 49,
+      "centroid_pairs_screened_within_100m": 525,
+      "inferred_duplicate_pairs": 47,
+      "adjacent_pairs": 137,
+      "unrelated_pairs": 341,
+      "overlap_classifications_are_confirmed_provider_duplicates": false
+    },
+    "sampled_full_graph_routing": {
+      "ordered_od_pairs": 100,
+      "routes_succeeded": 100,
+      "routes_failed": 0,
+      "cost_used": "projected OSM geometry length",
+      "dynamic_coverage_mean_pct": 14.0736,
+      "dynamic_coverage_median_pct": 11.5207,
+      "dynamic_coverage_min_pct": 0.0,
+      "dynamic_coverage_max_pct": 58.3333,
+      "routes_over_25pct_dynamic_coverage_pct": 17.0,
+      "routes_over_50pct_dynamic_coverage_pct": 3.0,
+      "route_sample_is_benefit_evaluation": false
+    },
+    "dynamic_traffic_routing_feasible_for_citywide_claim": false,
+    "centroid_proximity_is_endpoint_connectivity": false,
+    "conclusion": "The full OSM graph is connected and can support static fallback routes. Traffic mapping is sparse, fragmented, direction-ambiguous, and has suspicious multi-ID length compatibility; do not claim citywide dynamic-routing benefit from this mapping."
+  },
+  "ml_feasibility": true,
+  "ml_feasibility_details": {
+    "task": "Next-hour speed prediction: X(t) -> speed(t+1) in km/h",
+    "clean_window_hours": 322,
+    "lag24_feasible": true,
+    "train_target_hours_ist": [
+      "2026-01-05T01:30:00+05:30",
+      "2026-01-13T08:30:00+05:30"
+    ],
+    "validation_target_hours_ist": [
+      "2026-01-13T09:30:00+05:30",
+      "2026-01-15T08:30:00+05:30"
+    ],
+    "test_target_hours_ist": [
+      "2026-01-15T09:30:00+05:30",
+      "2026-01-17T09:30:00+05:30"
+    ],
+    "train_samples": 139994,
+    "validation_samples": 33599,
+    "test_samples": 34300,
+    "total_usable_samples": 207893,
+    "split_ratio_approx": "67.34 / 16.16 / 16.50 percent of usable samples; time cut points are approximately 70/15/15 percent of the clean window after lag warm-up",
+    "split_method": "Strict chronological, non-random",
+    "temporal_autocorrelation": {
+      "lag1_mean": 0.5751,
+      "lag3_mean": 0.1746,
+      "lag6_mean": 0.0138,
+      "lag12_mean": -0.3972,
+      "lag24_mean": 0.5851
+    },
+    "limitations": [
+      "Duration spans 16.4 days total (13.4 clean days), preventing seasonal or annual generalization claims.",
+      "67.7% ceiling effect (currentSpeed == freeFlowSpeed) leads to bounded distribution.",
+      "Single-step prediction does not prove multi-step recursive autoregressive stability."
+    ]
+  },
+  "data_leakage_risks": [
+    "Target speed at t+1 must never be present in feature set at t.",
+    "Same-timestamp currentTravelTime, speed_ratio, and congestion_level derive from currentSpeed(t) and must be lagged before predicting speed(t+1).",
+    "The CSV file sets is_congested=False on missing rows, creating an artificial negative label if unobserved rows are not filtered.",
+    "The CSV calendar features (hour_of_day, day_of_week) are based on UTC, lagging local diurnal patterns by 5.5 hours; local features must be derived in Asia/Kolkata.",
+    "freeFlowSpeed varies over time for 671 segments; it must only be used if verified to be an ex-ante time-of-day profile."
+  ],
+  "synthetic_data_required": false,
+  "synthetic_data_reason": "Real observed traffic data (246,399 rows) is fully sufficient for training the next-hour speed prediction model and running real-world traffic replay. Held-out test sets contain genuine peak-hour congestion dips and 25,374 real roadClosure events. Synthetic data is ONLY optional for simulating a controlled dynamic incident perturbation during rerouting demonstrations, and if used, must be generated as a separate labelled runtime overlay.",
+  "recommended_preprocessing": [
+    "Adopt traffic_structured_v1.parquet as the single canonical processed dataset.",
+    "Filter all ML modeling to is_observed == True.",
+    "Exclude the front-loaded missing period (Jan 1 - Jan 3) and use the 322-hour clean window (Jan 4 - Jan 17).",
+    "Compute local calendar features strictly in Asia/Kolkata (IST).",
+    "Construct strict backward-looking lags (t, t-1, t-2, t-3, t-6, t-12, t-24) per segment_id.",
+    "Discard stored currentTravelTime and freeFlowTravelTime columns for routing cost calculation.",
+    "Do NOT clip or alter observed speeds (ranges 1 to 54 km/h are valid urban speeds)."
+  ],
+  "recommended_next_step": "Recover and version the committed Bhubaneswar GraphML after reviewing its tracked deletion; independently validate traffic-edge identity, direction, length compatibility, and dynamic coverage before any dynamic-routing evaluation.",
+  "final_recommendation": "A chronological next-hour speed-prediction pilot is feasible after preprocessing. Static routing on the full connected OSM graph is feasible, but dynamic-routing claims must wait for improved, independently validated traffic-edge mapping and resolution of the stored travel-time inconsistency."
+}
