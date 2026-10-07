@@ -1,0 +1,11 @@
+{
+  "total_segments": 700,
+  "segments_matched": 700,
+  "full_way_matches": 21,
+  "subsegment_matches": 592,
+  "multi_way_chain_matches": 87,
+  "G_seg_nodes": 888,
+  "G_seg_directed_edges": 760,
+  "length_diff_median_m": 0.00019832667771879642,
+  "length_diff_p95_m": 438.3687755589059
+}

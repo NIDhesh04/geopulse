@@ -1,0 +1,54 @@
+== DuckDB objects in traffic_v1.duckdb ==
+
+--- main.traffic (BASE TABLE) rows=275800
+   segment_id                BIGINT
+   hour                      TIMESTAMP WITH TIME ZONE
+   timestamp                 TIMESTAMP WITH TIME ZONE
+   currentSpeed              DOUBLE
+   freeFlowSpeed             DOUBLE
+   currentTravelTime         DOUBLE
+   freeFlowTravelTime        DOUBLE
+   confidence                DOUBLE
+   is_observed               BOOLEAN
+   is_missing                BOOLEAN
+   roadClosure               BOOLEAN
+   osmid                     VARCHAR
+   road_name                 DOUBLE
+   road_type                 VARCHAR
+   length_m                  DOUBLE
+   lat                       DOUBLE
+   lon                       DOUBLE
+   segment_id                      hour                 timestamp  currentSpeed  freeFlowSpeed  currentTravelTime  freeFlowTravelTime  confidence  is_observed  is_missing  roadClosure                                osmid  road_name road_type     length_m       lat        lon
+0           0 2026-01-01 00:30:00+05:30 2026-01-01 01:09:50+05:30          54.0           54.0             1376.0              1376.0         1.0         True       False        False  [1209033472, 280421140, 1317533102]        0.0     trunk  3016.997938  20.28395  85.806267
+1           0 2026-01-01 01:30:00+05:30                       NaT           NaN            NaN                NaN                 NaN         NaN        False        True         <NA>                                 None        NaN      None          NaN       NaN        NaN
+2           0 2026-01-01 02:30:00+05:30                       NaT           NaN            NaN                NaN                 NaN         NaN        False        True         <NA>                                 None        NaN      None          NaN       NaN        NaN
+3           0 2026-01-01 03:30:00+05:30                       NaT           NaN            NaN                NaN                 NaN         NaN        False        True         <NA>                                 None        NaN      None          NaN       NaN        NaN
+4           0 2026-01-01 04:30:00+05:30                       NaT           NaN            NaN                NaN                 NaN         NaN        False        True         <NA>                                 None        NaN      None          NaN       NaN        NaN
+
+== Parquet traffic_structured_v1.parquet: rows=275800
+   segment_id                int64
+   hour                      timestamp[ns, tz=UTC]
+   timestamp                 timestamp[ns, tz=UTC]
+   currentSpeed              double
+   freeFlowSpeed             double
+   currentTravelTime         double
+   freeFlowTravelTime        double
+   confidence                double
+   is_observed               bool
+   is_missing                bool
+   roadClosure               bool
+   osmid                     string
+   road_name                 double
+   road_type                 string
+   length_m                  double
+   lat                       double
+   lon                       double
+   segment_id                      hour                 timestamp  currentSpeed  freeFlowSpeed  currentTravelTime  freeFlowTravelTime  confidence  is_observed  is_missing roadClosure                                osmid  road_name road_type     length_m       lat        lon
+0           0 2025-12-31 19:00:00+00:00 2025-12-31 19:39:50+00:00          54.0           54.0             1376.0              1376.0         1.0         True       False       False  [1209033472, 280421140, 1317533102]        0.0     trunk  3016.997938  20.28395  85.806267
+1           0 2025-12-31 20:00:00+00:00                       NaT           NaN            NaN                NaN                 NaN         NaN        False        True        None                                 None        NaN      None          NaN       NaN        NaN
+2           0 2025-12-31 21:00:00+00:00                       NaT           NaN            NaN                NaN                 NaN         NaN        False        True        None                                 None        NaN      None          NaN       NaN        NaN
+3           0 2025-12-31 22:00:00+00:00                       NaT           NaN            NaN                NaN                 NaN         NaN        False        True        None                                 None        NaN      None          NaN       NaN        NaN
+4           0 2025-12-31 23:00:00+00:00                       NaT           NaN            NaN                NaN                 NaN         NaN        False        True        None                                 None        NaN      None          NaN       NaN        NaN
+
+Columns in DuckDB but not CSV: ['lat', 'length_m', 'lon', 'osmid', 'roadClosure', 'road_name', 'road_type', 'timestamp']
+Columns in Parquet but not CSV: ['lat', 'length_m', 'lon', 'osmid', 'roadClosure', 'road_name', 'road_type', 'timestamp']

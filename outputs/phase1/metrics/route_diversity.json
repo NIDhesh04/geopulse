@@ -1,0 +1,27 @@
+{
+  "network": "G_seg (Traffic Segments Alone)",
+  "largest_wcc_nodes": 15,
+  "pairs_tested_in_lcc": 105,
+  "connected_pairs_found": 105,
+  "pairs_with_at_least_one_alternative_path": 0,
+  "alternative_path_availability_pct": 0.0,
+  "cyclomatic_complexity": 0,
+  "traffic_dependent_route_change_rate_pct": 0.0,
+  "scenarios": {
+    "A_free_flow": {
+      "route_diversity": "Zero alternatives available (unique tree path)",
+      "rerouting_possible": false
+    },
+    "B_most_congested_hour": {
+      "timestamp_utc": "2026-01-09 13:00:00+00:00",
+      "route_changed_vs_free_flow_pct": 0.0,
+      "reason": "Tree topology forces identical traversal regardless of congestion"
+    },
+    "C_evening_peak": {
+      "timestamp_utc": "2026-01-09 13:00:00+00:00",
+      "route_changed_vs_free_flow_pct": 0.0,
+      "reason": "No alternative edges exist to bypass congestion"
+    }
+  },
+  "critical_finding": "G_seg alone is topologically incapable of supporting dynamic rerouting. Because the 700 traffic segments are isolated linear corridors with cyclomatic number 0, no alternative simple paths exist between any origin and destination."
+}

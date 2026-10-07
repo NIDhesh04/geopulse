@@ -1,0 +1,191 @@
+{
+  "duckdb": {
+    "main.traffic": {
+      "type": "BASE TABLE",
+      "rows": 275800,
+      "columns": [
+        {
+          "name": "segment_id",
+          "dtype": "BIGINT"
+        },
+        {
+          "name": "hour",
+          "dtype": "TIMESTAMP WITH TIME ZONE"
+        },
+        {
+          "name": "timestamp",
+          "dtype": "TIMESTAMP WITH TIME ZONE"
+        },
+        {
+          "name": "currentSpeed",
+          "dtype": "DOUBLE"
+        },
+        {
+          "name": "freeFlowSpeed",
+          "dtype": "DOUBLE"
+        },
+        {
+          "name": "currentTravelTime",
+          "dtype": "DOUBLE"
+        },
+        {
+          "name": "freeFlowTravelTime",
+          "dtype": "DOUBLE"
+        },
+        {
+          "name": "confidence",
+          "dtype": "DOUBLE"
+        },
+        {
+          "name": "is_observed",
+          "dtype": "BOOLEAN"
+        },
+        {
+          "name": "is_missing",
+          "dtype": "BOOLEAN"
+        },
+        {
+          "name": "roadClosure",
+          "dtype": "BOOLEAN"
+        },
+        {
+          "name": "osmid",
+          "dtype": "VARCHAR"
+        },
+        {
+          "name": "road_name",
+          "dtype": "DOUBLE"
+        },
+        {
+          "name": "road_type",
+          "dtype": "VARCHAR"
+        },
+        {
+          "name": "length_m",
+          "dtype": "DOUBLE"
+        },
+        {
+          "name": "lat",
+          "dtype": "DOUBLE"
+        },
+        {
+          "name": "lon",
+          "dtype": "DOUBLE"
+        }
+      ]
+    }
+  },
+  "parquet": {
+    "rows": 275800,
+    "columns": [
+      {
+        "name": "segment_id",
+        "dtype": "int64"
+      },
+      {
+        "name": "hour",
+        "dtype": "timestamp[ns, tz=UTC]"
+      },
+      {
+        "name": "timestamp",
+        "dtype": "timestamp[ns, tz=UTC]"
+      },
+      {
+        "name": "currentSpeed",
+        "dtype": "double"
+      },
+      {
+        "name": "freeFlowSpeed",
+        "dtype": "double"
+      },
+      {
+        "name": "currentTravelTime",
+        "dtype": "double"
+      },
+      {
+        "name": "freeFlowTravelTime",
+        "dtype": "double"
+      },
+      {
+        "name": "confidence",
+        "dtype": "double"
+      },
+      {
+        "name": "is_observed",
+        "dtype": "bool"
+      },
+      {
+        "name": "is_missing",
+        "dtype": "bool"
+      },
+      {
+        "name": "roadClosure",
+        "dtype": "bool"
+      },
+      {
+        "name": "osmid",
+        "dtype": "string"
+      },
+      {
+        "name": "road_name",
+        "dtype": "double"
+      },
+      {
+        "name": "road_type",
+        "dtype": "string"
+      },
+      {
+        "name": "length_m",
+        "dtype": "double"
+      },
+      {
+        "name": "lat",
+        "dtype": "double"
+      },
+      {
+        "name": "lon",
+        "dtype": "double"
+      }
+    ],
+    "key_value_metadata": {
+      "pandas": "{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\": \"segment_id\", \"field_name\": \"segment_id\", \"pandas_type\": \"int64\", \"numpy_type\": \"int64\", \"metadata\": null}, {\"name\": \"hour\", \"field_name\": \"hour\", \"pandas_type\": \"datetimetz\", \"numpy_type\": \"datetime64[ns]\", \"metadata\": {\"timezone\": \"UTC\"}}, {\"name\": \"timestamp\", \"field_name\": \"timestamp\", \"pandas_type\": \"datetimetz\", \"numpy_type\": \"datetime64[ns]\", \"metadata\": {\"timezone\": \"UTC\"}}, {\"name\": \"currentSpeed\", \"field_name\": \"currentSp"
+    }
+  },
+  "csv_columns": [
+    "segment_id",
+    "hour",
+    "hour_of_day",
+    "day_of_week",
+    "is_weekend",
+    "currentSpeed",
+    "freeFlowSpeed",
+    "currentTravelTime",
+    "freeFlowTravelTime",
+    "confidence",
+    "speed_ratio",
+    "congestion_level",
+    "is_congested",
+    "is_observed",
+    "is_missing"
+  ],
+  "columns_in_duckdb_not_csv": [
+    "lat",
+    "length_m",
+    "lon",
+    "osmid",
+    "roadClosure",
+    "road_name",
+    "road_type",
+    "timestamp"
+  ],
+  "columns_in_parquet_not_csv": [
+    "lat",
+    "length_m",
+    "lon",
+    "osmid",
+    "roadClosure",
+    "road_name",
+    "road_type",
+    "timestamp"
+  ]
+}

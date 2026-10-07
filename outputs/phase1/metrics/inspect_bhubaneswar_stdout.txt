@@ -1,0 +1,290 @@
+﻿{
+ "rows": 275800,
+ "columns": 15,
+ "column_names": [
+  "segment_id",
+  "hour",
+  "hour_of_day",
+  "day_of_week",
+  "is_weekend",
+  "currentSpeed",
+  "freeFlowSpeed",
+  "currentTravelTime",
+  "freeFlowTravelTime",
+  "confidence",
+  "speed_ratio",
+  "congestion_level",
+  "is_congested",
+  "is_observed",
+  "is_missing"
+ ],
+ "unique_segments": 700,
+ "segment_id_min": 0,
+ "segment_id_max": 699,
+ "unique_hours": 394,
+ "min_hour_utc": "2025-12-31 19:00:00+00:00",
+ "max_hour_utc": "2026-01-17 04:00:00+00:00",
+ "min_hour_ist": "2026-01-01 00:30:00+05:30",
+ "max_hour_ist": "2026-01-17 09:30:00+05:30",
+ "span_hours": 394.0,
+ "full_hourly_grid_len": 394,
+ "hours_missing_from_grid": 0,
+ "expected_rows_segments_x_hours": 275800,
+ "duplicate_segment_hour_rows": 0,
+ "rows_per_segment_min": 394,
+ "rows_per_segment_max": 394,
+ "is_regular_grid": true,
+ "unique_days_utc": 18,
+ "unique_days_ist": 17,
+ "hour_of_day_col_matches_utc": 1.0,
+ "hour_of_day_col_matches_ist": 0.0,
+ "day_of_week_col_matches_utc": 1.0,
+ "is_observed_true": 246399,
+ "is_observed_false": 29401,
+ "is_missing_true": 29401,
+ "observed_and_missing_consistent": true,
+ "observed_pct": 89.33973894126179,
+ "weekend_rows": 70700,
+ "weekday_rows": 205100,
+ "congestion_level_counts": {
+  "free_flow": 180661,
+  "mild": 61403,
+  "NaN": 29401,
+  "moderate": 4281,
+  "severe": 54
+ }
+}
+{
+ "segment_missing_pct": {
+  "count": 700.0,
+  "mean": 10.660261058738216,
+  "std": 1.7775831504233477,
+  "min": 8.883248730964468,
+  "25%": 8.883248730964468,
+  "50%": 10.786802030456853,
+  "75%": 12.436548223350254,
+  "max": 12.436548223350254
+ },
+ "segments_with_0pct_missing": 0,
+ "segments_missing_gt_20pct": 0,
+ "segments_missing_gt_50pct": 0,
+ "best_segments": {
+  "0": 8.88,
+  "1": 8.88,
+  "2": 8.88,
+  "3": 8.88,
+  "4": 8.88
+ },
+ "worst_segments": {
+  "350": 12.44,
+  "351": 12.44,
+  "352": 12.44,
+  "353": 12.44,
+  "354": 12.44,
+  "355": 12.44,
+  "356": 12.44,
+  "357": 12.44,
+  "358": 12.44,
+  "359": 12.44
+ },
+ "timestamp_missing_pct": {
+  "count": 394.0,
+  "mean": 10.660261058738216,
+  "std": 29.42300951160788,
+  "min": 0.0,
+  "25%": 0.0,
+  "50%": 0.0,
+  "75%": 0.0,
+  "max": 100.0
+ },
+ "hours_fully_missing": 35,
+ "hours_ge90pct_missing": 35,
+ "hours_fully_observed": 344,
+ "worst_hours": {
+  "2025-12-31 20:00:00+00:00": 100.0,
+  "2025-12-31 21:00:00+00:00": 100.0,
+  "2025-12-31 22:00:00+00:00": 100.0,
+  "2025-12-31 23:00:00+00:00": 100.0,
+  "2026-01-01 00:00:00+00:00": 100.0,
+  "2026-01-01 01:00:00+00:00": 100.0,
+  "2026-01-01 02:00:00+00:00": 100.0,
+  "2026-01-01 03:00:00+00:00": 100.0,
+  "2026-01-01 04:00:00+00:00": 100.0,
+  "2026-01-01 05:00:00+00:00": 100.0,
+  "2026-01-01 06:00:00+00:00": 100.0,
+  "2026-01-01 07:00:00+00:00": 100.0,
+  "2026-01-01 08:00:00+00:00": 100.0,
+  "2026-01-01 09:00:00+00:00": 100.0,
+  "2026-01-01 10:00:00+00:00": 100.0
+ },
+ "missing_by_ist_hour_of_day": {
+  "0": 11.76,
+  "1": 11.76,
+  "2": 11.76,
+  "3": 11.76,
+  "4": 11.76,
+  "5": 11.76,
+  "6": 11.76,
+  "7": 11.76,
+  "8": 11.76,
+  "9": 11.76,
+  "10": 12.5,
+  "11": 12.51,
+  "12": 9.38,
+  "13": 9.38,
+  "14": 9.38,
+  "15": 9.38,
+  "16": 9.38,
+  "17": 9.38,
+  "18": 9.38,
+  "19": 9.38,
+  "20": 9.38,
+  "21": 9.38,
+  "22": 9.38,
+  "23": 9.38
+ },
+ "gap_runs_total": 701,
+ "gap_run_length_dist": {
+  "1": 1,
+  "35": 350,
+  "49": 350
+ },
+ "gap_runs_len1": 1,
+ "gap_runs_len_le3": 1,
+ "gap_runs_len_ge6": 700,
+ "gap_runs_len_ge24": 700,
+ "max_gap_h": 49,
+ "missing_rows_in_runs_ge6": 29400,
+ "leading_gap_note": "first grid hour per segment is 50.0% observed"
+}
+                       count      mean      std     min      1%       5%       25%     50%     75%     95%     99%     max  nulls_in_observed  negatives  zeros  non_integer
+field                                                                                                                                                                       
+currentSpeed        246399.0    33.137    8.970   1.000  19.000   21.000    27.000    32.0    38.0    53.0    54.0    54.0                  0          0      0            0
+freeFlowSpeed       246399.0    35.058    8.519  16.000  21.000   26.000    28.000    34.0    43.0    54.0    54.0    55.0                  0          0      0            0
+currentTravelTime   246399.0  1464.786  719.576   2.000  74.000  254.000  1015.000  1565.0  1946.0  2718.0  2945.0  3213.0                  0          0      0            0
+freeFlowTravelTime  246399.0  1375.152  676.654   2.000  71.000  254.000   998.000  1391.0  1723.0  2618.0  2718.0  2718.0                  0          0      0            0
+confidence          246399.0     0.977    0.075   0.505   0.574    0.827     1.000     1.0     1.0     1.0     1.0     1.0                  0          0      0        42873
+speed_ratio         246399.0     0.944    0.093   0.053   0.667    0.750     0.889     1.0     1.0     1.0     1.0     1.0                  0          0      0        79571
+{
+ "nonobserved_rows_all_traffic_null": true,
+ "nonobserved_congestion_level_null": true,
+ "nonobserved_is_congested_values": {
+  "false": 29401
+ },
+ "observed_rows_with_any_null_traffic": 0,
+ "currentSpeed_le_0": 0,
+ "currentSpeed_gt_freeFlowSpeed": 0,
+ "currentSpeed_eq_freeFlowSpeed": 166828,
+ "currentTT_lt_freeFlowTT": 0,
+ "currentTT_eq_freeFlowTT": 166828,
+ "speed_ratio_gt_1": 0,
+ "speed_ratio_lt_0": 0,
+ "speed_ratio_equals_cs_over_ffs_maxabs": 1.1102230246251565e-16,
+ "speed_ratio_vs_tt_ratio_maxabs": 0.13333333333333341,
+ "speed_ratio_vs_tt_ratio_p99abs": 0.0013138138138137911,
+ "corr_speed_ratio_tt_ratio": 0.9998645792238385,
+ "congestion_level_speed_ratio_ranges": {
+  "severe": {
+   "min": 0.0526315789473684,
+   "max": 0.3928571428571428,
+   "count": 54
+  },
+  "moderate": {
+   "min": 0.4137931034482758,
+   "max": 0.6976744186046512,
+   "count": 4281
+  },
+  "mild": {
+   "min": 0.7,
+   "max": 0.896551724137931,
+   "count": 61403
+  },
+  "free_flow": {
+   "min": 0.9,
+   "max": 1.0,
+   "count": 180661
+  }
+ },
+ "is_congested_speed_ratio_ranges": {
+  "False": {
+   "min": 0.7,
+   "max": 1.0,
+   "count": 242064
+  },
+  "True": {
+   "min": 0.0526315789473684,
+   "max": 0.6976744186046512,
+   "count": 4335
+  }
+ },
+ "confidence_unique_values": 6458,
+ "confidence_eq_1_pct": 82.60017289031205,
+ "confidence_lt_0_7_pct": 2.3961136205909925,
+ "roadClosure_column_present": false,
+ "implied_length_cur_vs_ff_rel_diff_median": 0.0,
+ "implied_length_cur_vs_ff_rel_diff_p95": 0.00039142112864253925,
+ "per_segment_ff_length_cv_median": 6.947831393867067e-05,
+ "per_segment_ff_length_cv_p95": 0.0005199937196782979,
+ "segments_constant_freeFlowSpeed": 29,
+ "segments_constant_freeFlowTT": 29,
+ "implied_ff_length_m_summary": {
+  "count": 700.0,
+  "mean": 13667.473809523808,
+  "std": 7174.520349108449,
+  "min": 11.11111111111111,
+  "25%": 8481.111111111111,
+  "50%": 19116.666666666668,
+  "75%": 19997.222222222223,
+  "max": 21420.0
+ },
+ "fftt_median_s_summary": {
+  "count": 700.0,
+  "mean": 1373.9742857142858,
+  "std": 674.3556067212389,
+  "min": 2.0,
+  "25%": 998.0,
+  "50%": 1376.0,
+  "75%": 1723.0,
+  "max": 2618.0
+ }
+}
+{
+ "parquet_rows": 275800,
+ "parquet_cols": [
+  "segment_id",
+  "hour",
+  "timestamp",
+  "currentSpeed",
+  "freeFlowSpeed",
+  "currentTravelTime",
+  "freeFlowTravelTime",
+  "confidence",
+  "is_observed",
+  "is_missing",
+  "roadClosure",
+  "osmid",
+  "road_name",
+  "road_type",
+  "length_m",
+  "lat",
+  "lon"
+ ],
+ "extra_cols_vs_csv": [
+  "lat",
+  "length_m",
+  "lon",
+  "osmid",
+  "roadClosure",
+  "road_name",
+  "road_type",
+  "timestamp"
+ ],
+ "missing_cols_vs_csv": [
+  "congestion_level",
+  "day_of_week",
+  "hour_of_day",
+  "is_congested",
+  "is_weekend",
+  "speed_ratio"
+ ]
+}

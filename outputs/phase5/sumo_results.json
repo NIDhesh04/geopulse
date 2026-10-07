@@ -1,0 +1,23 @@
+{
+  "veh_static": {
+    "depart_time": 0.0,
+    "arrival_time": 758.57,
+    "travel_duration_seconds": 758.57,
+    "travel_duration_minutes": 12.64,
+    "total_distance_km": 8.49
+  },
+  "veh_predictive": {
+    "depart_time": 0.0,
+    "arrival_time": 759.14,
+    "travel_duration_seconds": 759.14,
+    "travel_duration_minutes": 12.65,
+    "total_distance_km": 8.46
+  },
+  "veh_dynamic": {
+    "depart_time": 0.0,
+    "arrival_time": 759.14,
+    "travel_duration_seconds": 759.14,
+    "travel_duration_minutes": 12.65,
+    "total_distance_km": 8.46
+  }
+}

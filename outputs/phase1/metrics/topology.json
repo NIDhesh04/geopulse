@@ -1,0 +1,85 @@
+{
+  "G_seg": {
+    "graph": "G_seg (Traffic Segments)",
+    "nodes": 888,
+    "directed_edges": 760,
+    "undirected_edges": 624,
+    "degree_undirected": {
+      "min": 1,
+      "max": 4,
+      "mean": 1.4054054054054055,
+      "median": 1.0,
+      "dist": {
+        "1": 538,
+        "2": 341,
+        "3": 8,
+        "4": 1
+      }
+    },
+    "in_degree_mean": 0.8558558558558559,
+    "out_degree_mean": 0.8558558558558559,
+    "dead_ends_undirected_deg1": 538,
+    "dead_ends_pct": 60.58558558558559,
+    "directed_sinks_out0": 254,
+    "directed_sources_in0": 251,
+    "junctions_deg_ge3": 9,
+    "junctions_deg_ge3_pct": 1.0135135135135136,
+    "n_weak_components": 264,
+    "component_size_dist": {
+      "2": 117,
+      "3": 58,
+      "4": 42,
+      "5": 20,
+      "6": 10,
+      "7": 4,
+      "8": 8,
+      "9": 1,
+      "10": 1,
+      "11": 1,
+      "15": 2
+    },
+    "largest_wcc_nodes": 15,
+    "largest_wcc_nodes_pct": 1.6891891891891893,
+    "largest_wcc_edges": 14,
+    "largest_wcc_edges_pct": 1.8421052631578945,
+    "n_strong_components": 842,
+    "scc_size_dist": {
+      "1": 813,
+      "2": 19,
+      "3": 6,
+      "4": 3,
+      "7": 1
+    },
+    "largest_scc_nodes": 7,
+    "largest_scc_nodes_pct": 0.7882882882882882,
+    "largest_scc_edges": 24,
+    "cyclomatic_number_undirected": 0,
+    "largest_cc_cyclomatic": 0,
+    "largest_cc_bridges": 14,
+    "largest_cc_bridge_pct": 100.0
+  },
+  "wcc_top10_sizes": [
+    15,
+    15,
+    11,
+    10,
+    9,
+    8,
+    8,
+    8,
+    8,
+    8
+  ],
+  "scc_top10_sizes": [
+    7,
+    4,
+    4,
+    4,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3
+  ]
+}

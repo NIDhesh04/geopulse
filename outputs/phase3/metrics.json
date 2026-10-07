@@ -1,0 +1,21 @@
+{
+  "train_rows": 181646,
+  "test_rows": 62300,
+  "train_hours": 266,
+  "test_hours": 89,
+  "split_timestamp": "2026-01-13 12:00:00+00:00",
+  "features": [
+    "hour_sin",
+    "hour_cos",
+    "day_sin",
+    "day_cos",
+    "is_weekend_num",
+    "freeFlowSpeed",
+    "speed_t-1",
+    "speed_t-2",
+    "speed_t-3"
+  ],
+  "test_mae_kmh": 0.962831314073137,
+  "test_rmse_kmh": 1.8285550716826364,
+  "test_r2": 0.9582868222734986
+}

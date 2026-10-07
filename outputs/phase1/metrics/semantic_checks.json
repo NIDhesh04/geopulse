@@ -1,0 +1,83 @@
+{
+  "nonobserved_rows_all_traffic_null": true,
+  "nonobserved_congestion_level_null": true,
+  "nonobserved_is_congested_values": {
+    "false": 29401
+  },
+  "observed_rows_with_any_null_traffic": 0,
+  "currentSpeed_le_0": 0,
+  "currentSpeed_gt_freeFlowSpeed": 0,
+  "currentSpeed_eq_freeFlowSpeed": 166828,
+  "currentTT_lt_freeFlowTT": 0,
+  "currentTT_eq_freeFlowTT": 166828,
+  "speed_ratio_gt_1": 0,
+  "speed_ratio_lt_0": 0,
+  "speed_ratio_equals_cs_over_ffs_maxabs": 1.1102230246251565e-16,
+  "speed_ratio_vs_tt_ratio_maxabs": 0.13333333333333341,
+  "speed_ratio_vs_tt_ratio_p99abs": 0.0013138138138137911,
+  "corr_speed_ratio_tt_ratio": 0.9998645792238385,
+  "congestion_level_speed_ratio_ranges": {
+    "severe": {
+      "min": 0.0526315789473684,
+      "max": 0.3928571428571428,
+      "count": 54
+    },
+    "moderate": {
+      "min": 0.4137931034482758,
+      "max": 0.6976744186046512,
+      "count": 4281
+    },
+    "mild": {
+      "min": 0.7,
+      "max": 0.896551724137931,
+      "count": 61403
+    },
+    "free_flow": {
+      "min": 0.9,
+      "max": 1.0,
+      "count": 180661
+    }
+  },
+  "is_congested_speed_ratio_ranges": {
+    "False": {
+      "min": 0.7,
+      "max": 1.0,
+      "count": 242064
+    },
+    "True": {
+      "min": 0.0526315789473684,
+      "max": 0.6976744186046512,
+      "count": 4335
+    }
+  },
+  "confidence_unique_values": 6458,
+  "confidence_eq_1_pct": 82.60017289031205,
+  "confidence_lt_0_7_pct": 2.3961136205909925,
+  "roadClosure_column_present": false,
+  "implied_length_cur_vs_ff_rel_diff_median": 0.0,
+  "implied_length_cur_vs_ff_rel_diff_p95": 0.00039142112864253925,
+  "per_segment_ff_length_cv_median": 6.947831393867067e-05,
+  "per_segment_ff_length_cv_p95": 0.0005199937196782979,
+  "segments_constant_freeFlowSpeed": 29,
+  "segments_constant_freeFlowTT": 29,
+  "implied_ff_length_m_summary": {
+    "count": 700.0,
+    "mean": 13667.473809523808,
+    "std": 7174.520349108449,
+    "min": 11.11111111111111,
+    "25%": 8481.111111111111,
+    "50%": 19116.666666666668,
+    "75%": 19997.222222222223,
+    "max": 21420.0
+  },
+  "fftt_median_s_summary": {
+    "count": 700.0,
+    "mean": 1373.9742857142858,
+    "std": 674.3556067212389,
+    "min": 2.0,
+    "25%": 998.0,
+    "50%": 1376.0,
+    "75%": 1723.0,
+    "max": 2618.0
+  }
+}

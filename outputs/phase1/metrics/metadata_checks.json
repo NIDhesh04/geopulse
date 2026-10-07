@@ -1,0 +1,106 @@
+{
+  "static_cols_constant_per_segment": {
+    "osmid": true,
+    "road_name": true,
+    "road_type": true,
+    "length_m": true,
+    "lat": true,
+    "lon": true
+  },
+  "static_cols_null_on_missing_rows": true,
+  "road_type_counts": {
+    "primary": 334,
+    "secondary": 275,
+    "trunk": 91
+  },
+  "road_name_unique": 350,
+  "road_name_sample": [
+    0.0,
+    1.0,
+    2.0,
+    3.0,
+    4.0,
+    5.0,
+    6.0,
+    7.0,
+    8.0,
+    9.0
+  ],
+  "road_name_eq_segment_id_pct": 50.0,
+  "n_osm_ways_dist": {
+    "1": 613,
+    "2": 25,
+    "3": 44,
+    "4": 8,
+    "5": 10
+  },
+  "unique_osm_ways_total": 344,
+  "segments_sharing_identical_osmid_set": 562,
+  "segments_sharing_identical_centroid": 92,
+  "length_m_summary": {
+    "count": 700.0,
+    "mean": 218.60801612317258,
+    "std": 288.67290272874516,
+    "min": 60.36897279670646,
+    "25%": 86.70597709807481,
+    "50%": 129.2056038592509,
+    "75%": 224.76895798425824,
+    "max": 3016.9979383186064
+  },
+  "tomtom_len_m_summary": {
+    "count": 700.0,
+    "mean": 13667.473809523808,
+    "std": 7174.520349108449,
+    "min": 11.11111111111111,
+    "25%": 8481.111111111111,
+    "50%": 19116.666666666668,
+    "75%": 19997.222222222223,
+    "max": 21420.0
+  },
+  "tomtom_len_over_osm_len_summary": {
+    "count": 700.0,
+    "mean": 110.45045011664125,
+    "std": 87.31543170344646,
+    "min": 0.17354577350525308,
+    "25%": 34.66657934647087,
+    "50%": 92.31134830702896,
+    "75%": 160.4344921280946,
+    "max": 350.36936215946844
+  },
+  "segments_tomtom_len_within_20pct_of_osm": 2,
+  "segments_tomtom_len_gt_2x_osm": 691,
+  "distinct_tomtom_signatures": 629,
+  "largest_signature_group": 5,
+  "segments_in_shared_signature_groups": 121,
+  "shared_group_spatial_spread_m": {
+    "count": 50.0,
+    "mean": 1261.9969616803614,
+    "std": 1737.8450928255725,
+    "min": 0.0,
+    "25%": 6.656210577983779e-10,
+    "50%": 478.23987958829633,
+    "75%": 2125.837561928518,
+    "max": 7193.248088318342
+  },
+  "pairwise_speed_corr_summary": {
+    "count": 241165.0,
+    "mean": 0.5164052821209921,
+    "std": 0.24398394332700438,
+    "min": -0.0747740627236618,
+    "25%": 0.3558915099457122,
+    "50%": 0.579784134910768,
+    "75%": 0.6930210433639165,
+    "max": 1.0
+  },
+  "pairs_corr_gt_0_99_pct": 0.3109904007629631,
+  "roadClosure_true_segments": 171,
+  "bbox": {
+    "lat_min": 20.21161811932942,
+    "lat_max": 20.36393124372287,
+    "lon_min": 85.78037964643454,
+    "lon_max": 85.88927091495788
+  },
+  "endpoint_fields_present": false,
+  "geometry_fields_present": false,
+  "direction_field_present": false
+}

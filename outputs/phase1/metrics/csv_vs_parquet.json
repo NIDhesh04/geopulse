@@ -1,0 +1,40 @@
+{
+  "parquet_rows": 275800,
+  "parquet_cols": [
+    "segment_id",
+    "hour",
+    "timestamp",
+    "currentSpeed",
+    "freeFlowSpeed",
+    "currentTravelTime",
+    "freeFlowTravelTime",
+    "confidence",
+    "is_observed",
+    "is_missing",
+    "roadClosure",
+    "osmid",
+    "road_name",
+    "road_type",
+    "length_m",
+    "lat",
+    "lon"
+  ],
+  "extra_cols_vs_csv": [
+    "lat",
+    "length_m",
+    "lon",
+    "osmid",
+    "roadClosure",
+    "road_name",
+    "road_type",
+    "timestamp"
+  ],
+  "missing_cols_vs_csv": [
+    "congestion_level",
+    "day_of_week",
+    "hour_of_day",
+    "is_congested",
+    "is_weekend",
+    "speed_ratio"
+  ]
+}
