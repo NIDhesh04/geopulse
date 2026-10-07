@@ -92,8 +92,15 @@ The dashboard provides two operational demonstration modes:
 - **Validation**: Automatically verifies parity against canonical Phase 11 artifacts (`results/phase11/demo_results.json`).
 
 ### Mode B — Explore Scenarios
-Allows faculty and examiners to test the system across **20 reproducible benchmark scenarios** spanning diverse operational conditions:
-- **Evening Peak (Scenarios 0–7)**: High congestion across NH16 and arterial corridors; triggers beneficial dynamic rerouting ($\Delta T = 84.9\text{ s}$, $+5.43\%$ to $+6.60\%$).
+Allows faculty and examiners to test the system across **26 reproducible scenarios** spanning diverse operational conditions and diverse road corridors:
+- **Canonical Corridor (Scenarios 0–7)**: High congestion across the primary NH16 arterial corridor; triggers dynamic rerouting around the major bottleneck ($\Delta T = 84.9\text{ s}$, $+5.43\%$ to $+6.60\%$).
+- **Diverse Road Corridors (Scenarios 20–25)**: Independent arterial corridors across Bhubaneswar with distinct real-world savings:
+  - **Scenario 20 (OD #15: Tamando NH16 $\to$ Laxmi Sagar)**: Saves **62.80 s** (+3.26%)
+  - **Scenario 21 (OD #19: Khandagiri Hills $\to$ Mancheswar)**: Saves **47.63 s** (+4.64%)
+  - **Scenario 22 (OD #3: Baramunda $\to$ Mancheswar Industrial)**: Saves **40.96 s** (+5.21%)
+  - **Scenario 23 (OD #42: Infocity Tech Hub $\to$ Utkal Hospital)**: Saves **37.04 s** (+3.31%)
+  - **Scenario 24 (OD #45: Patia Infocity $\to$ BJB Nagar)**: **Reroute Suppressed** (2.41% < 3.0% gate)
+  - **Scenario 25 (OD #30: Old Town Lingaraj $\to$ Sailashree Vihar)**: **Reroute Suppressed** (1.59% < 3.0% gate)
 - **Morning Peak (Scenarios 8–11)**: Traffic flows close to predictive expectations; degradation remains below gates; dynamic rerouting is **properly suppressed** (Saving = $0.0\text{ s}$, $0.0\%$ churn).
 - **Midday Nominal Flow (Scenarios 12–15)**: Stable arterial flow; rerouting suppressed.
 - **Off-Peak Free Flow (Scenarios 16–19)**: Late-night free flow conditions; routes maintained.

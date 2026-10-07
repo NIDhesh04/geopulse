@@ -111,16 +111,25 @@ def render_route_map_matplotlib(
         if min_lon <= min(xs) <= max_lon and min_lat <= min(ys) <= max_lat:
             ax.plot(xs, ys, color=net_color, linewidth=0.75, alpha=0.65, zorder=1)
 
-    # 2. Abandoned congested corridor (Red dashed) if rerouted
+    # 2. Original Route / No-Reroute Path (Red dashed) if rerouted
     if reroute_triggered:
         abandoned_edges = initial_edges[decision_step:]
         first_aband = True
         for e in abandoned_edges:
             coords = _extract_edge_coords(G, e[0], e[1], e[2] if len(e) > 2 else 0)
             xs, ys = zip(*coords)
-            ax.plot(xs, ys, color=COLOR_CONGESTED, linewidth=3.5, linestyle='--', alpha=0.9, zorder=3,
-                    label='Observed Congestion (Abandoned Corridor)' if first_aband else "")
+            ax.plot(xs, ys, color=COLOR_CONGESTED, linewidth=3.8, linestyle='--', alpha=0.92, zorder=3,
+                    label='Original Route / No-Reroute Path (Congested)' if first_aband else "")
             first_aband = False
+
+        # Highlight detected bottleneck segment if available
+        b_info = run_result.get('bottleneck_analysis', {})
+        if b_info.get('detected') and b_info.get('edge'):
+            b_e = b_info['edge']
+            b_coords = _extract_edge_coords(G, b_e[0], b_e[1], b_e[2] if len(b_e) > 2 else 0)
+            b_xs, b_ys = zip(*b_coords)
+            ax.plot(b_xs, b_ys, color='#7f1d1d', linewidth=7.0, alpha=0.9, zorder=6,
+                    label=f"Congested Bottleneck ({b_info.get('corridor_name', 'Arterial')})")
 
     # 3. Dynamic Reroute Bypass (Green solid)
     if reroute_triggered:
@@ -129,8 +138,8 @@ def render_route_map_matplotlib(
         for e in reroute_bypass_edges:
             coords = _extract_edge_coords(G, e[0], e[1], e[2] if len(e) > 2 else 0)
             xs, ys = zip(*coords)
-            ax.plot(xs, ys, color=COLOR_REROUTE, linewidth=3.8, alpha=0.95, zorder=4,
-                    label='GeoPulse Dynamic Bypass' if first_reroute else "")
+            ax.plot(xs, ys, color=COLOR_REROUTE, linewidth=4.2, alpha=0.95, zorder=4,
+                    label='GeoPulse Dynamic Route (Optimal Bypass)' if first_reroute else "")
             first_reroute = False
     else:
         # Initial predicted route when not rerouted
@@ -138,8 +147,8 @@ def render_route_map_matplotlib(
         for e in initial_edges:
             coords = _extract_edge_coords(G, e[0], e[1], e[2] if len(e) > 2 else 0)
             xs, ys = zip(*coords)
-            ax.plot(xs, ys, color='#64748b', linewidth=3.5, alpha=0.7, zorder=3,
-                    label='Initial Predicted Route (Maintained)' if first_init else "")
+            ax.plot(xs, ys, color='#64748b', linewidth=3.8, alpha=0.85, zorder=3,
+                    label='Planned Route (Maintained Optimal)' if first_init else "")
             first_init = False
 
     # 4. Traversed Path up to current_step (Blue solid)
@@ -148,7 +157,7 @@ def render_route_map_matplotlib(
     for e in traversed_edges:
         coords = _extract_edge_coords(G, e[0], e[1], e[2] if len(e) > 2 else 0)
         xs, ys = zip(*coords)
-        ax.plot(xs, ys, color=COLOR_TRAVERSED, linewidth=4.5, zorder=5,
+        ax.plot(xs, ys, color=COLOR_TRAVERSED, linewidth=4.8, zorder=5,
                 label=f'Traversed Path (Step 0→{step})' if first_trav else "")
         first_trav = False
 
@@ -160,12 +169,12 @@ def render_route_map_matplotlib(
     dec_pt = (float(G.nodes[decision_node].get('x', G.nodes[decision_node].get('lon'))),
               float(G.nodes[decision_node].get('y', G.nodes[decision_node].get('lat'))))
 
-    ax.scatter(*src_pt, color=COLOR_ORIGIN, s=260, edgecolors='white', linewidth=2.0, zorder=8,
+    ax.scatter(*src_pt, color=COLOR_ORIGIN, s=280, edgecolors='white', linewidth=2.0, zorder=8,
                label=f"Origin: {run_result['origin_name']}")
-    ax.scatter(*dst_pt, color=COLOR_DESTINATION, s=260, marker='s', edgecolors='white', linewidth=2.0, zorder=8,
+    ax.scatter(*dst_pt, color=COLOR_DESTINATION, s=280, marker='s', edgecolors='white', linewidth=2.0, zorder=8,
                label=f"Destination: {run_result['destination_name']}")
-    ax.scatter(*dec_pt, color=COLOR_DECISION, s=340, marker='*', edgecolors='black', linewidth=1.8, zorder=9,
-               label=f"Decision Point (Step {decision_step})")
+    ax.scatter(*dec_pt, color=COLOR_DECISION, s=360, marker='*', edgecolors='black', linewidth=1.8, zorder=9,
+               label=f"Reroute Decision Point (Step {decision_step})")
 
     # 6. Current Vehicle Position Marker
     if step < len(active_route_nodes):
@@ -177,8 +186,8 @@ def render_route_map_matplotlib(
               float(G.nodes[curr_veh_node].get('y', G.nodes[curr_veh_node].get('lat'))))
 
     # Glow ring + Puck marker
-    ax.scatter(*veh_pt, color=COLOR_VEHICLE, s=500, alpha=0.35, zorder=10)
-    ax.scatter(*veh_pt, color=COLOR_VEHICLE, s=220, edgecolors='white', linewidth=2.5, zorder=11,
+    ax.scatter(*veh_pt, color=COLOR_VEHICLE, s=550, alpha=0.35, zorder=10)
+    ax.scatter(*veh_pt, color=COLOR_VEHICLE, s=240, edgecolors='white', linewidth=2.5, zorder=11,
                label=f'Vehicle Position (Step {step}/{total_steps})')
 
     # Formatting
@@ -234,9 +243,9 @@ def create_pydeck_map(
             coords = _extract_edge_coords(G, e[0], e[1], e[2] if len(e) > 2 else 0)
             path_data.append({
                 'path': [[lon, lat] for lon, lat in coords],
-                'color': [239, 68, 68, 220],
+                'color': [220, 38, 38, 230],
                 'width': 6,
-                'name': 'Observed Congestion (Abandoned Corridor)'
+                'name': 'Original Route / No-Reroute Path (Congested)'
             })
 
     # 2. Dynamic Reroute Bypass (Green)
@@ -245,9 +254,9 @@ def create_pydeck_map(
             coords = _extract_edge_coords(G, e[0], e[1], e[2] if len(e) > 2 else 0)
             path_data.append({
                 'path': [[lon, lat] for lon, lat in coords],
-                'color': [16, 185, 129, 230],
+                'color': [16, 185, 129, 240],
                 'width': 7,
-                'name': 'GeoPulse Dynamic Bypass'
+                'name': 'GeoPulse Dynamic Route (Optimal Bypass)'
             })
     else:
         for e in initial_edges:
@@ -256,7 +265,7 @@ def create_pydeck_map(
                 'path': [[lon, lat] for lon, lat in coords],
                 'color': [100, 116, 139, 180],
                 'width': 6,
-                'name': 'Initial Predicted Route (Maintained)'
+                'name': 'Planned Route (Maintained Optimal)'
             })
 
     # 3. Traversed Path (Blue)
@@ -284,7 +293,7 @@ def create_pydeck_map(
     point_data = [
         {'position': src_pt, 'color': [37, 99, 235], 'radius': 80, 'name': f"Origin: {run_result['origin_name']}"},
         {'position': dst_pt, 'color': [5, 150, 105], 'radius': 80, 'name': f"Destination: {run_result['destination_name']}"},
-        {'position': dec_pt, 'color': [245, 158, 11], 'radius': 90, 'name': 'Decision Point (Traffic Update)'},
+        {'position': dec_pt, 'color': [245, 158, 11], 'radius': 95, 'name': f"Reroute Decision Point (Step {decision_step})"},
         {'position': veh_pt, 'color': [225, 29, 72], 'radius': 110, 'name': f"Connected Vehicle (Step {step}/{total_steps})"}
     ]
 

@@ -41,12 +41,28 @@ def init_session_state():
     if 'map_renderer' not in st.session_state:
         st.session_state.map_renderer = "Matplotlib High-Res Road Network"
 
+    if 'last_executed_params' not in st.session_state:
+        st.session_state.last_executed_params = None
 
-def set_current_run(run_result: Dict[str, Any]):
-    """Stores a newly executed run result and resets playback to step 0."""
+
+def set_current_run(run_result: Dict[str, Any], params: Optional[Any] = None, *args, **kwargs):
+    """Stores a newly executed run result, synchronizes executed parameters, and resets playback to step 0."""
     st.session_state.current_run = run_result
     st.session_state.vehicle_step = 0
     st.session_state.auto_play = False
+    if params is not None:
+        st.session_state.last_executed_params = params
+    elif 'params' in kwargs:
+        st.session_state.last_executed_params = kwargs['params']
+    elif len(args) > 0:
+        st.session_state.last_executed_params = args[0]
+    elif run_result is not None:
+        st.session_state.last_executed_params = (
+            run_result.get('scenario_id', 0),
+            run_result.get('reroute_mode', 'GeoPulse Dual Threshold'),
+            run_result.get('threshold_seconds', 10.0),
+            run_result.get('threshold_percent', 3.0)
+        )
 
 
 def step_forward():

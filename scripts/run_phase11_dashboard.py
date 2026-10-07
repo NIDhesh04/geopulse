@@ -134,6 +134,87 @@ st.markdown("""
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
+    
+    .decision-card-reroute {
+        background: #f0fdf4;
+        border: 2px solid #22c55e;
+        border-radius: 10px;
+        padding: 18px 22px;
+        margin: 14px 0;
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.12);
+    }
+    .decision-card-suppressed {
+        background: #f8fafc;
+        border: 2px solid #94a3b8;
+        border-radius: 10px;
+        padding: 18px 22px;
+        margin: 14px 0;
+        box-shadow: 0 2px 8px rgba(148, 163, 184, 0.1);
+    }
+    .gate-badge-pass {
+        background: #dcfce7;
+        color: #15803d;
+        font-weight: 800;
+        padding: 3px 8px;
+        border-radius: 4px;
+        border: 1px solid #86efac;
+        font-size: 12px;
+    }
+    .gate-badge-fail {
+        background: #fee2e2;
+        color: #b91c1c;
+        font-weight: 800;
+        padding: 3px 8px;
+        border-radius: 4px;
+        border: 1px solid #fca5a5;
+        font-size: 12px;
+    }
+    .scenario-summary-banner {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-left: 6px solid #0284c7;
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+    .shared-pattern-banner {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-left: 5px solid #2563eb;
+        border-radius: 8px;
+        padding: 14px 18px;
+        margin-bottom: 20px;
+        color: #1e40af;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+    .bottleneck-banner {
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        border-left: 5px solid #f97316;
+        border-radius: 8px;
+        padding: 14px 18px;
+        margin: 14px 0;
+        color: #9a3412;
+        font-size: 13px;
+    }
+    .flow-step {
+        display: inline-block;
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #334155;
+        margin: 2px 4px;
+    }
+    .flow-arrow {
+        color: #94a3b8;
+        font-weight: 800;
+        margin: 0 2px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -219,7 +300,7 @@ with st.sidebar:
 
     st.markdown("---")
     
-    run_btn = st.button("▶ RUN GEOPULSE", type="primary", use_container_width=True)
+    run_btn = st.button("▶ RE-RUN PIPELINE", type="primary", use_container_width=True)
 
 
 # -----------------------------------------------------------------------------
@@ -233,8 +314,21 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# Execute pipeline on Run button click
-if run_btn or st.session_state.current_run is None:
+# Detect parameter change to trigger auto-execution on scenario selection
+current_exec_params = (
+    selected_scenario_id,
+    st.session_state.reroute_mode,
+    st.session_state.threshold_seconds,
+    st.session_state.threshold_percent
+)
+
+should_run = (
+    run_btn or 
+    st.session_state.current_run is None or 
+    st.session_state.get('last_executed_params') != current_exec_params
+)
+
+if should_run:
     progress_bar = st.progress(0.0)
     status_text = st.empty()
 
@@ -244,13 +338,14 @@ if run_btn or st.session_state.current_run is None:
 
     try:
         run_res = run_geopulse_pipeline(
-            scenario_id=st.session_state.selected_scenario_id,
+            scenario_id=selected_scenario_id,
             threshold_seconds=st.session_state.threshold_seconds,
             threshold_percent=st.session_state.threshold_percent,
             reroute_mode=st.session_state.reroute_mode,
             progress_callback=update_prog
         )
         set_current_run(run_res)
+        st.session_state.last_executed_params = current_exec_params
         # Persist to disk
         json_p, csv_p = export_run_results(run_res)
         status_text.empty()
@@ -262,6 +357,57 @@ if run_btn or st.session_state.current_run is None:
         st.stop()
 
 run_result = st.session_state.current_run
+
+# -----------------------------------------------------------------------------
+# 3B. SCENARIO SUMMARY & SYSTEM ARCHITECTURE OVERVIEW
+# -----------------------------------------------------------------------------
+scen_id = run_result['scenario_id']
+is_reroute = run_result['reroute_triggered']
+status_badge = '<span class="status-badge-reroute">REROUTE TRIGGERED</span>' if is_reroute else '<span class="status-badge-maintain">REROUTE SUPPRESSED</span>'
+saving_str = f"Saves {run_result['time_saved_s']:.1f}s (+{run_result['improvement_pct']:.2f}%)" if is_reroute else "Planned Route Maintained (0.0s)"
+
+st.markdown(f"""
+<div class="scenario-summary-banner">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div>
+            <div style="font-size: 18px; font-weight: 800; color: #0f172a;">Scenario #{scen_id:02d} — {run_result['origin_name']} → {run_result['destination_name']}</div>
+            <div style="font-size: 13px; color: #475569; margin-top: 5px;">
+                <b>Origin:</b> Node {run_result['origin_node']} • <b>Destination:</b> Node {run_result['destination_node']} • 
+                <b>Departure:</b> {run_result['departure_timestamp']} ({run_result['period']}) • 
+                <b>Decision Point:</b> Node {run_result['decision_node']} (Step {run_result['decision_step']})
+            </div>
+        </div>
+        <div style="text-align: right;">
+            {status_badge}
+            <div style="font-size: 13px; font-weight: 700; color: #0369a1; margin-top: 4px;">{saving_str}</div>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# Shared Bottleneck Pattern Banner (Explaining legitimate identical savings across OD #0 and OD #2)
+if run_result.get('shared_bottleneck_info', {}).get('detected'):
+    st.markdown(f"""
+    <div class="shared-pattern-banner">
+        <b>ℹ️ SHARED CONGESTION PATTERN DETECTED</b><br/>
+        {run_result['shared_bottleneck_info']['explanation']}
+    </div>
+    """, unsafe_allow_html=True)
+
+# System Architecture Flow Visual
+st.markdown("""
+<div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 20px; text-align: center;">
+    <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; margin-bottom: 6px;">GEOPULSE CLOSED-LOOP ARCHITECTURE PIPELINE</div>
+    <span class="flow-step">1. Historical Traffic</span><span class="flow-arrow">→</span>
+    <span class="flow-step">2. LightGBM Prediction</span><span class="flow-arrow">→</span>
+    <span class="flow-step">3. Dynamic Edge Weights</span><span class="flow-arrow">→</span>
+    <span class="flow-step">4. Custom Dijkstra</span><span class="flow-arrow">→</span>
+    <span class="flow-step">5. Vehicle Traversal</span><span class="flow-arrow">→</span>
+    <span class="flow-step">6. Real-Time Update</span><span class="flow-arrow">→</span>
+    <span class="flow-step">7. Dual-Gate Gating</span><span class="flow-arrow">→</span>
+    <span class="flow-step">8. Dynamic Reroute / Maintain</span>
+</div>
+""", unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
 # 4. EDGE-CLOUD ARCHITECTURE STATUS STRIP
@@ -337,6 +483,36 @@ with map_col:
         )
         st.pydeck_chart(deck, use_container_width=True)
 
+    # Visual Legend for Red vs Green Routes (Requirement 3)
+    if run_result['reroute_triggered']:
+        st.markdown("""
+        <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:8px 12px; margin-top:8px; font-size:12px; display:flex; justify-content:space-around; flex-wrap:wrap; gap:8px;">
+            <span>🔴 <b style="color:#dc2626;">Original Route / No-Reroute Path</b> (Congested)</span>
+            <span>🟢 <b style="color:#16a34a;">GeoPulse Dynamic Route</b> (Optimal Bypass)</span>
+            <span>🔵 <b style="color:#0284c7;">Traversed Path</b> (Active Progress)</span>
+            <span>⭐ <b style="color:#d97706;">Reroute Decision Point</b></span>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:8px 12px; margin-top:8px; font-size:12px; display:flex; justify-content:space-around; flex-wrap:wrap; gap:8px;">
+            <span>🛣️ <b style="color:#475569;">Planned Route (Maintained Optimal)</b></span>
+            <span>🔵 <b style="color:#0284c7;">Traversed Path</b> (Active Progress)</span>
+            <span>⭐ <b style="color:#d97706;">Traffic Evaluation Point</b></span>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Congested bottleneck highlight callout (Requirement 4)
+    if run_result.get('bottleneck_analysis', {}).get('detected'):
+        b_info = run_result['bottleneck_analysis']
+        st.markdown(f"""
+        <div class="bottleneck-banner">
+            <b>⚠️ CONGESTED BOTTLENECK DETECTED: {b_info['corridor_name']}</b><br/>
+            Observed Speed: <b>{b_info['observed_speed_kmh']} km/h</b> vs Predicted: <b>{b_info['predicted_speed_kmh']} km/h</b> 
+            (Speed Drop: <b>-{b_info['speed_drop_kmh']} km/h / -{b_info['speed_drop_pct']}%</b>) • Traversal Delay Added: <b>+{b_info['delay_added_s']}s</b>.
+        </div>
+        """, unsafe_allow_html=True)
+
 with sim_col:
     st.markdown("#### 🎮 Vehicle Simulation Controls")
     st.caption("Step through the vehicle's physical journey along the network links.")
@@ -404,19 +580,163 @@ with sim_col:
         """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 6. LIVE METRIC CARDS
+# 6. REROUTING DECISION & OPERATIONAL GATE AUDIT (REQUIREMENTS 5, 6, 8, 9)
 # -----------------------------------------------------------------------------
 st.markdown("---")
-st.markdown("### 📊 Live Pipeline Performance Metrics")
+st.markdown("### 🎯 Rerouting Decision & Operational Gate Audit")
 
-m_c1, m_c2, m_c3, m_c4 = st.columns(4)
+gate_data = run_result.get('gate_evaluation', {})
+time_pass = gate_data.get('time_gate_pass', False)
+pct_pass = gate_data.get('percent_gate_pass', False)
+time_badge = '<span class="gate-badge-pass">PASS</span>' if time_pass else '<span class="gate-badge-fail">FAIL</span>'
+pct_badge = '<span class="gate-badge-pass">PASS</span>' if pct_pass else '<span class="gate-badge-fail">FAIL</span>'
 
-with m_c1:
-    st.markdown("**ML Speed Prediction**")
+if run_result['reroute_triggered']:
+    st.markdown(f"""
+    <div class="decision-card-reroute">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div style="font-size: 14px; font-weight: 800; color: #15803d; text-transform: uppercase; letter-spacing: 0.5px;">
+                ✅ REROUTE TRIGGERED — OPERATIONAL GATES SATISFIED
+            </div>
+            <span class="status-badge-reroute" style="background:#dcfce7; color:#15803d; border-color:#86efac;">
+                TIME SAVED: {run_result['time_saved_s']:.2f} s (+{run_result['improvement_pct']:.2f}%)
+            </span>
+        </div>
+        <div style="font-size: 13px; color: #166534; margin: 12px 0 14px 0; line-height: 1.6;">
+            <b>Why Did GeoPulse Reroute?</b><br/>
+            {run_result.get('reroute_explanation', '')}
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; background: #ffffff; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px 16px;">
+            <div>
+                <span style="font-size: 11px; color: #64748b; font-weight: 700;">GATE 1: ABSOLUTE DELAY (ΔT)</span><br/>
+                <span style="font-size: 16px; font-weight: 800; color: #0f172a;">{run_result['delta_T_s']:.2f}s</span> 
+                <span style="font-size: 12px; color: #475569;">(Req ≥ {run_result['threshold_seconds']:.0f}s)</span> → {time_badge}
+            </div>
+            <div>
+                <span style="font-size: 11px; color: #64748b; font-weight: 700;">GATE 2: RELATIVE GAIN (ΔT%)</span><br/>
+                <span style="font-size: 16px; font-weight: 800; color: #0f172a;">{run_result['delta_T_pct']:.2f}%</span> 
+                <span style="font-size: 12px; color: #475569;">(Req ≥ {run_result['threshold_percent']:.1f}%)</span> → {pct_badge}
+            </div>
+            <div>
+                <span style="font-size: 11px; color: #64748b; font-weight: 700;">FINAL OPERATIONAL OUTCOME</span><br/>
+                <span style="font-size: 16px; font-weight: 800; color: #15803d;">DYNAMIC BYPASS ACTIVE</span>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown(f"""
+    <div class="decision-card-suppressed">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div style="font-size: 14px; font-weight: 800; color: #334155; text-transform: uppercase; letter-spacing: 0.5px;">
+                🛡️ REROUTE SUPPRESSED — PLANNED ROUTE RETAINED
+            </div>
+            <span class="status-badge-maintain">
+                MAINTAIN CURRENT ROUTE
+            </span>
+        </div>
+        <div style="font-size: 13px; color: #475569; margin: 12px 0 14px 0; line-height: 1.6;">
+            <b>Why Did GeoPulse Not Reroute?</b><br/>
+            {run_result.get('reroute_explanation', '')}
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px;">
+            <div>
+                <span style="font-size: 11px; color: #64748b; font-weight: 700;">GATE 1: ABSOLUTE DELAY (ΔT)</span><br/>
+                <span style="font-size: 16px; font-weight: 800; color: #0f172a;">{run_result['delta_T_s']:.2f}s</span> 
+                <span style="font-size: 12px; color: #475569;">(Req ≥ {run_result['threshold_seconds']:.0f}s)</span> → {time_badge}
+            </div>
+            <div>
+                <span style="font-size: 11px; color: #64748b; font-weight: 700;">GATE 2: RELATIVE GAIN (ΔT%)</span><br/>
+                <span style="font-size: 16px; font-weight: 800; color: #0f172a;">{run_result['delta_T_pct']:.2f}%</span> 
+                <span style="font-size: 12px; color: #475569;">(Req ≥ {run_result['threshold_percent']:.1f}%)</span> → {pct_badge}
+            </div>
+            <div>
+                <span style="font-size: 11px; color: #64748b; font-weight: 700;">FINAL OPERATIONAL OUTCOME</span><br/>
+                <span style="font-size: 16px; font-weight: 800; color: #475569;">ROUTE RETENTION (STABLE)</span>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# -----------------------------------------------------------------------------
+# 6B. ROUTE COMPARISON TABLE (REQUIREMENT 14)
+# -----------------------------------------------------------------------------
+if run_result['reroute_triggered']:
+    st.markdown("#### 🛣️ Route Comparison Table")
+    init_dep_dt = pd.to_datetime(run_result['departure_timestamp'])
+    eta_no_reroute = (init_dep_dt + pd.Timedelta(seconds=run_result['no_reroute_total_time_s'])).strftime('%H:%M:%S')
+    eta_dynamic = (init_dep_dt + pd.Timedelta(seconds=run_result['dynamic_reroute_total_time_s'])).strftime('%H:%M:%S')
+
+    route_table = pd.DataFrame([
+        {
+            "Performance Metric": "Directed Route Edges",
+            "Original Route (No Reroute)": f"{run_result['initial_route_edges_count']} links",
+            "GeoPulse Dynamic Route": f"{run_result['final_route_edges_count']} links",
+            "Operational Difference": f"{run_result['final_route_edges_count'] - run_result['initial_route_edges_count']:+d} links"
+        },
+        {
+            "Performance Metric": "Total Distance Traversed",
+            "Original Route (No Reroute)": f"{run_result['initial_route_distance_m']:.1f} m ({run_result['initial_route_distance_m']/1000:.2f} km)",
+            "GeoPulse Dynamic Route": f"{run_result['final_route_distance_m']:.1f} m ({run_result['final_route_distance_m']/1000:.2f} km)",
+            "Operational Difference": f"{run_result['final_route_distance_m'] - run_result['initial_route_distance_m']:+.1f} m"
+        },
+        {
+            "Performance Metric": "Total Travel Time",
+            "Original Route (No Reroute)": f"{run_result['no_reroute_total_time_s']:.2f} s ({run_result['no_reroute_total_time_s']/60:.2f} min)",
+            "GeoPulse Dynamic Route": f"{run_result['dynamic_reroute_total_time_s']:.2f} s ({run_result['dynamic_reroute_total_time_s']/60:.2f} min)",
+            "Operational Difference": f"Time Saved: {run_result['time_saved_s']:.2f} s ({run_result['improvement_pct']:.2f}%)"
+        },
+        {
+            "Performance Metric": "Destination Arrival ETA",
+            "Original Route (No Reroute)": eta_no_reroute,
+            "GeoPulse Dynamic Route": eta_dynamic,
+            "Operational Difference": f"Arrives {run_result['time_saved_s']:.1f}s earlier"
+        }
+    ])
+    st.table(route_table.set_index("Performance Metric"))
+
+# -----------------------------------------------------------------------------
+# 6C. RESEARCH-ORIENTED KPI PERFORMANCE SECTION (REQUIREMENT 7)
+# -----------------------------------------------------------------------------
+st.markdown("---")
+st.markdown("### 📊 Research-Oriented KPI Performance Metrics")
+
+kpi_c1, kpi_c2, kpi_c3, kpi_c4 = st.columns(4)
+
+with kpi_c1:
+    st.markdown("**Route Performance**")
+    st.metric(
+        label="No-Reroute Travel Time",
+        value=f"{run_result['no_reroute_total_time_s']:.1f} s",
+        help="Counterfactual travel time if vehicle continued on initial planned route"
+    )
+    st.metric(
+        label="GeoPulse Travel Time",
+        value=f"{run_result['dynamic_reroute_total_time_s']:.1f} s",
+        delta=f"-{run_result['time_saved_s']:.1f} s ({run_result['improvement_pct']:.2f}%)" if run_result['reroute_triggered'] else "0.0s (Maintained)",
+        delta_color="normal"
+    )
+
+with kpi_c2:
+    st.markdown("**Spatial Route Metrics**")
+    st.metric(
+        label="Initial Route Distance",
+        value=f"{run_result['initial_route_distance_m']/1000:.2f} km",
+        help=f"{run_result['initial_route_edges_count']} directed road links"
+    )
+    st.metric(
+        label="Final Route Distance",
+        value=f"{run_result['final_route_distance_m']/1000:.2f} km",
+        delta=f"Overlap: {run_result['route_overlap']*100:.1f}%",
+        delta_color="off"
+    )
+
+with kpi_c3:
+    st.markdown("**ML Model & Speeds**")
     st.metric(
         label="Predicted Corridor Speed",
         value=f"{run_result['speed_metrics']['predicted_speed_kmh']} km/h",
-        delta=None
+        help="Pre-trip speed forecasted by LightGBM model"
     )
     st.metric(
         label="Observed Sensor Speed",
@@ -425,42 +745,20 @@ with m_c1:
         delta_color="inverse"
     )
 
-with m_c2:
-    st.markdown("**Routing ETAs**")
+with kpi_c4:
+    st.markdown("**Software Execution Latency**")
+    exec_dict = run_result['execution_times_ms']
     st.metric(
-        label="Initial Planned ETA",
-        value=f"{run_result['eta_metrics']['initial_route_eta_s']/60:.2f} min",
-        help="ETA computed using LightGBM predicted link weights at departure"
+        label="Total Pipeline Decision",
+        value=f"{exec_dict['total_edge_decision_ms']:.2f} ms",
+        help="Includes traffic ingest, custom Dijkstra reroute, and gate checks"
     )
     st.metric(
-        label="Current Path Remaining ETA",
-        value=f"{run_result['eta_metrics']['current_remaining_eta_s']:.1f} s",
-        help="Estimated time remaining on original route under observed congested speeds"
+        label="Reroute Dijkstra Latency",
+        value=f"{exec_dict['edge_reroute_dijkstra_ms']:.2f} ms",
+        delta=f"Initial: {exec_dict['edge_initial_dijkstra_ms']:.1f} ms",
+        delta_color="off"
     )
-
-with m_c3:
-    st.markdown("**Alternative Route**")
-    st.metric(
-        label="Alternative Bypass ETA",
-        value=f"{run_result['eta_metrics']['optimal_alternative_eta_s']:.1f} s",
-        help="Optimal alternative route computed from decision point using custom Dijkstra"
-    )
-    st.metric(
-        label="Absolute Saving (ΔT)",
-        value=f"{run_result['delta_T_s']:.1f} s",
-        delta=f"{run_result['delta_T_pct']:.1f}% relative",
-        delta_color="normal"
-    )
-
-with m_c4:
-    st.markdown("**Rerouting Decision**")
-    st.markdown(f"**Dual Gate:** `ΔT ≥ {run_result['threshold_seconds']:.0f}s & ΔT% ≥ {run_result['threshold_percent']:.1f}%`")
-    if run_result['reroute_triggered']:
-        st.markdown('<div class="status-badge-reroute">TRIGGER DYNAMIC REROUTE</div>', unsafe_allow_html=True)
-        st.caption(f"Reason: Potential saving ({run_result['delta_T_s']:.1f}s, {run_result['delta_T_pct']:.1f}%) crossed both operational thresholds.")
-    else:
-        st.markdown('<div class="status-badge-maintain">MAINTAIN ROUTE</div>', unsafe_allow_html=True)
-        st.caption(f"Reason: Traffic degradation ({run_result['delta_T_s']:.1f}s, {run_result['delta_T_pct']:.1f}%) stayed below operational thresholds.")
 
 # -----------------------------------------------------------------------------
 # 7. FINAL COMPARATIVE RESULT PANEL

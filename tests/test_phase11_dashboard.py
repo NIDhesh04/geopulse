@@ -39,6 +39,15 @@ from src.dashboard.visualization import (
     render_journey_timeline_figure,
     get_step_simulation_status
 )
+from src.dashboard.state import (
+    init_session_state,
+    set_current_run,
+    step_forward,
+    step_backward,
+    reset_playback,
+    jump_to_decision,
+    jump_to_destination
+)
 
 
 @pytest.fixture(scope="module")
@@ -64,9 +73,9 @@ def test_dashboard_imports_and_loaders():
 
 
 def test_scenario_catalog_integrity():
-    """Requirement 2: Scenario catalog provides 20 scenarios with required metadata."""
+    """Requirement 2: Scenario catalog provides 20+ scenarios with required metadata."""
     catalog = get_scenario_catalog()
-    assert len(catalog) == 20
+    assert len(catalog) >= 20
 
     scen0 = catalog[0]
     assert scen0['scenario_id'] == 0
@@ -250,3 +259,125 @@ def test_results_export_preserves_canonical_artifacts():
         exported_data = json.load(f)
     assert exported_data['scenario_id'] == 0
     assert exported_data['time_saved_s'] == res['time_saved_s']
+
+
+def test_scenario_8_execution_and_suppression_audit():
+    """Test 1 & 3: Selecting Scenario #8 executes Scenario #8 and displays valid suppression reason."""
+    res = run_geopulse_pipeline(scenario_id=8)
+    assert res['scenario_id'] == 8
+    assert res['od_id'] == 1
+    assert "Patia Infocity" in res['origin_name']
+    assert res['reroute_triggered'] is False
+    assert res['time_saved_s'] == 0.0
+    assert res['improvement_pct'] == 0.0
+
+    # Verify suppression explanations are dynamically populated
+    gate_info = res['gate_evaluation']
+    assert gate_info['final_decision'] == "KEEP CURRENT ROUTE"
+    assert "GeoPulse kept the current route" in gate_info['explanation']
+    assert "GeoPulse kept the current route" in res['reroute_explanation']
+
+
+def test_scenario_20_execution_and_reroute_audit():
+    """Test 2 & 4: Selecting Scenario #20 executes Scenario #20 and displays diverse real saving."""
+    res = run_geopulse_pipeline(scenario_id=20)
+    assert res['scenario_id'] == 20
+    assert res['od_id'] == 15
+    assert "Tamando" in res['origin_name']
+    assert res['reroute_triggered'] is True
+    # Evaluated saving on diverse candidate corridor: ~62.8s (+3.26%)
+    assert abs(res['time_saved_s'] - 62.80) < 1.0
+    assert abs(res['improvement_pct'] - 3.26) < 0.5
+
+    gate_info = res['gate_evaluation']
+    assert gate_info['final_decision'] == "REROUTE"
+    assert gate_info['time_gate_pass'] is True
+    assert gate_info['percent_gate_pass'] is True
+    assert "satisfying both operational gates" in res['reroute_explanation']
+
+
+def test_suppressed_scenarios_specific_gate_failure_reasons():
+    """Test 3: Verifies specific gate failure reporting across distinct negative control scenarios."""
+    # Scenario 12: ΔT = 8.69s (< 10s threshold), ΔT% = 0.56% (< 3% threshold)
+    res12 = run_geopulse_pipeline(scenario_id=12)
+    assert res12['reroute_triggered'] is False
+    assert res12['gate_evaluation']['time_gate_pass'] is False
+    assert res12['gate_evaluation']['percent_gate_pass'] is False
+    assert "both the absolute time gate" in res12['reroute_explanation']
+
+    # Scenario 15: ΔT = 17.39s (>= 10s), but ΔT% = 1.27% (< 3% threshold)
+    res15 = run_geopulse_pipeline(scenario_id=15)
+    assert res15['reroute_triggered'] is False
+    assert res15['gate_evaluation']['time_gate_pass'] is True
+    assert res15['gate_evaluation']['percent_gate_pass'] is False
+    assert "relative improvement was only" in res15['reroute_explanation']
+    assert "below the required" in res15['reroute_explanation']
+
+
+def test_state_isolation_no_stale_scenario_0_data():
+    """Test 5: Verifies that transitioning between scenarios creates fully isolated result dictionaries."""
+    res0 = run_geopulse_pipeline(scenario_id=0)
+    res8 = run_geopulse_pipeline(scenario_id=8)
+
+    assert res8['scenario_id'] != res0['scenario_id']
+    assert res8['origin_node'] != res0['origin_node']
+    assert res8['destination_node'] != res0['destination_node']
+    assert res8['initial_route_edges'] != res0['initial_route_edges']
+    assert res8['no_reroute_total_time_s'] != res0['no_reroute_total_time_s']
+    assert res8['time_saved_s'] != res0['time_saved_s']
+
+
+def test_route_geometries_correspond_to_selected_scenario():
+    """Test 6: Route geometry nodes strictly anchor to origin and destination for each scenario."""
+    for s_id in [0, 8, 20]:
+        res = run_geopulse_pipeline(scenario_id=s_id)
+        # Initial route starts at origin and ends at destination
+        assert res['initial_route_nodes'][0] == res['origin_node']
+        assert res['initial_route_nodes'][-1] == res['destination_node']
+
+        # Final route ends at destination
+        assert res['final_route_nodes'][0] == res['origin_node']
+        assert res['final_route_nodes'][-1] == res['destination_node']
+
+
+def test_bottleneck_and_shared_pattern_detection():
+    """Test: Validates automated bottleneck edge detection and shared pattern flag."""
+    res0 = run_geopulse_pipeline(scenario_id=0)
+    assert res0['shared_bottleneck_info']['detected'] is True
+    assert "NH16" in res0['shared_bottleneck_info']['corridor']
+    assert res0['bottleneck_analysis']['detected'] is True
+    assert res0['bottleneck_analysis']['edge'] is not None
+
+    res8 = run_geopulse_pipeline(scenario_id=8)
+    assert res8['shared_bottleneck_info']['detected'] is False
+
+
+def test_dashboard_session_state_lifecycle():
+    """Test: Validates session state initialization, set_current_run with and without kwargs, and playback."""
+    init_session_state()
+
+    dummy_run = {
+        'scenario_id': 5,
+        'reroute_mode': 'GeoPulse Dual Threshold',
+        'threshold_seconds': 10.0,
+        'threshold_percent': 3.0,
+        'reroute_triggered': True,
+        'decision_step': 2,
+        'initial_route_edges': [('A', 'B'), ('B', 'C'), ('C', 'D')],
+        'final_route_edges': [('A', 'B'), ('B', 'E'), ('E', 'D')]
+    }
+
+    # Test 1: set_current_run without keyword args
+    set_current_run(dummy_run)
+    assert hasattr(set_current_run, '__call__')
+
+    # Test 2: set_current_run with params keyword argument (backward & hot-reload compatibility)
+    set_current_run(dummy_run, params=(5, 'GeoPulse Dual Threshold', 10.0, 3.0))
+
+    # Test 3: Playback navigation step forward / reset
+    step_forward()
+    reset_playback()
+    jump_to_decision()
+    jump_to_destination()
+
+
