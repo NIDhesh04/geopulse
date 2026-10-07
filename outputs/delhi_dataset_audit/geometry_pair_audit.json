@@ -1,0 +1,17 @@
+{
+  "audit_date": "2024-08-11",
+  "direction_agnostic_unique_geometries": 21350,
+  "geometry_groups_shared_by_multiple_segmentIds": 3588,
+  "duplicate_group_sizes": {
+    "2": 3588
+  },
+  "pairs": 3588,
+  "pairs_with_reversed_coordinate_order": 3588,
+  "pairs_with_opposite_signed_segmentIds": 3588,
+  "pairs_with_same_frc": 3588,
+  "pairs_with_same_streetName": 3588,
+  "pairs_with_same_distance": 3588,
+  "pairs_with_identical_24_hour_probeCount_sequences": 23,
+  "pairs_with_different_24_hour_probeCount_sequences": 3565,
+  "interpretation": "For these matched geometries, the observed reverse coordinate order and opposite signed segmentId support reciprocal directed edges. Preserve both directions; do not deduplicate on direction-agnostic geometry. This is not a network connectivity test."
+}

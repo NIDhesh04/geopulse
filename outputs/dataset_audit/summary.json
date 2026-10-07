@@ -1,0 +1,910 @@
+{
+  "inputs": {
+    "database": "C:\\Users\\Mohit sharma\\Desktop\\7th sem\\new major project\\geopulse\\datasets\\traffic_v1.duckdb",
+    "graph": "C:\\Users\\Mohit sharma\\Desktop\\7th sem\\new major project\\geopulse\\notebooks\\bhubaneswar_drive.graphml",
+    "database_bytes": 11808768,
+    "graph_bytes": 18569800,
+    "tables": [
+      "traffic"
+    ]
+  },
+  "structure": {
+    "rows": 275800,
+    "segments": 700,
+    "unique_timestamps": 509,
+    "unique_hour_values": 394,
+    "expected_segment_time_rows": 275800,
+    "complete_segment_time_grid": true,
+    "unique_segment_hour_pairs": 275800,
+    "duplicate_full_rows_involved": 0,
+    "duplicate_segment_hour_rows_involved": 0,
+    "null_counts": {
+      "segment_id": 0,
+      "hour": 0,
+      "timestamp": 29401,
+      "currentSpeed": 29401,
+      "freeFlowSpeed": 29401,
+      "currentTravelTime": 29401,
+      "freeFlowTravelTime": 29401,
+      "confidence": 29401,
+      "is_observed": 0,
+      "is_missing": 0,
+      "roadClosure": 29401,
+      "osmid": 29401,
+      "road_name": 29401,
+      "road_type": 29401,
+      "length_m": 29401,
+      "lat": 29401,
+      "lon": 29401
+    },
+    "dtypes": {
+      "segment_id": "int64",
+      "hour": "datetime64[us, Asia/Calcutta]",
+      "timestamp": "datetime64[us, Asia/Calcutta]",
+      "currentSpeed": "float64",
+      "freeFlowSpeed": "float64",
+      "currentTravelTime": "float64",
+      "freeFlowTravelTime": "float64",
+      "confidence": "float64",
+      "is_observed": "bool",
+      "is_missing": "bool",
+      "roadClosure": "boolean",
+      "osmid": "str",
+      "road_name": "float64",
+      "road_type": "str",
+      "length_m": "float64",
+      "lat": "float64",
+      "lon": "float64"
+    },
+    "unique_values": {
+      "road_type": 3,
+      "road_name": 350,
+      "osmid": 266,
+      "is_observed": 2,
+      "is_missing": 2,
+      "roadClosure": 2
+    }
+  },
+  "temporal": {
+    "min_hour_local": "2026-01-01 00:30:00+05:30",
+    "max_hour_local": "2026-01-17 09:30:00+05:30",
+    "duration_days": 16.375,
+    "unique_hourly_grid_timestamps": 394,
+    "unique_observation_timestamps": 509,
+    "min_observation_timestamp_local": "2026-01-01 01:09:50+05:30",
+    "max_observation_timestamp_local": "2026-01-17 09:30:01+05:30",
+    "observation_timestamp_offset_from_hour_minutes": {
+      "min": 0.016666666666666666,
+      "median": 0.016666666666666666,
+      "max": 43.85
+    },
+    "hour_grid_differences_hours": {
+      "1.0": 393
+    },
+    "raw_timestamp_differences_hours": {
+      "0.000278": 148,
+      "0.073056": 1,
+      "0.269444": 1,
+      "0.411389": 1,
+      "0.730556": 1,
+      "0.926944": 1,
+      "0.999722": 166,
+      "1.0": 171,
+      "1.000278": 17,
+      "35.925278": 1
+    },
+    "raw_timestamp_is_strictly_hourly": false,
+    "modal_step_hours": 1.0,
+    "missing_global_timeline_slots": 0,
+    "coverage": {
+      "min_pct": 87.56345177664974,
+      "max_pct": 91.11675126903553,
+      "mean_pct": 89.33973894126179,
+      "median_pct": 89.21319796954315,
+      "std_pct": 1.7775831504233495
+    },
+    "lowest_20_segments": [
+      {
+        "segment_id": 350,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 351,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 352,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 353,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 354,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 355,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 356,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 357,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 358,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 359,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 360,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 361,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 362,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 363,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 364,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 365,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 366,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 367,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 368,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      },
+      {
+        "segment_id": 369,
+        "records": 394,
+        "observed": 345,
+        "missing": 49,
+        "coverage_pct": 87.56345177664974,
+        "observed_record_pct": 87.56345177664974
+      }
+    ]
+  },
+  "missingness": {
+    "valid_observations": 246399,
+    "missing_by_audit_definition": 29401,
+    "is_observed_true": 246399,
+    "is_missing_true": 29401,
+    "flags_not_complementary_count": 0,
+    "flag_vs_valid_speed_disagree_count": 0,
+    "by_road_type": [
+      {
+        "road_type": "primary",
+        "total": 117651,
+        "observed": 117651,
+        "missing": 0,
+        "coverage_pct": 100.0
+      },
+      {
+        "road_type": "secondary",
+        "total": 96331,
+        "observed": 96331,
+        "missing": 0,
+        "coverage_pct": 100.0
+      },
+      {
+        "road_type": "trunk",
+        "total": 32417,
+        "observed": 32417,
+        "missing": 0,
+        "coverage_pct": 100.0
+      },
+      {
+        "road_type": NaN,
+        "total": 29401,
+        "observed": 0,
+        "missing": 29401,
+        "coverage_pct": 0.0
+      }
+    ],
+    "worst_dates": [
+      {
+        "date": "2026-01-01",
+        "total": 16800,
+        "observed": 350,
+        "missing": 16450,
+        "coverage_pct": 2.083333333333333
+      },
+      {
+        "date": "2026-01-02",
+        "total": 16800,
+        "observed": 4200,
+        "missing": 12600,
+        "coverage_pct": 25.0
+      },
+      {
+        "date": "2026-01-03",
+        "total": 16800,
+        "observed": 16450,
+        "missing": 350,
+        "coverage_pct": 97.91666666666666
+      },
+      {
+        "date": "2026-01-12",
+        "total": 16800,
+        "observed": 16799,
+        "missing": 1,
+        "coverage_pct": 99.99404761904762
+      },
+      {
+        "date": "2026-01-05",
+        "total": 16800,
+        "observed": 16800,
+        "missing": 0,
+        "coverage_pct": 100.0
+      },
+      {
+        "date": "2026-01-06",
+        "total": 16800,
+        "observed": 16800,
+        "missing": 0,
+        "coverage_pct": 100.0
+      },
+      {
+        "date": "2026-01-07",
+        "total": 16800,
+        "observed": 16800,
+        "missing": 0,
+        "coverage_pct": 100.0
+      },
+      {
+        "date": "2026-01-04",
+        "total": 16800,
+        "observed": 16800,
+        "missing": 0,
+        "coverage_pct": 100.0
+      },
+      {
+        "date": "2026-01-08",
+        "total": 16800,
+        "observed": 16800,
+        "missing": 0,
+        "coverage_pct": 100.0
+      },
+      {
+        "date": "2026-01-09",
+        "total": 16800,
+        "observed": 16800,
+        "missing": 0,
+        "coverage_pct": 100.0
+      }
+    ],
+    "hour_coverage": [
+      {
+        "hour": 0,
+        "total": 11900,
+        "observed": 10500,
+        "missing": 1400,
+        "coverage_pct": 88.23529411764706
+      },
+      {
+        "hour": 1,
+        "total": 11900,
+        "observed": 10500,
+        "missing": 1400,
+        "coverage_pct": 88.23529411764706
+      },
+      {
+        "hour": 2,
+        "total": 11900,
+        "observed": 10500,
+        "missing": 1400,
+        "coverage_pct": 88.23529411764706
+      },
+      {
+        "hour": 3,
+        "total": 11900,
+        "observed": 10500,
+        "missing": 1400,
+        "coverage_pct": 88.23529411764706
+      },
+      {
+        "hour": 4,
+        "total": 11900,
+        "observed": 10500,
+        "missing": 1400,
+        "coverage_pct": 88.23529411764706
+      },
+      {
+        "hour": 5,
+        "total": 11900,
+        "observed": 10500,
+        "missing": 1400,
+        "coverage_pct": 88.23529411764706
+      },
+      {
+        "hour": 6,
+        "total": 11900,
+        "observed": 10500,
+        "missing": 1400,
+        "coverage_pct": 88.23529411764706
+      },
+      {
+        "hour": 7,
+        "total": 11900,
+        "observed": 10500,
+        "missing": 1400,
+        "coverage_pct": 88.23529411764706
+      },
+      {
+        "hour": 8,
+        "total": 11900,
+        "observed": 10500,
+        "missing": 1400,
+        "coverage_pct": 88.23529411764706
+      },
+      {
+        "hour": 9,
+        "total": 11900,
+        "observed": 10500,
+        "missing": 1400,
+        "coverage_pct": 88.23529411764706
+      },
+      {
+        "hour": 10,
+        "total": 11200,
+        "observed": 9800,
+        "missing": 1400,
+        "coverage_pct": 87.5
+      },
+      {
+        "hour": 11,
+        "total": 11200,
+        "observed": 9799,
+        "missing": 1401,
+        "coverage_pct": 87.49107142857143
+      },
+      {
+        "hour": 12,
+        "total": 11200,
+        "observed": 10150,
+        "missing": 1050,
+        "coverage_pct": 90.625
+      },
+      {
+        "hour": 13,
+        "total": 11200,
+        "observed": 10150,
+        "missing": 1050,
+        "coverage_pct": 90.625
+      },
+      {
+        "hour": 14,
+        "total": 11200,
+        "observed": 10150,
+        "missing": 1050,
+        "coverage_pct": 90.625
+      },
+      {
+        "hour": 15,
+        "total": 11200,
+        "observed": 10150,
+        "missing": 1050,
+        "coverage_pct": 90.625
+      },
+      {
+        "hour": 16,
+        "total": 11200,
+        "observed": 10150,
+        "missing": 1050,
+        "coverage_pct": 90.625
+      },
+      {
+        "hour": 17,
+        "total": 11200,
+        "observed": 10150,
+        "missing": 1050,
+        "coverage_pct": 90.625
+      },
+      {
+        "hour": 18,
+        "total": 11200,
+        "observed": 10150,
+        "missing": 1050,
+        "coverage_pct": 90.625
+      },
+      {
+        "hour": 19,
+        "total": 11200,
+        "observed": 10150,
+        "missing": 1050,
+        "coverage_pct": 90.625
+      },
+      {
+        "hour": 20,
+        "total": 11200,
+        "observed": 10150,
+        "missing": 1050,
+        "coverage_pct": 90.625
+      },
+      {
+        "hour": 21,
+        "total": 11200,
+        "observed": 10150,
+        "missing": 1050,
+        "coverage_pct": 90.625
+      },
+      {
+        "hour": 22,
+        "total": 11200,
+        "observed": 10150,
+        "missing": 1050,
+        "coverage_pct": 90.625
+      },
+      {
+        "hour": 23,
+        "total": 11200,
+        "observed": 10150,
+        "missing": 1050,
+        "coverage_pct": 90.625
+      }
+    ],
+    "weekday_coverage": [
+      {
+        "day_of_week": "Friday",
+        "total": 50400,
+        "observed": 37800,
+        "missing": 12600,
+        "coverage_pct": 75.0
+      },
+      {
+        "day_of_week": "Monday",
+        "total": 33600,
+        "observed": 33599,
+        "missing": 1,
+        "coverage_pct": 99.99702380952381
+      },
+      {
+        "day_of_week": "Saturday",
+        "total": 40600,
+        "observed": 40250,
+        "missing": 350,
+        "coverage_pct": 99.13793103448276
+      },
+      {
+        "day_of_week": "Sunday",
+        "total": 33600,
+        "observed": 33600,
+        "missing": 0,
+        "coverage_pct": 100.0
+      },
+      {
+        "day_of_week": "Thursday",
+        "total": 50400,
+        "observed": 33950,
+        "missing": 16450,
+        "coverage_pct": 67.36111111111111
+      },
+      {
+        "day_of_week": "Tuesday",
+        "total": 33600,
+        "observed": 33600,
+        "missing": 0,
+        "coverage_pct": 100.0
+      },
+      {
+        "day_of_week": "Wednesday",
+        "total": 33600,
+        "observed": 33600,
+        "missing": 0,
+        "coverage_pct": 100.0
+      }
+    ]
+  },
+  "continuity": {
+    "segments_with_longest_contiguous_observations_at_least_lag_plus_one": {
+      "1": 700,
+      "3": 700,
+      "6": 700,
+      "12": 700,
+      "24": 700
+    },
+    "median_sequence_length_across_segments": 262.25,
+    "mean_sequences_per_segment": 1.5014285714285713,
+    "median_longest_sequence": 345.0,
+    "mean_gap_count_per_segment": 0.0014285714285714286,
+    "total_sequences": 1051,
+    "total_gaps_1h": 1,
+    "total_gaps_2h_plus": 350,
+    "max_gap_hours": 36.0
+  },
+  "speed": {
+    "currentSpeed": {
+      "n": 246399,
+      "min": 1.0,
+      "max": 54.0,
+      "mean": 33.13745997345769,
+      "median": 32.0,
+      "std": 8.969907109882877,
+      "q": {
+        "0.01": 19.0,
+        "0.05": 21.0,
+        "0.25": 27.0,
+        "0.5": 32.0,
+        "0.75": 38.0,
+        "0.95": 53.0,
+        "0.99": 54.0
+      }
+    },
+    "freeFlowSpeed": {
+      "n": 246399,
+      "min": 16.0,
+      "max": 55.0,
+      "mean": 35.05807653440152,
+      "median": 34.0,
+      "std": 8.51862504404215,
+      "q": {
+        "0.01": 21.0,
+        "0.05": 26.0,
+        "0.25": 28.0,
+        "0.5": 34.0,
+        "0.75": 43.0,
+        "0.95": 54.0,
+        "0.99": 54.0
+      }
+    },
+    "current_speed_nonpositive": 0,
+    "current_speed_gt_free_flow": 0,
+    "current_speed_over_120": 0,
+    "current_speed_over_160": 0,
+    "current_speed_infinite": 0,
+    "free_flow_nonpositive": 0,
+    "free_flow_over_160": 0,
+    "free_flow_infinite": 0,
+    "free_flow_stable_segments": 29,
+    "free_flow_unstable_segments": 671,
+    "speed_ratio": {
+      "n": 246399,
+      "min": 0.05263157894736842,
+      "max": 1.0,
+      "mean": 0.9437597163655201,
+      "median": 1.0,
+      "std": 0.09336138751289555,
+      "q": {
+        "0.01": 0.6666666666666666,
+        "0.05": 0.75,
+        "0.25": 0.8888888888888888,
+        "0.5": 1.0,
+        "0.75": 1.0,
+        "0.95": 1.0,
+        "0.99": 1.0
+      }
+    },
+    "speed_ratio_counts": {
+      "lt_0_9": 65738,
+      "lt_0_8": 28243,
+      "lt_0_7": 4335,
+      "lt_0_5": 124,
+      "gt_1": 0,
+      "eq_1": 166828,
+      "lt_1": 79571,
+      "n": 246399
+    },
+    "segments": {
+      "nearly_constant_std_le_0_1": 5,
+      "no_congestion_ratio_lt_0_8": 123,
+      "high_congestion_over_50pct": 0
+    }
+  },
+  "labels": {
+    "available_columns": [],
+    "status": "not present in source schema; label counts and consistency cannot be audited",
+    "derived_proxy_counts_ratio_lt_0_8": 28243,
+    "proxy_definition": "currentSpeed/freeFlowSpeed < 0.8; derived for audit only"
+  },
+  "temporal_signal": {
+    "segment_autocorrelation": {
+      "1": {
+        "segments_with_estimable_acf": 695,
+        "mean_segment_acf": 0.5750804836836433,
+        "median_segment_acf": 0.6777190366186453,
+        "pooled_mean_acf": 0.5744767316550565
+      },
+      "3": {
+        "segments_with_estimable_acf": 695,
+        "mean_segment_acf": 0.17464661144803367,
+        "median_segment_acf": 0.18931605820980948,
+        "pooled_mean_acf": 0.17427775098068699
+      },
+      "6": {
+        "segments_with_estimable_acf": 695,
+        "mean_segment_acf": 0.013791027136129437,
+        "median_segment_acf": 0.012452007636400178,
+        "pooled_mean_acf": 0.013727388614137078
+      },
+      "12": {
+        "segments_with_estimable_acf": 695,
+        "mean_segment_acf": -0.3971663904948924,
+        "median_segment_acf": -0.4419408011027866,
+        "pooled_mean_acf": -0.39648095734618766
+      },
+      "24": {
+        "segments_with_estimable_acf": 695,
+        "mean_segment_acf": 0.5851245200764162,
+        "median_segment_acf": 0.6611509871226587,
+        "pooled_mean_acf": 0.584123528947618
+      }
+    }
+  },
+  "travel_time": {
+    "unit_assumption": "speeds in km/h; length in metres; travel times in seconds",
+    "current": {
+      "n": 246399,
+      "mean_abs_difference_seconds": 1440.0071869371038,
+      "median_abs_difference_seconds": 1551.2929681324629,
+      "max_abs_difference_seconds": 3202.711910514178,
+      "within_1s_pct": 0.14569864325748075,
+      "within_5s_pct": 0.14569864325748075,
+      "within_10pct_expected_pct": 0.14569864325748075
+    },
+    "free_flow": {
+      "n": 246399,
+      "mean_abs_difference_seconds": 1351.8345322039183,
+      "median_abs_difference_seconds": 1376.721282178459,
+      "max_abs_difference_seconds": 2709.2946935119967,
+      "within_1s_pct": 0.14569864325748075,
+      "within_5s_pct": 0.14569864325748075,
+      "within_10pct_expected_pct": 0.14569864325748075
+    }
+  },
+  "metadata": {
+    "osmid_unique_raw_values": 266,
+    "road_type_counts": {
+      "primary": 117651,
+      "secondary": 96331,
+      "trunk": 32417,
+      "NaN": 29401
+    },
+    "road_name_unique": 350,
+    "length_m_nonpositive": 0,
+    "length_m": {
+      "n": 246399,
+      "min": 60.36897279670646,
+      "max": 3016.9979383186064,
+      "mean": 221.18237564668374,
+      "median": 130.8960342471774,
+      "std": 290.72514870228747,
+      "q": {
+        "0.01": 61.552714374238654,
+        "0.05": 66.06337197043854,
+        "0.25": 86.92544872837664,
+        "0.5": 130.8960342471774,
+        "0.75": 226.5674830169553,
+        "0.95": 726.1860143366849,
+        "0.99": 1505.9062740619322
+      }
+    },
+    "lat": {
+      "n": 246399,
+      "min": 20.21161811932942,
+      "max": 20.36393124372287,
+      "mean": 20.283425361869377,
+      "median": 20.277992320542083,
+      "std": 0.03676974018039279,
+      "q": {
+        "0.01": 20.214578327332585,
+        "0.05": 20.228287089696607,
+        "0.25": 20.2573404304178,
+        "0.5": 20.277992320542083,
+        "0.75": 20.30550208932056,
+        "0.95": 20.35386774300183,
+        "0.99": 20.359855513848967
+      }
+    },
+    "lon": {
+      "n": 246399,
+      "min": 85.78037964643454,
+      "max": 85.88927091495788,
+      "mean": 85.83189191262926,
+      "median": 85.83453863966754,
+      "std": 0.02358113975691904,
+      "q": {
+        "0.01": 85.78064729516193,
+        "0.05": 85.78400769999999,
+        "0.25": 85.82057859831785,
+        "0.5": 85.83453863966754,
+        "0.75": 85.843649,
+        "0.95": 85.87205818256953,
+        "0.99": 85.883597525277
+      }
+    },
+    "confidence": {
+      "n": 246399,
+      "min": 0.505346,
+      "max": 1.0,
+      "mean": 0.9771840787422027,
+      "median": 1.0,
+      "std": 0.07508966089360214,
+      "q": {
+        "0.01": 0.574265,
+        "0.05": 0.82671,
+        "0.25": 1.0,
+        "0.5": 1.0,
+        "0.75": 1.0,
+        "0.95": 1.0,
+        "0.99": 1.0
+      }
+    },
+    "invalid_lat_nonnull": 0,
+    "invalid_lon_nonnull": 0,
+    "road_closure_true": 25374,
+    "road_closure_true_pct": 10.297931403942385,
+    "segments_one_osm_id": 613,
+    "segments_multiple_osm_ids": 87,
+    "segments_malformed_osmid": 0
+  },
+  "osm_id_existence": {
+    "graph_nodes": 18260,
+    "graph_directed_edges": 46679,
+    "unique_graph_osm_ids": 11337,
+    "traffic_segments": 700,
+    "matched_segments": 700,
+    "unmatched_segments": 0,
+    "match_pct": 100.0
+  },
+  "spatial": {
+    "matched_segments": 700,
+    "unmatched_or_invalid": 0,
+    "distance": {
+      "n": 700,
+      "min": 4.511267194658609e-07,
+      "max": 76.53052254558584,
+      "mean": 1.5115784549116043,
+      "median": 0.13502719471679303,
+      "std": 6.414898631862227,
+      "q": {
+        "0.5": 0.13502719471679303,
+        "0.9": 2.1361768030339867,
+        "0.95": 5.808417342883748
+      }
+    },
+    "within_m": {
+      "25": 688,
+      "50": 697,
+      "100": 700,
+      "250": 700,
+      "500": 700
+    },
+    "within_m_pct": {
+      "25": 98.28571428571429,
+      "50": 99.57142857142857,
+      "100": 100.0,
+      "250": 100.0,
+      "500": 100.0
+    },
+    "road_type_match_pct": 100.0,
+    "length_ratio_stats": {
+      "n": 700,
+      "min": 0.2845189186725737,
+      "max": 1.6562418742783498,
+      "mean": 0.9997811396895115,
+      "median": 1.0036922708938287,
+      "std": 0.07019911760860142,
+      "q": {
+        "0.5": 1.0036922708938287,
+        "0.9": 1.0046071368548082,
+        "0.95": 1.0046224476079293
+      }
+    }
+  },
+  "connectivity": {
+    "covered_directed_edges": 1102,
+    "covered_nodes": 1041,
+    "weak_component_count": 44,
+    "largest_weak_component_nodes": 101,
+    "second_largest_weak_component_nodes": 95,
+    "largest_component_node_share_pct": 9.702209414024976,
+    "spatially_matched_directed_edge_count": 700,
+    "spatially_matched_unique_directed_edges": 645,
+    "spatially_matched_nodes": 867,
+    "spatial_weak_component_count": 227,
+    "spatial_largest_weak_component_nodes": 20,
+    "spatial_largest_component_node_share_pct": 2.306805074971165
+  }
+}

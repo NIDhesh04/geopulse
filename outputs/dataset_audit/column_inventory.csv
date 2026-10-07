@@ -1,0 +1,18 @@
+column,dtype,null_count,unique_nonnull
+segment_id,int64,0,700
+hour,"datetime64[us, Asia/Calcutta]",0,394
+timestamp,"datetime64[us, Asia/Calcutta]",29401,509
+currentSpeed,float64,29401,53
+freeFlowSpeed,float64,29401,35
+currentTravelTime,float64,29401,450
+freeFlowTravelTime,float64,29401,134
+confidence,float64,29401,6458
+is_observed,bool,0,2
+is_missing,bool,0,2
+roadClosure,boolean,29401,2
+osmid,str,29401,266
+road_name,float64,29401,350
+road_type,str,29401,3
+length_m,float64,29401,663
+lat,float64,29401,662
+lon,float64,29401,663
