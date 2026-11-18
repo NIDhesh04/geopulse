@@ -177,17 +177,43 @@ class RouteController:
                 termination_reason = "Destination reached successfully."
                 break
 
-            # Check dynamic traffic change injection
-            if traffic_update_step is not None and step == traffic_update_step and updated_weights:
-                current_weights = dict(updated_weights)
-                if updated_speeds:
-                    current_speeds = dict(updated_speeds)
+        # Check dynamic traffic change injection
+        if traffic_update_step is not None and step == traffic_update_step and updated_weights:
+            # Preserve current weights for comparison
+            old_weights = dict(current_weights)
+            # Apply updated traffic conditions
+            current_weights = dict(updated_weights)
+            if updated_speeds:
+                current_speeds = dict(updated_speeds)
 
-                # Evaluate reroute opportunity: compare continuation on current strategy vs fallback Dijkstra
-                check_alt = custom_dijkstra(self.adjacency, current_weights, curr_node, dest_str)
-                if check_alt.is_reached:
-                    # Rerouting metric check
-                    reroute_count += 1
+            # Evaluate whether to reroute based on dual thresholds
+            # Compute remaining travel time on current continuation using old weights
+            remaining_old = custom_dijkstra(self.adjacency, old_weights, curr_node, dest_str)
+            if remaining_old.is_reached:
+                remaining_old_time = sum(old_weights.get(e, 10.0) for e in remaining_old.edge_path)
+            else:
+                remaining_old_time = float('inf')
+
+            # Compute optimal continuation under updated weights
+            remaining_new = custom_dijkstra(self.adjacency, current_weights, curr_node, dest_str)
+            if remaining_new.is_reached:
+                remaining_new_time = sum(current_weights.get(e, 10.0) for e in remaining_new.edge_path)
+            else:
+                remaining_new_time = float('inf')
+
+            absolute_saving = remaining_old_time - remaining_new_time
+            relative_saving = (absolute_saving / remaining_old_time) * 100.0 if remaining_old_time > 0 else 0.0
+
+            if (absolute_saving >= self.reroute_threshold_s) and (relative_saving >= self.reroute_threshold_pct):
+                # Reroute confirmed: keep updated weights
+                reroute_count += 1
+                # No additional action needed; future decisions will use updated_weights
+            else:
+                # Do not reroute: revert to old weights
+                current_weights = old_weights
+                if updated_speeds:
+                    # Revert speeds if they were updated
+                    current_speeds = {}
 
             # Execute Two-Edge Selection
             t_step_start = time.perf_counter()

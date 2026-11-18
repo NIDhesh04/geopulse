@@ -16,8 +16,10 @@ from src.routing.candidate_generator import (
 )
 from src.routing.decision_strategies import (
     BaseDecisionStrategy,
-    DecisionEvaluationResult
+    DecisionEvaluationResult,
+    LimitedLookaheadDecisionStrategy
 )
+
 
 
 @dataclass
@@ -80,6 +82,19 @@ class TwoEdgeSelector:
         Executes a single two-edge decision step at current_node.
         """
         # 1. Generate candidates
+        # Determine if a lookahead evaluator should be supplied (for LOOKAHEAD strategy)
+        lookahead_evaluator = None
+        if isinstance(self.decision_strategy, LimitedLookaheadDecisionStrategy):
+            # Create a fresh LimitedLookaheadEvaluator using the current edge_weights to avoid stale data
+            eval_instance = LimitedLookaheadEvaluator(
+                self.candidate_generator.adjacency,
+                edge_weights,
+                self.candidate_generator.estimate_remaining_time,
+                depth=self.decision_strategy.evaluator.depth,
+                max_expansions_per_node=self.decision_strategy.evaluator.max_expansions
+            )
+            lookahead_evaluator = eval_instance.evaluate_edge
+
         gen_result: CandidateGenerationResult = self.candidate_generator.generate_candidates(
             current_node=current_node,
             destination=destination,
@@ -87,7 +102,8 @@ class TwoEdgeSelector:
             edge_speeds=edge_speeds,
             previous_node=previous_node,
             visited_nodes=visited_nodes,
-            strategy=self.candidate_strategy
+            strategy=self.candidate_strategy,
+            lookahead_evaluator=lookahead_evaluator
         )
 
         # 2. Dead-end check

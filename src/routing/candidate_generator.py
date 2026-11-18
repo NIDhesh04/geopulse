@@ -84,7 +84,7 @@ class CandidateGenerator:
         adjacency: Dict[str, List[Tuple[str, int]]],
         edge_lengths: Dict[Tuple[str, str, int], float],
         node_coords: Optional[Dict[str, Tuple[float, float]]] = None,
-        default_free_flow_speed_kmh: float = 40.0,
+        default_free_flow_speed_kmh: float = 25.0,
         random_seed: Optional[int] = 42
     ):
         """
@@ -98,6 +98,7 @@ class CandidateGenerator:
             Mapping of node -> (lat, lon) or (y, x) for heuristic estimation.
         default_free_flow_speed_kmh : float
             Speed used for optimistic Euclidean/Haversine heuristic travel-time calculation.
+            Calibrated to realistic urban speed (25 km/h for Bhubaneswar network).
         random_seed : Optional[int]
             Random seed for reproducibility in stochastic selection.
         """
