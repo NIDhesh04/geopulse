@@ -21,7 +21,7 @@ Features:
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Tuple, Set, Optional, Any, Callable
+from typing import Dict, List, Tuple, Set, Optional, Any
 import time
 
 from src.routing.dijkstra import custom_dijkstra, DijkstraResult
@@ -53,9 +53,7 @@ class SequentialJourneyResult:
 
 
 class RouteController:
-    """
-    Executes sequential routing journeys, managing state, safety, and dynamic rerouting.
-    """
+    """Executes sequential routing journeys, managing state, safety, and dynamic rerouting."""
 
     def __init__(
         self,
@@ -65,7 +63,7 @@ class RouteController:
         max_hops_multiplier: float = 3.0,
         max_node_visits: int = 2,
         reroute_threshold_seconds: float = 10.0,
-        reroute_threshold_percent: float = 3.0
+        reroute_threshold_percent: float = 3.0,
     ):
         self.adjacency = adjacency
         self.edge_lengths = edge_lengths
@@ -85,10 +83,9 @@ class RouteController:
         updated_weights: Optional[Dict[Tuple[str, str, int], float]] = None,
         updated_speeds: Optional[Dict[Tuple[str, str, int], float]] = None,
         max_hops: Optional[int] = None,
-        reference_dijkstra: Optional[DijkstraResult] = None
+        reference_dijkstra: Optional[DijkstraResult] = None,
     ) -> SequentialJourneyResult:
-        """
-        Executes a complete sequential journey from source to destination.
+        """Executes a complete sequential journey from source to destination.
 
         Parameters
         ----------
@@ -112,11 +109,9 @@ class RouteController:
             Precomputed reference path for baseline comparison.
         """
         start_time_perf = time.perf_counter()
-
         source_str = str(source)
         dest_str = str(destination)
 
-        # Trivial case: source == destination
         if source_str == dest_str:
             return SequentialJourneyResult(
                 source_node=source_str,
@@ -135,10 +130,10 @@ class RouteController:
                 reroute_events=0,
                 average_decision_latency_ms=0.0,
                 total_computation_time_ms=0.0,
-                termination_reason="Source equals destination."
+                termination_reason="Source equals destination.",
             )
 
-        # Establish max hop bound
+        # Determine hop bound
         if max_hops is None:
             if reference_dijkstra and reference_dijkstra.is_reached and reference_dijkstra.node_path:
                 computed_max_hops = max(50, int(len(reference_dijkstra.node_path) * self.max_hops_multiplier))
@@ -147,19 +142,16 @@ class RouteController:
         else:
             computed_max_hops = max(10, int(max_hops))
 
-        # Runtime journey tracking
+        # Runtime tracking
         current_weights = dict(initial_weights)
         current_speeds = dict(initial_speeds) if initial_speeds else {}
-
         curr_node = source_str
         prev_node: Optional[str] = None
         node_path: List[str] = [curr_node]
         edge_path: List[Tuple[str, str, int]] = []
         decision_steps: List[TwoEdgeDecisionStep] = []
-
         visited_node_counts: Dict[str, int] = {curr_node: 1}
         visited_nodes_set: Set[str] = {curr_node}
-
         total_travel_time = 0.0
         total_distance = 0.0
         recovery_count = 0
@@ -167,55 +159,56 @@ class RouteController:
         is_success = False
         termination_reason = ""
         decision_latencies: List[float] = []
-
         step = 0
 
         while step < computed_max_hops:
-            # Check destination reached
+            # Destination reached?
             if curr_node == dest_str:
                 is_success = True
                 termination_reason = "Destination reached successfully."
                 break
 
-        # Check dynamic traffic change injection
-        if traffic_update_step is not None and step == traffic_update_step and updated_weights:
-            # Preserve current weights for comparison
-            old_weights = dict(current_weights)
-            # Apply updated traffic conditions
-            current_weights = dict(updated_weights)
-            if updated_speeds:
-                current_speeds = dict(updated_speeds)
-
-            # Evaluate whether to reroute based on dual thresholds
-            # Compute remaining travel time on current continuation using old weights
-            remaining_old = custom_dijkstra(self.adjacency, old_weights, curr_node, dest_str)
-            if remaining_old.is_reached:
-                remaining_old_time = sum(old_weights.get(e, 10.0) for e in remaining_old.edge_path)
-            else:
-                remaining_old_time = float('inf')
-
-            # Compute optimal continuation under updated weights
-            remaining_new = custom_dijkstra(self.adjacency, current_weights, curr_node, dest_str)
-            if remaining_new.is_reached:
-                remaining_new_time = sum(current_weights.get(e, 10.0) for e in remaining_new.edge_path)
-            else:
-                remaining_new_time = float('inf')
-
-            absolute_saving = remaining_old_time - remaining_new_time
-            relative_saving = (absolute_saving / remaining_old_time) * 100.0 if remaining_old_time > 0 else 0.0
-
-            if (absolute_saving >= self.reroute_threshold_s) and (relative_saving >= self.reroute_threshold_pct):
-                # Reroute confirmed: keep updated weights
-                reroute_count += 1
-                # No additional action needed; future decisions will use updated_weights
-            else:
-                # Do not reroute: revert to old weights
-                current_weights = old_weights
+            # Dynamic traffic update handling (once)
+            if (
+                traffic_update_step is not None
+                and step == traffic_update_step
+                and updated_weights
+            ):
+                old_weights = dict(current_weights)
+                old_speeds = dict(current_speeds)
+                current_weights = dict(updated_weights)
                 if updated_speeds:
-                    # Revert speeds if they were updated
-                    current_speeds = {}
+                    current_speeds = dict(updated_speeds)
+                # Compute remaining travel times
+                remaining_old = custom_dijkstra(self.adjacency, old_weights, curr_node, dest_str)
+                remaining_old_time = (
+                    sum(old_weights.get(e, 10.0) for e in remaining_old.edge_path)
+                    if remaining_old.is_reached
+                    else float("inf")
+                )
+                remaining_new = custom_dijkstra(self.adjacency, current_weights, curr_node, dest_str)
+                remaining_new_time = (
+                    sum(current_weights.get(e, 10.0) for e in remaining_new.edge_path)
+                    if remaining_new.is_reached
+                    else float("inf")
+                )
+                absolute_saving = remaining_old_time - remaining_new_time
+                relative_saving = (
+                    (absolute_saving / remaining_old_time) * 100.0
+                    if remaining_old_time > 0
+                    else 0.0
+                )
+                if (
+                    absolute_saving >= self.reroute_threshold_s
+                    and relative_saving >= self.reroute_threshold_pct
+                ):
+                    reroute_count += 1  # keep updated weights
+                else:
+                    # revert to previous state
+                    current_weights = old_weights
+                    current_speeds = old_speeds
 
-            # Execute Two-Edge Selection
+            # Two‑edge selection
             t_step_start = time.perf_counter()
             decision: TwoEdgeDecisionStep = self.selector.decide_next_edge(
                 step_index=step,
@@ -224,23 +217,25 @@ class RouteController:
                 edge_weights=current_weights,
                 edge_speeds=current_speeds,
                 previous_node=prev_node,
-                visited_nodes=visited_nodes_set
+                visited_nodes=visited_nodes_set,
             )
             step_lat_ms = (time.perf_counter() - t_step_start) * 1000.0
             decision_latencies.append(step_lat_ms)
 
-            # Safety check 1: Dead end recovery
+            # Dead‑end or missing decision handling
             if decision.is_dead_end or decision.selected_edge is None or decision.next_node is None:
                 recovery_count += 1
                 fallback_res = custom_dijkstra(self.adjacency, current_weights, curr_node, dest_str)
-                if fallback_res.is_reached and len(fallback_res.edge_path) > 0:
-                    # Recover via next edge of fallback route from curr_node
+                if fallback_res.is_reached and fallback_res.edge_path:
+                    # Simple forward recovery from current node
                     rec_edge = fallback_res.edge_path[0]
                     rec_next = fallback_res.node_path[1]
-                    rec_length = self.edge_lengths.get(rec_edge, 50.0)
+                    rec_len = self.edge_lengths.get(rec_edge, 50.0)
                     rec_cost = current_weights.get(rec_edge, 10.0)
-                    rec_speed = current_speeds.get(rec_edge, (rec_length / rec_cost * 3.6) if rec_cost > 0 else 30.0)
-
+                    rec_speed = current_speeds.get(
+                        rec_edge,
+                        (rec_len / rec_cost * 3.6) if rec_cost > 0 else 30.0,
+                    )
                     decision = TwoEdgeDecisionStep(
                         step_index=step,
                         current_node=curr_node,
@@ -251,73 +246,70 @@ class RouteController:
                         score_a=None,
                         score_b=None,
                         travel_time_s=rec_cost,
-                        length_m=rec_length,
+                        length_m=rec_len,
                         speed_kmh=rec_speed,
                         strategy_name=f"{self.selector.decision_strategy.name} [RECOVERY_DEAD_END]",
-                        decision_reason=f"Dead-end recovery invoked at node {curr_node}; routed along {rec_edge[0]}->{rec_edge[1]}.",
+                        decision_reason=f"Dead‑end recovery invoked at node {curr_node}; routed along {rec_edge[0]}->{rec_edge[1]}.",
                         is_forced=True,
                         is_dead_end=False,
-                        evaluation_time_ms=step_lat_ms
+                        evaluation_time_ms=step_lat_ms,
                     )
                 elif prev_node is not None:
-                    # Backtrack recovery: curr_node has 0 exits, backtrack to prev_node
-                    # Block the dead-end edge in current_weights so prev_node will not select it again
-                    if edge_path:
-                        last_edge = edge_path[-1]
-                        current_weights[last_edge] = float('inf')
-
-                    # Backtrack to prev_node
-                    curr_node = prev_node
-                    # Find fallback from prev_node
-                    backtrack_res = custom_dijkstra(self.adjacency, current_weights, curr_node, dest_str)
-                    if backtrack_res.is_reached and len(backtrack_res.edge_path) > 0:
-                        rec_edge = backtrack_res.edge_path[0]
-                        rec_next = backtrack_res.node_path[1]
-                        rec_length = self.edge_lengths.get(rec_edge, 50.0)
-                        rec_cost = current_weights.get(rec_edge, 10.0)
-                        rec_speed = current_speeds.get(rec_edge, (rec_length / rec_cost * 3.6) if rec_cost > 0 else 30.0)
-
+                    # Backtrack recovery – record a reverse traversal if edge exists
+                    reverse_edge = (curr_node, prev_node, 0)  # lane id placeholder
+                    if reverse_edge in self.edge_lengths:
+                        rev_len = self.edge_lengths[reverse_edge]
+                        rev_cost = current_weights.get(reverse_edge, 10.0)
+                        rev_speed = current_speeds.get(
+                            reverse_edge,
+                            (rev_len / rev_cost * 3.6) if rev_cost > 0 else 30.0,
+                        )
                         decision = TwoEdgeDecisionStep(
                             step_index=step,
                             current_node=curr_node,
-                            next_node=rec_next,
-                            selected_edge=rec_edge,
+                            next_node=prev_node,
+                            selected_edge=reverse_edge,
                             candidate_a=None,
                             candidate_b=None,
                             score_a=None,
                             score_b=None,
-                            travel_time_s=rec_cost,
-                            length_m=rec_length,
-                            speed_kmh=rec_speed,
+                            travel_time_s=rev_cost,
+                            length_m=rev_len,
+                            speed_kmh=rev_speed,
                             strategy_name=f"{self.selector.decision_strategy.name} [RECOVERY_BACKTRACK]",
-                            decision_reason=f"Dead-end backtrack recovery from dead end to {curr_node}; redirected along {rec_edge[0]}->{rec_edge[1]}.",
+                            decision_reason=f"Backtrack from dead‑end {curr_node} to {prev_node}.",
                             is_forced=True,
                             is_dead_end=False,
-                            evaluation_time_ms=step_lat_ms
+                            evaluation_time_ms=step_lat_ms,
                         )
+                        # Update current position for movement below
+                        next_node = prev_node
+                        selected_edge = reverse_edge
                     else:
-                        termination_reason = f"Unrecoverable dead-end reached at node {curr_node}."
+                        termination_reason = f"Unrecoverable dead-end at {curr_node}; no reverse edge."
                         break
                 else:
-                    termination_reason = f"Unrecoverable dead-end reached at node {curr_node}."
+                    termination_reason = f"Unrecoverable dead‑end at {curr_node}."
                     break
 
+            # If we have a fresh decision (not overwritten by recovery), extract next info
             next_node = decision.next_node
             selected_edge = decision.selected_edge
 
-            # Safety check 2: Cycle detection & excessive visit frequency
+            # Cycle detection
             node_visits = visited_node_counts.get(next_node, 0)
             if node_visits >= self.max_node_visits:
-                # Cycle detected: break loop via Dijkstra recovery
                 recovery_count += 1
                 fallback_res = custom_dijkstra(self.adjacency, current_weights, curr_node, dest_str)
-                if fallback_res.is_reached and len(fallback_res.edge_path) > 0:
+                if fallback_res.is_reached and fallback_res.edge_path:
                     rec_edge = fallback_res.edge_path[0]
                     rec_next = fallback_res.node_path[1]
-                    rec_length = self.edge_lengths.get(rec_edge, 50.0)
+                    rec_len = self.edge_lengths.get(rec_edge, 50.0)
                     rec_cost = current_weights.get(rec_edge, 10.0)
-                    rec_speed = current_speeds.get(rec_edge, (rec_length / rec_cost * 3.6) if rec_cost > 0 else 30.0)
-
+                    rec_speed = current_speeds.get(
+                        rec_edge,
+                        (rec_len / rec_cost * 3.6) if rec_cost > 0 else 30.0,
+                    )
                     decision = TwoEdgeDecisionStep(
                         step_index=step,
                         current_node=curr_node,
@@ -328,38 +320,30 @@ class RouteController:
                         score_a=None,
                         score_b=None,
                         travel_time_s=rec_cost,
-                        length_m=rec_length,
+                        length_m=rec_len,
                         speed_kmh=rec_speed,
                         strategy_name=f"{self.selector.decision_strategy.name} [RECOVERY_CYCLE_BREAKER]",
-                        decision_reason=f"Cycle breaking recovery: node {next_node} already visited {node_visits} times. Redirected to {rec_next}.",
+                        decision_reason=f"Cycle break at {next_node} (visited {node_visits} times).",
                         is_forced=True,
                         is_dead_end=False,
-                        evaluation_time_ms=step_lat_ms
+                        evaluation_time_ms=step_lat_ms,
                     )
                     next_node = rec_next
                     selected_edge = rec_edge
 
-            # Apply step movement
+            # Record movement
             edge_path.append(selected_edge)
             node_path.append(next_node)
             decision_steps.append(decision)
-
             total_travel_time += decision.travel_time_s
             total_distance += decision.length_m
-
             prev_node = curr_node
             curr_node = next_node
-
             visited_node_counts[curr_node] = visited_node_counts.get(curr_node, 0) + 1
             visited_nodes_set.add(curr_node)
-
             step += 1
 
-            if curr_node == dest_str:
-                is_success = True
-                termination_reason = "Destination reached successfully."
-                break
-
+        # Post‑loop termination handling
         if not is_success and step >= computed_max_hops:
             termination_reason = f"Maximum hops exceeded ({computed_max_hops} hops)."
 
@@ -384,5 +368,5 @@ class RouteController:
             reroute_events=reroute_count,
             average_decision_latency_ms=round(avg_lat_ms, 3),
             total_computation_time_ms=round(total_comp_ms, 3),
-            termination_reason=termination_reason
+            termination_reason=termination_reason,
         )

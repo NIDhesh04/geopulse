@@ -441,3 +441,91 @@ def test_sequential_journey_with_dynamic_traffic_update(diamond_graph):
     assert result.is_success is True
     assert result.node_path[-1] == 'D'
     assert result.reroute_events > 0
+
+
+def test_backtrack_recovery_records_reverse_movement():
+    """A dead-end node backtracks to the previous node and records the reverse edge.
+    The graph includes a reverse edge with defined length and weight.
+    """
+    adj = {
+        'A': [('B', 0)],
+        'B': [('A', 0), ('C', 0)],
+        'C': []
+    }
+    lengths = {('A', 'B', 0): 10.0, ('B', 'A', 0): 10.0, ('B', 'C', 0): 20.0}
+    weights = {('A', 'B', 0): 1.0, ('B', 'A', 0): 1.0, ('B', 'C', 0): 2.0}
+    generator = CandidateGenerator(adj, lengths)
+    selector = TwoEdgeSelector(generator, GreedyDecisionStrategy())
+    controller = RouteController(adj, lengths, selector)
+    # Force backtrack by allowing only one visit per node
+    controller.max_node_visits = 0
+    result = controller.execute_journey(source='A', destination='C', initial_weights=weights)
+    assert result.node_path == ['A', 'B', 'A', 'B', 'C']
+    assert result.edge_path[0] == ('A', 'B', 0)
+    assert result.edge_path[1] == ('B', 'A', 0)
+    assert result.edge_path[-1] == ('B', 'C', 0)
+    expected_time = weights[('A', 'B', 0)] + weights[('B', 'A', 0)] + weights[('B', 'C', 0)]
+    assert abs(result.total_travel_time_s - expected_time) < 1e-6
+
+
+def test_cycle_detection_breaks_loop():
+    """Detect and break a simple two-node cycle using fallback recovery."""
+    adj = {'A': [('B', 0), ('C', 0)], 'B': [('A', 0)], 'C': []}
+    lengths = {('A', 'B', 0): 10.0, ('B', 'A', 0): 10.0, ('A', 'C', 0): 20.0}
+    weights = {('A', 'B', 0): 1.0, ('B', 'A', 0): 1.0, ('A', 'C', 0): 5.0}
+    generator = CandidateGenerator(adj, lengths)
+    selector = TwoEdgeSelector(generator, GreedyDecisionStrategy())
+    controller = RouteController(adj, lengths, selector, max_node_visits=1)
+    result = controller.execute_journey(source='A', destination='C', initial_weights=weights)
+    assert result.is_success
+    assert result.node_path[-1] == 'C'
+    assert result.recovery_events >= 1
+
+
+def test_traffic_update_accepts_and_changes_route():
+    """Traffic update passes thresholds and alters the chosen path."""
+    adj = {'A': [('B', 0), ('C', 0)], 'B': [('D', 0)], 'C': [('D', 0)], 'D': []}
+    lengths = {('A', 'B', 0): 10.0, ('A', 'C', 0): 10.0, ('B', 'D', 0): 10.0, ('C', 'D', 0): 10.0}
+    init_weights = {('A', 'B', 0): 1.0, ('A', 'C', 0): 2.0, ('B', 'D', 0): 1.0, ('C', 'D', 0): 2.0}
+    updated_weights = {('A', 'B', 0): 5.0, ('A', 'C', 0): 2.0, ('B', 'D', 0): 10.0, ('C', 'D', 0): 2.0}
+    generator = CandidateGenerator(adj, lengths)
+    selector = TwoEdgeSelector(generator, GreedyDecisionStrategy())
+    controller = RouteController(adj, lengths, selector, reroute_threshold_seconds=0.0, reroute_threshold_percent=0.0)
+    result = controller.execute_journey(
+        source='A', destination='D', initial_weights=init_weights,
+        traffic_update_step=0, updated_weights=updated_weights)
+    assert result.node_path[:3] == ['A', 'C', 'D']
+    assert result.reroute_events == 1
+
+
+def test_traffic_update_rejected_restores_original_weights():
+    """Traffic update fails thresholds; original route is kept."""
+    adj = {'A': [('B', 0), ('C', 0)], 'B': [('D', 0)], 'C': [('D', 0)], 'D': []}
+    lengths = {('A', 'B', 0): 10.0, ('A', 'C', 0): 10.0, ('B', 'D', 0): 10.0, ('C', 'D', 0): 10.0}
+    init_weights = {('A', 'B', 0): 1.0, ('A', 'C', 0): 2.0, ('B', 'D', 0): 1.0, ('C', 'D', 0): 2.0}
+    updated_weights = {('A', 'B', 0): 2.0, ('A', 'C', 0): 2.0, ('B', 'D', 0): 3.0, ('C', 'D', 0): 2.0}
+    generator = CandidateGenerator(adj, lengths)
+    selector = TwoEdgeSelector(generator, GreedyDecisionStrategy())
+    controller = RouteController(adj, lengths, selector, reroute_threshold_seconds=5.0, reroute_threshold_percent=10.0)
+    result = controller.execute_journey(
+        source='A', destination='D', initial_weights=init_weights,
+        traffic_update_step=0, updated_weights=updated_weights)
+    assert result.node_path[:3] == ['A', 'B', 'D']
+    assert result.reroute_events == 0
+
+
+def test_lookahead_uses_updated_weights_after_reroute():
+    """Lookahead decision reflects new weights after a successful traffic update."""
+    adj = {'A': [('B', 0), ('C', 0)], 'B': [('D', 0)], 'C': [('D', 0)], 'D': []}
+    lengths = {('A', 'B', 0): 10.0, ('A', 'C', 0): 10.0, ('B', 'D', 0): 10.0, ('C', 'D', 0): 10.0}
+    init_weights = {('A', 'B', 0): 1.0, ('A', 'C', 0): 2.0, ('B', 'D', 0): 1.0, ('C', 'D', 0): 2.0}
+    updated_weights = {('A', 'B', 0): 5.0, ('A', 'C', 0): 2.0, ('B', 'D', 0): 10.0, ('C', 'D', 0): 2.0}
+    generator = CandidateGenerator(adj, lengths)
+    lookahead_eval = LimitedLookaheadEvaluator(adj, init_weights, lambda u, v: 0.0, depth=2)
+    selector = TwoEdgeSelector(generator, LimitedLookaheadDecisionStrategy(lookahead_eval))
+    controller = RouteController(adj, lengths, selector, reroute_threshold_seconds=0.0, reroute_threshold_percent=0.0)
+    result = controller.execute_journey(
+        source='A', destination='D', initial_weights=init_weights,
+        traffic_update_step=0, updated_weights=updated_weights)
+    assert result.node_path[1] == 'C'
+    assert result.reroute_events == 1
