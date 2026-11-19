@@ -14,7 +14,7 @@ from src.routing.candidate_generator import (
     CandidateGenerationResult,
     CandidateGenerationStrategy
 )
-from src.routing.decision_strategies import (
+from src.routing.lookahead import LimitedLookaheadEvaluator
     BaseDecisionStrategy,
     DecisionEvaluationResult,
     LimitedLookaheadDecisionStrategy
