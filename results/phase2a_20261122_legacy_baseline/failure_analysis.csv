@@ -1,0 +1,44 @@
+od_id,source_node,destination_node,algorithm,symptoms,journey_success,two_edge_only_success,two_edge_with_local_backtracking_success,repeated_node_visits,cycle_recoveries,loop_trap_recoveries,dijkstra_fallback_steps,backtracking_steps,two_edge_prefix_time_s,total_travel_time_s,termination_reason
+0,3722327026,2443921849,Greedy Two-Edge,needed_safety_recovery;repeated_node_or_cycle,True,False,False,9,1,0,75,0,284.1957208016042,1618.51,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware Two-Edge (25 km/h),needed_safety_recovery;repeated_node_or_cycle,True,False,False,12,1,0,78,0,233.24092321504867,1591.57,Destination reached successfully.
+0,3722327026,2443921849,Lookahead Two-Edge (depth=2),needed_safety_recovery;repeated_node_or_cycle,True,False,False,8,1,0,75,0,226.7074451475349,1561.03,Destination reached successfully.
+0,3722327026,2443921849,Adaptive Two-Edge,needed_safety_recovery;repeated_node_or_cycle,True,False,False,8,1,0,75,0,226.7074451475349,1561.03,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware Two-Edge (safe h=120 km/h),needed_safety_recovery;repeated_node_or_cycle,True,False,False,9,1,0,75,0,284.1957208016042,1618.51,Destination reached successfully.
+1,2283167591,293464723,Greedy Two-Edge,needed_safety_recovery;repeated_node_or_cycle,True,False,False,9,1,0,58,0,353.03647141803816,1046.2,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware Two-Edge (25 km/h),needed_safety_recovery;repeated_node_or_cycle,True,False,False,9,1,0,56,0,224.5651875768061,914.21,Destination reached successfully.
+1,2283167591,293464723,Lookahead Two-Edge (depth=2),journey_failed;needed_safety_recovery;repeated_node_or_cycle,False,False,False,36,1,0,37,0,1283.75949087855,1713.52,Maximum hops exceeded (186 hops).
+1,2283167591,293464723,Adaptive Two-Edge,needed_safety_recovery;repeated_node_or_cycle,True,False,False,7,1,0,55,0,335.9212926734219,1049.37,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware Two-Edge (safe h=120 km/h),journey_failed;needed_safety_recovery;repeated_node_or_cycle,False,False,False,24,0,0,0,0,1429.0143916395425,1429.01,Maximum hops exceeded (186 hops).
+2,3727013594,2392383587,Greedy Two-Edge,needed_safety_recovery;repeated_node_or_cycle,True,False,False,17,1,0,124,0,200.9732625237297,1821.64,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware Two-Edge (25 km/h),needed_safety_recovery;repeated_node_or_cycle,True,False,False,13,1,0,127,0,235.76013500458185,1903.68,Destination reached successfully.
+2,3727013594,2392383587,Lookahead Two-Edge (depth=2),needed_safety_recovery;repeated_node_or_cycle,True,False,False,15,1,0,126,0,218.65976457817857,1863.98,Destination reached successfully.
+2,3727013594,2392383587,Adaptive Two-Edge,needed_safety_recovery;repeated_node_or_cycle,True,False,False,15,1,0,126,0,218.65976457817857,1863.98,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware Two-Edge (safe h=120 km/h),needed_safety_recovery;repeated_node_or_cycle,True,False,False,8,1,0,124,0,80.21431410054501,1700.88,Destination reached successfully.
+3,8144958910,5875519688,Greedy Two-Edge,needed_safety_recovery;repeated_node_or_cycle,True,False,False,10,1,0,97,0,139.96775603224808,1030.87,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware Two-Edge (25 km/h),needed_safety_recovery;repeated_node_or_cycle,True,False,False,9,1,0,97,0,130.72631406392466,1016.43,Destination reached successfully.
+3,8144958910,5875519688,Lookahead Two-Edge (depth=2),needed_safety_recovery;repeated_node_or_cycle,True,False,False,16,1,0,90,0,375.35596959530784,1199.81,Destination reached successfully.
+3,8144958910,5875519688,Adaptive Two-Edge,needed_safety_recovery;repeated_node_or_cycle,True,False,False,16,1,0,90,0,375.35596959530784,1199.81,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware Two-Edge (safe h=120 km/h),needed_safety_recovery;repeated_node_or_cycle,True,False,False,10,1,0,97,0,139.96775603224808,1030.87,Destination reached successfully.
+4,8167025447,8166852655,Greedy Two-Edge,needed_safety_recovery;repeated_node_or_cycle,True,False,False,4,1,0,62,0,183.5071669815857,1057.23,Destination reached successfully.
+4,8167025447,8166852655,Destination-Aware Two-Edge (safe h=120 km/h),needed_safety_recovery;repeated_node_or_cycle,True,False,False,13,1,0,56,0,381.67236559353825,1169.51,Destination reached successfully.
+5,3725763498,293464962,Greedy Two-Edge,needed_safety_recovery;repeated_node_or_cycle,True,False,False,9,1,0,82,0,128.521667866692,1252.7,Destination reached successfully.
+5,3725763498,293464962,Lookahead Two-Edge (depth=2),needed_safety_recovery;repeated_node_or_cycle,True,False,False,33,1,0,29,0,1757.511539979711,2055.13,Destination reached successfully.
+5,3725763498,293464962,Adaptive Two-Edge,repeated_node_or_cycle,True,True,True,4,0,0,0,0,1391.8292800852425,1391.83,Destination reached successfully.
+5,3725763498,293464962,Destination-Aware Two-Edge (safe h=120 km/h),needed_safety_recovery;repeated_node_or_cycle,True,False,False,9,1,0,82,0,128.521667866692,1252.7,Destination reached successfully.
+6,2841381812,8182316367,Greedy Two-Edge,needed_safety_recovery;repeated_node_or_cycle,True,False,False,7,1,0,18,0,477.65072333131803,795.2,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware Two-Edge (25 km/h),needed_safety_recovery;repeated_node_or_cycle,True,False,False,6,1,0,14,0,628.0803144990855,870.38,Destination reached successfully.
+6,2841381812,8182316367,Adaptive Two-Edge,journey_failed;needed_safety_recovery;repeated_node_or_cycle,False,False,False,4,0,0,0,0,1197.1327074232022,1197.13,Maximum hops exceeded (50 hops).
+6,2841381812,8182316367,Destination-Aware Two-Edge (safe h=120 km/h),needed_safety_recovery;repeated_node_or_cycle,True,False,False,7,1,0,18,0,473.73657579903784,791.29,Destination reached successfully.
+7,8124118501,293464897,Greedy Two-Edge,needed_safety_recovery;repeated_node_or_cycle,True,False,False,11,1,0,63,0,128.21944906369305,1013.43,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware Two-Edge (25 km/h),needed_safety_recovery;repeated_node_or_cycle,True,False,False,13,1,0,63,0,156.68144855784735,1041.89,Destination reached successfully.
+7,8124118501,293464897,Lookahead Two-Edge (depth=2),needed_safety_recovery;repeated_node_or_cycle,True,False,False,24,1,0,72,0,430.05368878365175,1401.36,Destination reached successfully.
+7,8124118501,293464897,Adaptive Two-Edge,needed_safety_recovery;repeated_node_or_cycle,True,False,False,24,1,0,72,0,430.05368878365175,1401.36,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware Two-Edge (safe h=120 km/h),needed_safety_recovery;repeated_node_or_cycle,True,False,False,13,1,0,63,0,156.68144855784735,1041.89,Destination reached successfully.
+8,3725657841,6986305647,Greedy Two-Edge,journey_failed;needed_safety_recovery;repeated_node_or_cycle,False,False,False,23,1,0,14,0,1342.424590900329,1539.67,Maximum hops exceeded (120 hops).
+8,3725657841,6986305647,Destination-Aware Two-Edge (25 km/h),repeated_node_or_cycle,True,True,True,1,0,0,0,0,845.4760798648324,845.48,Destination reached successfully.
+8,3725657841,6986305647,Destination-Aware Two-Edge (safe h=120 km/h),journey_failed;needed_safety_recovery;repeated_node_or_cycle,False,False,False,10,0,0,0,0,1222.1682545692215,1222.17,Maximum hops exceeded (120 hops).
+9,3725560599,2443937252,Greedy Two-Edge,needed_safety_recovery;repeated_node_or_cycle,True,False,False,13,1,0,96,0,790.3893814920322,2420.02,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware Two-Edge (25 km/h),needed_safety_recovery;repeated_node_or_cycle,True,False,False,11,1,0,94,0,405.3086865432871,2035.96,Destination reached successfully.
+9,3725560599,2443937252,Lookahead Two-Edge (depth=2),journey_failed;needed_safety_recovery;repeated_node_or_cycle,False,False,False,26,1,0,116,0,1676.4549754532995,3049.19,Maximum hops exceeded (282 hops).
+9,3725560599,2443937252,Adaptive Two-Edge,needed_safety_recovery;repeated_node_or_cycle,True,False,False,27,1,0,96,0,1392.5381022783426,2925.51,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware Two-Edge (safe h=120 km/h),needed_safety_recovery;repeated_node_or_cycle,True,False,False,13,1,0,94,0,550.0151206935805,2105.75,Destination reached successfully.

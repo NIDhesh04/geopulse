@@ -1,0 +1,600 @@
+od_id,source_node,destination_node,algorithm,prediction_timestamp_utc,journey_success,two_edge_only_success,dijkstra_fallback_steps,dijkstra_fallback_share_pct,loop_traps,repeated_node_visits,total_travel_time_s,total_distance_m,termination_reason
+0,3722327026,2443921849,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,49,84.48275862068965,1,3,1442.95,12072.04,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,48,77.41935483870968,1,5,1455.25,12140.38,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,48,77.41935483870968,1,5,1455.25,12140.38,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,48,77.41935483870968,1,5,1455.25,12140.38,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,48,77.41935483870968,1,5,1455.25,12140.38,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,48,77.41935483870968,1,5,1455.25,12140.38,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,48,77.41935483870968,1,5,1455.25,12140.38,Destination reached successfully.
+0,3722327026,2443921849,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,False,False,0,0.0,0,0,1411.63,10878.08,Maximum hops exceeded (141 hops).
+0,3722327026,2443921849,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,False,False,0,0.0,0,0,1411.63,10878.08,Maximum hops exceeded (141 hops).
+1,2283167591,293464723,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,55,79.71014492753623,1,4,753.18,5956.0,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,63,64.28571428571429,1,4,1063.59,7499.48,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,63,64.28571428571429,1,4,1063.59,7499.48,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,63,64.28571428571429,1,4,1063.59,7499.48,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,63,64.28571428571429,1,4,1063.59,7499.48,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,63,64.28571428571429,1,4,1063.59,7499.48,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,63,64.28571428571429,1,4,1063.59,7499.48,Destination reached successfully.
+1,2283167591,293464723,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,False,False,62,33.33333333333333,1,23,1745.05,12264.2,Maximum hops exceeded (186 hops).
+1,2283167591,293464723,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,False,False,62,33.33333333333333,1,23,1745.05,12264.2,Maximum hops exceeded (186 hops).
+2,3727013594,2392383587,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,93,97.89473684210527,1,2,1641.65,14950.27,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,99,92.5233644859813,1,8,1721.86,15395.9,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,99,92.5233644859813,1,8,1721.86,15395.9,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,99,92.5233644859813,1,8,1721.86,15395.9,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,99,92.5233644859813,1,8,1721.86,15395.9,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,99,92.5233644859813,1,8,1721.86,15395.9,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,99,92.5233644859813,1,8,1721.86,15395.9,Destination reached successfully.
+2,3727013594,2392383587,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,15,7.177033492822966,1,6,2339.09,17158.53,Destination reached successfully.
+2,3727013594,2392383587,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,15,7.177033492822966,1,6,2339.09,17158.53,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,83,84.6938775510204,1,7,971.05,7236.97,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,83,84.6938775510204,1,7,971.05,7236.97,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,83,84.6938775510204,1,7,971.05,7236.97,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,83,84.6938775510204,1,7,971.05,7236.97,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,83,84.6938775510204,1,7,971.05,7236.97,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,83,84.6938775510204,1,7,971.05,7236.97,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,83,84.6938775510204,1,7,971.05,7236.97,Destination reached successfully.
+3,8144958910,5875519688,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,False,False,35,15.350877192982457,1,23,2094.28,14212.71,Maximum hops exceeded (228 hops).
+3,8144958910,5875519688,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,False,False,35,15.350877192982457,1,23,2094.28,14212.71,Maximum hops exceeded (228 hops).
+6,2841381812,8182316367,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,14,38.88888888888889,1,4,821.36,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,14,38.88888888888889,1,4,821.36,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,14,38.88888888888889,1,4,821.36,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,14,38.88888888888889,1,4,821.36,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,14,38.88888888888889,1,4,821.36,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,14,38.88888888888889,1,4,821.36,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,14,38.88888888888889,1,4,821.36,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,11,27.500000000000004,1,4,725.14,4855.66,Destination reached successfully.
+6,2841381812,8182316367,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,11,27.500000000000004,1,4,725.14,4855.66,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,59,98.33333333333333,1,1,896.83,6221.36,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,63,87.5,1,7,959.69,6570.57,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,63,87.5,1,7,959.69,6570.57,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,63,87.5,1,7,959.69,6570.57,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,63,87.5,1,7,959.69,6570.57,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,63,87.5,1,7,959.69,6570.57,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,63,87.5,1,7,959.69,6570.57,Destination reached successfully.
+7,8124118501,293464897,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,67,70.52631578947368,1,10,1141.23,7579.14,Destination reached successfully.
+7,8124118501,293464897,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,67,70.52631578947368,1,10,1141.23,7579.14,Destination reached successfully.
+8,3725657841,6986305647,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,13,25.0,1,1,824.98,5838.49,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,67,97.10144927536231,1,2,1637.65,14627.87,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,72,88.88888888888889,1,6,1796.7,15497.51,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,72,88.88888888888889,1,6,1796.7,15497.51,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,72,88.88888888888889,1,6,1796.7,15497.51,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,72,88.88888888888889,1,6,1796.7,15497.51,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,72,88.88888888888889,1,6,1796.7,15497.51,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,72,88.88888888888889,1,6,1796.7,15497.51,Destination reached successfully.
+9,3725560599,2443937252,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,72,86.74698795180723,1,7,1818.38,15617.96,Destination reached successfully.
+9,3725560599,2443937252,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,72,86.74698795180723,1,7,1818.38,15617.96,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,47,87.03703703703704,1,3,742.62,5234.73,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,60,64.51612903225806,1,14,1125.1,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,60,64.51612903225806,1,14,1125.1,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,60,64.51612903225806,1,14,1125.1,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,60,64.51612903225806,1,14,1125.1,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,60,64.51612903225806,1,14,1125.1,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,60,64.51612903225806,1,14,1125.1,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,65,81.25,1,9,1102.79,7608.65,Destination reached successfully.
+10,3706277194,1812432274,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,65,81.25,1,9,1102.79,7608.65,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,14,23.728813559322035,1,4,781.78,6391.45,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,14,23.728813559322035,1,4,781.78,6391.45,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,14,23.728813559322035,1,4,781.78,6391.45,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,14,23.728813559322035,1,4,781.78,6391.45,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,14,23.728813559322035,1,4,781.78,6391.45,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,14,23.728813559322035,1,4,781.78,6391.45,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,14,23.728813559322035,1,4,781.78,6391.45,Destination reached successfully.
+11,4620986372,12194086396,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,22,23.404255319148938,1,6,978.58,7249.49,Destination reached successfully.
+11,4620986372,12194086396,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,22,23.404255319148938,1,6,978.58,7249.49,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,26,29.545454545454547,1,1,985.12,7230.71,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,26,29.545454545454547,1,1,985.12,7230.71,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,26,29.545454545454547,1,1,985.12,7230.71,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,26,29.545454545454547,1,1,985.12,7230.71,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,26,29.545454545454547,1,1,985.12,7230.71,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,26,29.545454545454547,1,1,985.12,7230.71,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,26,29.545454545454547,1,1,985.12,7230.71,Destination reached successfully.
+13,293458413,8154498107,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,27,90.0,1,1,422.78,3578.59,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,71,56.8,1,2,1465.59,11032.54,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,77,48.42767295597484,1,8,1793.53,12672.31,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,77,48.42767295597484,1,8,1793.53,12672.31,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,77,48.42767295597484,1,8,1793.53,12672.31,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,77,48.42767295597484,1,8,1793.53,12672.31,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,77,48.42767295597484,1,8,1793.53,12672.31,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,77,48.42767295597484,1,8,1793.53,12672.31,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,108,96.42857142857143,1,3,2153.94,19777.0,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,125,73.09941520467837,1,8,2995.34,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,125,73.09941520467837,1,8,2995.34,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,125,73.09941520467837,1,8,2995.34,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,125,73.09941520467837,1,8,2995.34,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,125,73.09941520467837,1,8,2995.34,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,125,73.09941520467837,1,8,2995.34,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,115,88.46153846153845,1,11,2199.33,19847.38,Destination reached successfully.
+15,2277412755,8146129661,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,115,88.46153846153845,1,11,2199.33,19847.38,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,36,62.06896551724138,1,1,793.1,6082.8,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,49,57.647058823529406,1,15,1344.14,9436.41,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,49,57.647058823529406,1,15,1344.14,9436.41,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,49,57.647058823529406,1,15,1344.14,9436.41,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,49,57.647058823529406,1,15,1344.14,9436.41,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,49,57.647058823529406,1,15,1344.14,9436.41,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,49,57.647058823529406,1,15,1344.14,9436.41,Destination reached successfully.
+17,4720174514,3725763954,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,93,90.29126213592234,1,2,1296.4,11541.51,Destination reached successfully.
+17,4720174514,3725763954,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,76,58.46153846153847,1,5,1587.01,13412.1,Destination reached successfully.
+17,4720174514,3725763954,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,76,58.46153846153847,1,5,1587.01,13412.1,Destination reached successfully.
+17,4720174514,3725763954,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,76,58.46153846153847,1,5,1587.01,13412.1,Destination reached successfully.
+17,4720174514,3725763954,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,76,58.46153846153847,1,5,1587.01,13412.1,Destination reached successfully.
+17,4720174514,3725763954,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,76,58.46153846153847,1,5,1587.01,13412.1,Destination reached successfully.
+17,4720174514,3725763954,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,76,58.46153846153847,1,5,1587.01,13412.1,Destination reached successfully.
+18,13108436171,4714939571,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,83,38.425925925925924,1,6,1991.51,15865.06,Destination reached successfully.
+18,13108436171,4714939571,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,83,38.425925925925924,1,6,1991.51,15865.06,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,70,95.8904109589041,1,1,1067.61,9026.14,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,61,62.244897959183675,1,6,1641.21,12027.35,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,61,62.244897959183675,1,6,1641.21,12027.35,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,61,62.244897959183675,1,6,1641.21,12027.35,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,61,62.244897959183675,1,6,1641.21,12027.35,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,61,62.244897959183675,1,6,1641.21,12027.35,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,61,62.244897959183675,1,6,1641.21,12027.35,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,71,93.42105263157895,1,5,743.25,6475.84,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,76,88.37209302325581,1,10,828.36,6948.65,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,76,88.37209302325581,1,10,828.36,6948.65,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,76,88.37209302325581,1,10,828.36,6948.65,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,76,88.37209302325581,1,10,828.36,6948.65,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,76,88.37209302325581,1,10,828.36,6948.65,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,76,88.37209302325581,1,10,828.36,6948.65,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,26,17.449664429530202,1,9,1639.06,15257.21,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,30,18.072289156626507,1,14,2117.5,19009.66,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,30,18.072289156626507,1,14,2117.5,19009.66,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,30,18.072289156626507,1,14,2117.5,19009.66,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,30,18.072289156626507,1,14,2117.5,19009.66,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,30,18.072289156626507,1,14,2117.5,19009.66,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,30,18.072289156626507,1,14,2117.5,19009.66,Destination reached successfully.
+22,9919058606,8157084568,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,25,11.363636363636363,1,12,2117.95,18334.06,Destination reached successfully.
+22,9919058606,8157084568,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,25,11.363636363636363,1,12,2117.95,18334.06,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,170,90.42553191489363,1,8,1871.89,16587.23,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,171,90.0,1,9,1889.94,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,171,90.0,1,9,1889.94,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,171,90.0,1,9,1889.94,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,171,90.0,1,9,1889.94,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,171,90.0,1,9,1889.94,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,171,90.0,1,9,1889.94,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,163,86.70212765957447,1,3,1965.3,17134.36,Destination reached successfully.
+23,3714709032,10132690705,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,163,86.70212765957447,1,3,1965.3,17134.36,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,104,74.28571428571429,1,4,1669.05,12689.67,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,88,55.00000000000001,1,3,1818.87,13888.04,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,88,55.00000000000001,1,3,1818.87,13888.04,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,88,55.00000000000001,1,3,1818.87,13888.04,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,88,55.00000000000001,1,3,1818.87,13888.04,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,88,55.00000000000001,1,3,1818.87,13888.04,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,88,55.00000000000001,1,3,1818.87,13888.04,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,120,85.1063829787234,1,4,1701.79,15884.9,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,125,82.78145695364239,1,9,1772.84,16279.59,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,125,82.78145695364239,1,9,1772.84,16279.59,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,125,82.78145695364239,1,9,1772.84,16279.59,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,125,82.78145695364239,1,9,1772.84,16279.59,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,125,82.78145695364239,1,9,1772.84,16279.59,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,125,82.78145695364239,1,9,1772.84,16279.59,Destination reached successfully.
+25,10254604783,569909799,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,117,79.05405405405406,1,5,1857.3,16774.48,Destination reached successfully.
+25,10254604783,569909799,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,117,79.05405405405406,1,5,1857.3,16774.48,Destination reached successfully.
+26,4713176922,4714939512,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,76,77.55102040816327,1,4,1327.85,10206.1,Destination reached successfully.
+26,4713176922,4714939512,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,82,74.54545454545455,1,10,1459.92,10939.82,Destination reached successfully.
+26,4713176922,4714939512,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,82,74.54545454545455,1,10,1459.92,10939.82,Destination reached successfully.
+26,4713176922,4714939512,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,82,74.54545454545455,1,10,1459.92,10939.82,Destination reached successfully.
+26,4713176922,4714939512,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,82,74.54545454545455,1,10,1459.92,10939.82,Destination reached successfully.
+26,4713176922,4714939512,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,82,74.54545454545455,1,10,1459.92,10939.82,Destination reached successfully.
+26,4713176922,4714939512,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,82,74.54545454545455,1,10,1459.92,10939.82,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,59,66.29213483146067,1,1,1201.69,8879.68,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,59,41.54929577464789,1,5,1722.98,11869.79,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,59,41.54929577464789,1,5,1722.98,11869.79,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,59,41.54929577464789,1,5,1722.98,11869.79,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,59,41.54929577464789,1,5,1722.98,11869.79,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,59,41.54929577464789,1,5,1722.98,11869.79,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,59,41.54929577464789,1,5,1722.98,11869.79,Destination reached successfully.
+27,2365788091,10267000474,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,52,30.057803468208093,1,6,2056.86,13770.8,Destination reached successfully.
+27,2365788091,10267000474,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,52,30.057803468208093,1,6,2056.86,13770.8,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,16,17.77777777777778,1,7,981.56,8688.74,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,29,18.83116883116883,1,8,1494.73,11350.67,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,29,18.83116883116883,1,8,1494.73,11350.67,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,29,18.83116883116883,1,8,1494.73,11350.67,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,29,18.83116883116883,1,8,1494.73,11350.67,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,29,18.83116883116883,1,8,1494.73,11350.67,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,29,18.83116883116883,1,8,1494.73,11350.67,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware Two-Edge (no corridor),2026-01-15T08:00:00+00:00,True,False,105,62.5,1,5,1913.02,16893.17,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T08:00:00+00:00,True,False,105,62.5,1,5,1913.02,16893.17,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,105,62.5,1,5,1913.02,16893.17,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T08:00:00+00:00,True,False,105,62.5,1,5,1913.02,16893.17,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,105,62.5,1,5,1913.02,16893.17,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,105,62.5,1,5,1913.02,16893.17,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,105,62.5,1,5,1913.02,16893.17,Destination reached successfully.
+29,4721825589,10132690705,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T08:00:00+00:00,True,False,13,7.344632768361582,1,7,2286.87,16092.98,Destination reached successfully.
+29,4721825589,10132690705,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T08:00:00+00:00,True,False,13,7.344632768361582,1,7,2286.87,16092.98,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,77,89.53488372093024,1,3,1477.32,12068.95,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,76,84.44444444444444,1,5,1489.62,12137.28,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,76,84.44444444444444,1,5,1489.62,12137.28,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,76,84.44444444444444,1,5,1489.62,12137.28,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,76,84.44444444444444,1,5,1489.62,12137.28,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,76,84.44444444444444,1,5,1489.62,12137.28,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,76,84.44444444444444,1,5,1489.62,12137.28,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,55,79.71014492753623,1,4,779.58,5956.0,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,63,64.28571428571429,1,4,1091.79,7499.48,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,63,64.28571428571429,1,4,1091.79,7499.48,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,63,64.28571428571429,1,4,1091.79,7499.48,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,63,64.28571428571429,1,4,1091.79,7499.48,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,63,64.28571428571429,1,4,1091.79,7499.48,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,63,64.28571428571429,1,4,1091.79,7499.48,Destination reached successfully.
+1,2283167591,293464723,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,False,False,62,33.33333333333333,1,23,1777.98,12264.2,Maximum hops exceeded (186 hops).
+1,2283167591,293464723,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,False,False,62,33.33333333333333,1,23,1777.98,12264.2,Maximum hops exceeded (186 hops).
+2,3727013594,2392383587,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,121,98.3739837398374,1,2,1676.07,14947.18,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,127,94.07407407407408,1,8,1756.28,15392.81,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,127,94.07407407407408,1,8,1756.28,15392.81,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,127,94.07407407407408,1,8,1756.28,15392.81,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,127,94.07407407407408,1,8,1756.28,15392.81,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,127,94.07407407407408,1,8,1756.28,15392.81,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,127,94.07407407407408,1,8,1756.28,15392.81,Destination reached successfully.
+2,3727013594,2392383587,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,15,7.177033492822966,1,6,2337.07,17158.53,Destination reached successfully.
+2,3727013594,2392383587,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,15,7.177033492822966,1,6,2337.07,17158.53,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,97,86.60714285714286,1,7,1005.42,7818.86,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,97,86.60714285714286,1,7,1005.42,7818.86,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,97,86.60714285714286,1,7,1005.42,7818.86,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,97,86.60714285714286,1,7,1005.42,7818.86,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,97,86.60714285714286,1,7,1005.42,7818.86,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,97,86.60714285714286,1,7,1005.42,7818.86,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,97,86.60714285714286,1,7,1005.42,7818.86,Destination reached successfully.
+3,8144958910,5875519688,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,48,19.91701244813278,1,23,2317.23,15393.98,Destination reached successfully.
+3,8144958910,5875519688,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,48,19.91701244813278,1,23,2317.23,15393.98,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,14,38.88888888888889,1,4,821.73,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,14,38.88888888888889,1,4,821.73,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,14,38.88888888888889,1,4,821.73,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,14,38.88888888888889,1,4,821.73,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,14,38.88888888888889,1,4,821.73,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,14,38.88888888888889,1,4,821.73,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,14,38.88888888888889,1,4,821.73,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,11,27.500000000000004,1,4,726.46,4855.66,Destination reached successfully.
+6,2841381812,8182316367,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,11,27.500000000000004,1,4,726.46,4855.66,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,59,98.33333333333333,1,1,902.23,6221.36,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,63,87.5,1,7,965.09,6570.57,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,63,87.5,1,7,965.09,6570.57,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,63,87.5,1,7,965.09,6570.57,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,63,87.5,1,7,965.09,6570.57,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,63,87.5,1,7,965.09,6570.57,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,63,87.5,1,7,965.09,6570.57,Destination reached successfully.
+7,8124118501,293464897,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,67,70.52631578947368,1,10,1146.63,7579.14,Destination reached successfully.
+7,8124118501,293464897,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,67,70.52631578947368,1,10,1146.63,7579.14,Destination reached successfully.
+8,3725657841,6986305647,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,13,25.0,1,1,845.48,5838.49,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,95,97.9381443298969,1,2,1682.87,14624.78,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,100,91.74311926605505,1,6,1836.74,15494.41,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,100,91.74311926605505,1,6,1836.74,15494.41,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,100,91.74311926605505,1,6,1836.74,15494.41,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,100,91.74311926605505,1,6,1836.74,15494.41,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,100,91.74311926605505,1,6,1836.74,15494.41,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,100,91.74311926605505,1,6,1836.74,15494.41,Destination reached successfully.
+9,3725560599,2443937252,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,100,90.09009009009009,1,7,1858.42,15614.86,Destination reached successfully.
+9,3725560599,2443937252,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,100,90.09009009009009,1,7,1858.42,15614.86,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,47,87.03703703703704,1,3,746.59,5234.73,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,60,64.51612903225806,1,14,1129.31,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,60,64.51612903225806,1,14,1129.31,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,60,64.51612903225806,1,14,1129.31,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,60,64.51612903225806,1,14,1129.31,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,60,64.51612903225806,1,14,1129.31,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,60,64.51612903225806,1,14,1129.31,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,65,81.25,1,9,1112.43,7608.65,Destination reached successfully.
+10,3706277194,1812432274,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,65,81.25,1,9,1112.43,7608.65,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,14,20.8955223880597,1,4,834.34,6561.6,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,14,20.8955223880597,1,4,834.34,6561.6,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,14,20.8955223880597,1,4,834.34,6561.6,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,14,20.8955223880597,1,4,834.34,6561.6,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,14,20.8955223880597,1,4,834.34,6561.6,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,14,20.8955223880597,1,4,834.34,6561.6,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,14,20.8955223880597,1,4,834.34,6561.6,Destination reached successfully.
+11,4620986372,12194086396,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,22,23.404255319148938,1,6,998.13,7249.49,Destination reached successfully.
+11,4620986372,12194086396,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,22,23.404255319148938,1,6,998.13,7249.49,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,24,51.06382978723404,1,1,663.43,4975.28,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,26,29.545454545454547,1,1,997.69,7230.71,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,26,29.545454545454547,1,1,997.69,7230.71,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,26,29.545454545454547,1,1,997.69,7230.71,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,26,29.545454545454547,1,1,997.69,7230.71,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,26,29.545454545454547,1,1,997.69,7230.71,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,26,29.545454545454547,1,1,997.69,7230.71,Destination reached successfully.
+13,293458413,8154498107,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,27,90.0,1,1,426.68,3578.59,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,71,56.8,1,2,1472.01,11032.54,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,77,48.42767295597484,1,8,1799.95,12672.31,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,77,48.42767295597484,1,8,1799.95,12672.31,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,77,48.42767295597484,1,8,1799.95,12672.31,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,77,48.42767295597484,1,8,1799.95,12672.31,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,77,48.42767295597484,1,8,1799.95,12672.31,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,77,48.42767295597484,1,8,1799.95,12672.31,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,108,96.42857142857143,1,3,2159.34,19777.0,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,125,73.09941520467837,1,8,2998.01,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,125,73.09941520467837,1,8,2998.01,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,125,73.09941520467837,1,8,2998.01,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,125,73.09941520467837,1,8,2998.01,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,125,73.09941520467837,1,8,2998.01,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,125,73.09941520467837,1,8,2998.01,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,115,88.46153846153845,1,11,2204.73,19847.38,Destination reached successfully.
+15,2277412755,8146129661,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,115,88.46153846153845,1,11,2204.73,19847.38,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,36,62.06896551724138,1,1,796.02,6082.8,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,49,57.647058823529406,1,15,1347.06,9436.41,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,49,57.647058823529406,1,15,1347.06,9436.41,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,49,57.647058823529406,1,15,1347.06,9436.41,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,49,57.647058823529406,1,15,1347.06,9436.41,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,49,57.647058823529406,1,15,1347.06,9436.41,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,49,57.647058823529406,1,15,1347.06,9436.41,Destination reached successfully.
+17,4720174514,3725763954,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,93,90.29126213592234,1,2,1314.1,11541.51,Destination reached successfully.
+17,4720174514,3725763954,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,76,58.46153846153847,1,5,1602.7,13412.1,Destination reached successfully.
+17,4720174514,3725763954,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,76,58.46153846153847,1,5,1602.7,13412.1,Destination reached successfully.
+17,4720174514,3725763954,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,76,58.46153846153847,1,5,1602.7,13412.1,Destination reached successfully.
+17,4720174514,3725763954,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,76,58.46153846153847,1,5,1602.7,13412.1,Destination reached successfully.
+17,4720174514,3725763954,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,76,58.46153846153847,1,5,1602.7,13412.1,Destination reached successfully.
+17,4720174514,3725763954,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,76,58.46153846153847,1,5,1602.7,13412.1,Destination reached successfully.
+18,13108436171,4714939571,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,98,85.21739130434783,1,5,1378.83,12192.2,Destination reached successfully.
+18,13108436171,4714939571,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,99,84.61538461538461,1,6,1395.85,12286.76,Destination reached successfully.
+18,13108436171,4714939571,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,99,84.61538461538461,1,6,1395.85,12286.76,Destination reached successfully.
+18,13108436171,4714939571,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,99,84.61538461538461,1,6,1395.85,12286.76,Destination reached successfully.
+18,13108436171,4714939571,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,99,84.61538461538461,1,6,1395.85,12286.76,Destination reached successfully.
+18,13108436171,4714939571,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,99,84.61538461538461,1,6,1395.85,12286.76,Destination reached successfully.
+18,13108436171,4714939571,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,99,84.61538461538461,1,6,1395.85,12286.76,Destination reached successfully.
+18,13108436171,4714939571,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,83,38.425925925925924,1,6,2092.84,15865.06,Destination reached successfully.
+18,13108436171,4714939571,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,83,38.425925925925924,1,6,2092.84,15865.06,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,70,95.8904109589041,1,1,1085.83,9026.14,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,61,62.244897959183675,1,6,1661.79,12027.35,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,61,62.244897959183675,1,6,1661.79,12027.35,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,61,62.244897959183675,1,6,1661.79,12027.35,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,61,62.244897959183675,1,6,1661.79,12027.35,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,61,62.244897959183675,1,6,1661.79,12027.35,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,61,62.244897959183675,1,6,1661.79,12027.35,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,71,93.42105263157895,1,5,752.25,6475.84,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,76,88.37209302325581,1,10,837.36,6948.65,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,76,88.37209302325581,1,10,837.36,6948.65,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,76,88.37209302325581,1,10,837.36,6948.65,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,76,88.37209302325581,1,10,837.36,6948.65,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,76,88.37209302325581,1,10,837.36,6948.65,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,76,88.37209302325581,1,10,837.36,6948.65,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,87,67.44186046511628,1,2,1477.34,13699.73,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,91,56.17283950617284,1,5,1720.33,14931.79,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,91,56.17283950617284,1,5,1720.33,14931.79,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,91,56.17283950617284,1,5,1720.33,14931.79,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,91,56.17283950617284,1,5,1720.33,14931.79,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,91,56.17283950617284,1,5,1720.33,14931.79,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,91,56.17283950617284,1,5,1720.33,14931.79,Destination reached successfully.
+22,9919058606,8157084568,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,25,10.72961373390558,1,12,2249.83,18740.51,Destination reached successfully.
+22,9919058606,8157084568,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,25,10.72961373390558,1,12,2249.83,18740.51,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,170,90.42553191489363,1,8,1920.01,16587.23,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,171,90.0,1,9,1938.06,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,171,90.0,1,9,1938.06,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,171,90.0,1,9,1938.06,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,171,90.0,1,9,1938.06,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,171,90.0,1,9,1938.06,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,171,90.0,1,9,1938.06,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,163,86.70212765957447,1,3,2014.4,17134.36,Destination reached successfully.
+23,3714709032,10132690705,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,163,86.70212765957447,1,3,2014.4,17134.36,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,104,74.28571428571429,1,4,1757.96,12689.67,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,88,55.00000000000001,1,3,1920.2,13888.04,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,88,55.00000000000001,1,3,1920.2,13888.04,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,88,55.00000000000001,1,3,1920.2,13888.04,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,88,55.00000000000001,1,3,1920.2,13888.04,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,88,55.00000000000001,1,3,1920.2,13888.04,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,88,55.00000000000001,1,3,1920.2,13888.04,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,120,85.1063829787234,1,4,1753.2,15884.9,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,125,82.78145695364239,1,9,1824.24,16279.59,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,125,82.78145695364239,1,9,1824.24,16279.59,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,125,82.78145695364239,1,9,1824.24,16279.59,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,125,82.78145695364239,1,9,1824.24,16279.59,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,125,82.78145695364239,1,9,1824.24,16279.59,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,125,82.78145695364239,1,9,1824.24,16279.59,Destination reached successfully.
+25,10254604783,569909799,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,117,79.05405405405406,1,5,1909.76,16774.48,Destination reached successfully.
+25,10254604783,569909799,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,117,79.05405405405406,1,5,1909.76,16774.48,Destination reached successfully.
+26,4713176922,4714939512,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,76,77.55102040816327,1,4,1373.42,10206.1,Destination reached successfully.
+26,4713176922,4714939512,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,82,74.54545454545455,1,10,1505.48,10939.82,Destination reached successfully.
+26,4713176922,4714939512,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,82,74.54545454545455,1,10,1505.48,10939.82,Destination reached successfully.
+26,4713176922,4714939512,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,82,74.54545454545455,1,10,1505.48,10939.82,Destination reached successfully.
+26,4713176922,4714939512,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,82,74.54545454545455,1,10,1505.48,10939.82,Destination reached successfully.
+26,4713176922,4714939512,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,82,74.54545454545455,1,10,1505.48,10939.82,Destination reached successfully.
+26,4713176922,4714939512,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,82,74.54545454545455,1,10,1505.48,10939.82,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,69,72.63157894736842,1,4,1259.51,9095.87,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,75,70.09345794392523,1,10,1391.58,9829.58,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,75,70.09345794392523,1,10,1391.58,9829.58,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,75,70.09345794392523,1,10,1391.58,9829.58,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,75,70.09345794392523,1,10,1391.58,9829.58,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,75,70.09345794392523,1,10,1391.58,9829.58,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,75,70.09345794392523,1,10,1391.58,9829.58,Destination reached successfully.
+27,2365788091,10267000474,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,52,30.057803468208093,1,6,2079.33,13770.8,Destination reached successfully.
+27,2365788091,10267000474,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,52,30.057803468208093,1,6,2079.33,13770.8,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,16,17.77777777777778,1,7,996.64,8688.74,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,29,18.83116883116883,1,8,1508.19,11350.67,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,29,18.83116883116883,1,8,1508.19,11350.67,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,29,18.83116883116883,1,8,1508.19,11350.67,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,29,18.83116883116883,1,8,1508.19,11350.67,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,29,18.83116883116883,1,8,1508.19,11350.67,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,29,18.83116883116883,1,8,1508.19,11350.67,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware Two-Edge (no corridor),2026-01-15T14:00:00+00:00,True,False,105,60.3448275862069,1,5,2048.44,17593.22,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T14:00:00+00:00,True,False,105,60.3448275862069,1,5,2048.44,17593.22,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,105,60.3448275862069,1,5,2048.44,17593.22,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T14:00:00+00:00,True,False,105,60.3448275862069,1,5,2048.44,17593.22,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,105,60.3448275862069,1,5,2048.44,17593.22,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,105,60.3448275862069,1,5,2048.44,17593.22,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,105,60.3448275862069,1,5,2048.44,17593.22,Destination reached successfully.
+29,4721825589,10132690705,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T14:00:00+00:00,True,False,13,7.344632768361582,1,7,2308.01,16092.98,Destination reached successfully.
+29,4721825589,10132690705,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T14:00:00+00:00,True,False,13,7.344632768361582,1,7,2308.01,16092.98,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,49,84.48275862068965,1,3,1342.97,12072.04,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,48,77.41935483870968,1,5,1355.27,12140.38,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,48,77.41935483870968,1,5,1355.27,12140.38,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,48,77.41935483870968,1,5,1355.27,12140.38,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,48,77.41935483870968,1,5,1355.27,12140.38,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,48,77.41935483870968,1,5,1355.27,12140.38,Destination reached successfully.
+0,3722327026,2443921849,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,48,77.41935483870968,1,5,1355.27,12140.38,Destination reached successfully.
+0,3722327026,2443921849,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,False,False,0,0.0,0,0,1407.81,11173.2,Maximum hops exceeded (141 hops).
+0,3722327026,2443921849,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,False,False,0,0.0,0,0,1407.81,11173.2,Maximum hops exceeded (141 hops).
+1,2283167591,293464723,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,55,64.70588235294117,1,9,826.69,7756.21,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,63,61.76470588235294,1,11,999.17,8191.4,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,63,61.76470588235294,1,11,999.17,8191.4,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,63,61.76470588235294,1,11,999.17,8191.4,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,63,61.76470588235294,1,11,999.17,8191.4,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,63,61.76470588235294,1,11,999.17,8191.4,Destination reached successfully.
+1,2283167591,293464723,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,63,61.76470588235294,1,11,999.17,8191.4,Destination reached successfully.
+1,2283167591,293464723,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,False,False,62,33.33333333333333,1,23,1689.45,12264.2,Maximum hops exceeded (186 hops).
+1,2283167591,293464723,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,False,False,62,33.33333333333333,1,23,1689.45,12264.2,Maximum hops exceeded (186 hops).
+2,3727013594,2392383587,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,93,97.89473684210527,1,2,1542.89,14950.27,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,99,92.5233644859813,1,8,1623.1,15395.9,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,99,92.5233644859813,1,8,1623.1,15395.9,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,99,92.5233644859813,1,8,1623.1,15395.9,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,99,92.5233644859813,1,8,1623.1,15395.9,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,99,92.5233644859813,1,8,1623.1,15395.9,Destination reached successfully.
+2,3727013594,2392383587,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,99,92.5233644859813,1,8,1623.1,15395.9,Destination reached successfully.
+2,3727013594,2392383587,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,15,10.948905109489052,1,6,1923.59,16500.26,Destination reached successfully.
+2,3727013594,2392383587,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,15,10.948905109489052,1,6,1923.59,16500.26,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,83,84.6938775510204,1,7,894.22,7236.97,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,83,84.6938775510204,1,7,894.22,7236.97,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,83,84.6938775510204,1,7,894.22,7236.97,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,83,84.6938775510204,1,7,894.22,7236.97,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,83,84.6938775510204,1,7,894.22,7236.97,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,83,84.6938775510204,1,7,894.22,7236.97,Destination reached successfully.
+3,8144958910,5875519688,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,83,84.6938775510204,1,7,894.22,7236.97,Destination reached successfully.
+3,8144958910,5875519688,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,False,False,35,15.350877192982457,1,23,2071.81,14212.71,Maximum hops exceeded (228 hops).
+3,8144958910,5875519688,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,False,False,35,15.350877192982457,1,23,2071.81,14212.71,Maximum hops exceeded (228 hops).
+6,2841381812,8182316367,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,14,38.88888888888889,1,4,821.4,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,14,38.88888888888889,1,4,821.4,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,14,38.88888888888889,1,4,821.4,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,14,38.88888888888889,1,4,821.4,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,14,38.88888888888889,1,4,821.4,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,14,38.88888888888889,1,4,821.4,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,14,38.88888888888889,1,4,821.4,6017.06,Destination reached successfully.
+6,2841381812,8182316367,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,11,27.500000000000004,1,4,723.33,4855.66,Destination reached successfully.
+6,2841381812,8182316367,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,11,27.500000000000004,1,4,723.33,4855.66,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,59,98.33333333333333,1,1,874.21,6221.36,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,63,87.5,1,7,937.07,6570.57,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,63,87.5,1,7,937.07,6570.57,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,63,87.5,1,7,937.07,6570.57,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,63,87.5,1,7,937.07,6570.57,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,63,87.5,1,7,937.07,6570.57,Destination reached successfully.
+7,8124118501,293464897,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,63,87.5,1,7,937.07,6570.57,Destination reached successfully.
+7,8124118501,293464897,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,67,70.52631578947368,1,10,1118.61,7579.14,Destination reached successfully.
+7,8124118501,293464897,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,67,70.52631578947368,1,10,1118.61,7579.14,Destination reached successfully.
+8,3725657841,6986305647,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,13,25.0,1,1,741.91,5838.49,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,67,97.10144927536231,1,2,1554.66,14627.87,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,72,88.88888888888889,1,6,1714.25,15497.51,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,72,88.88888888888889,1,6,1714.25,15497.51,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,72,88.88888888888889,1,6,1714.25,15497.51,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,72,88.88888888888889,1,6,1714.25,15497.51,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,72,88.88888888888889,1,6,1714.25,15497.51,Destination reached successfully.
+9,3725560599,2443937252,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,72,88.88888888888889,1,6,1714.25,15497.51,Destination reached successfully.
+9,3725560599,2443937252,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,72,86.74698795180723,1,7,1735.93,15617.96,Destination reached successfully.
+9,3725560599,2443937252,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,72,86.74698795180723,1,7,1735.93,15617.96,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,47,87.03703703703704,1,3,724.04,5234.73,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,60,64.51612903225806,1,14,1106.12,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,60,64.51612903225806,1,14,1106.12,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,60,64.51612903225806,1,14,1106.12,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,60,64.51612903225806,1,14,1106.12,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,60,64.51612903225806,1,14,1106.12,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,60,64.51612903225806,1,14,1106.12,7486.24,Destination reached successfully.
+10,3706277194,1812432274,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,65,81.25,1,9,1074.82,7608.65,Destination reached successfully.
+10,3706277194,1812432274,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,65,81.25,1,9,1074.82,7608.65,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,14,23.728813559322035,1,4,720.89,6391.45,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,14,23.728813559322035,1,4,720.89,6391.45,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,14,23.728813559322035,1,4,720.89,6391.45,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,14,23.728813559322035,1,4,720.89,6391.45,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,14,23.728813559322035,1,4,720.89,6391.45,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,14,23.728813559322035,1,4,720.89,6391.45,Destination reached successfully.
+11,4620986372,12194086396,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,14,23.728813559322035,1,4,720.89,6391.45,Destination reached successfully.
+11,4620986372,12194086396,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,22,23.404255319148938,1,6,921.02,7249.49,Destination reached successfully.
+11,4620986372,12194086396,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,22,23.404255319148938,1,6,921.02,7249.49,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,26,32.5,1,1,911.47,7060.56,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,26,32.5,1,1,911.47,7060.56,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,26,32.5,1,1,911.47,7060.56,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,26,32.5,1,1,911.47,7060.56,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,26,32.5,1,1,911.47,7060.56,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,26,32.5,1,1,911.47,7060.56,Destination reached successfully.
+12,8151182352,4963335999,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,26,32.5,1,1,911.47,7060.56,Destination reached successfully.
+13,293458413,8154498107,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,27,90.0,1,1,386.44,3578.59,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,71,56.8,1,2,1447.24,11032.54,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,77,48.42767295597484,1,8,1775.18,12672.31,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,77,48.42767295597484,1,8,1775.18,12672.31,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,77,48.42767295597484,1,8,1775.18,12672.31,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,77,48.42767295597484,1,8,1775.18,12672.31,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,77,48.42767295597484,1,8,1775.18,12672.31,Destination reached successfully.
+14,2962277961,6604456762,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,77,48.42767295597484,1,8,1775.18,12672.31,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,108,96.42857142857143,1,3,2090.59,19777.0,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,125,73.09941520467837,1,8,2932.43,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,125,73.09941520467837,1,8,2932.43,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,125,73.09941520467837,1,8,2932.43,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,125,73.09941520467837,1,8,2932.43,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,125,73.09941520467837,1,8,2932.43,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,125,73.09941520467837,1,8,2932.43,23963.62,Destination reached successfully.
+15,2277412755,8146129661,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,115,88.46153846153845,1,11,2135.99,19847.38,Destination reached successfully.
+15,2277412755,8146129661,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,115,88.46153846153845,1,11,2135.99,19847.38,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,36,62.06896551724138,1,1,792.94,6082.8,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,49,57.647058823529406,1,15,1343.97,9436.41,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,49,57.647058823529406,1,15,1343.97,9436.41,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,49,57.647058823529406,1,15,1343.97,9436.41,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,49,57.647058823529406,1,15,1343.97,9436.41,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,49,57.647058823529406,1,15,1343.97,9436.41,Destination reached successfully.
+16,8153425846,3722327558,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,49,57.647058823529406,1,15,1343.97,9436.41,Destination reached successfully.
+17,4720174514,3725763954,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,93,90.29126213592234,1,2,1258.13,11541.51,Destination reached successfully.
+18,13108436171,4714939571,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,83,38.425925925925924,1,6,1950.77,15865.06,Destination reached successfully.
+18,13108436171,4714939571,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,83,38.425925925925924,1,6,1950.77,15865.06,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,79,96.34146341463415,1,1,982.12,9141.19,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,70,65.42056074766354,1,6,1576.3,12142.39,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,70,65.42056074766354,1,6,1576.3,12142.39,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,70,65.42056074766354,1,6,1576.3,12142.39,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,70,65.42056074766354,1,6,1576.3,12142.39,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,70,65.42056074766354,1,6,1576.3,12142.39,Destination reached successfully.
+19,3725764138,8166852625,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,70,65.42056074766354,1,6,1576.3,12142.39,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,71,93.42105263157895,1,5,710.22,6475.84,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,76,88.37209302325581,1,10,795.32,6948.65,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,76,88.37209302325581,1,10,795.32,6948.65,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,76,88.37209302325581,1,10,795.32,6948.65,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,76,88.37209302325581,1,10,795.32,6948.65,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,76,88.37209302325581,1,10,795.32,6948.65,Destination reached successfully.
+21,8133384806,9833884593,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,76,88.37209302325581,1,10,795.32,6948.65,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,13,9.15492957746479,1,2,1520.55,14074.41,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,26,15.028901734104046,1,15,1732.5,15251.88,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,26,15.028901734104046,1,15,1732.5,15251.88,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,26,15.028901734104046,1,15,1732.5,15251.88,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,26,15.028901734104046,1,15,1732.5,15251.88,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,26,15.028901734104046,1,15,1732.5,15251.88,Destination reached successfully.
+22,9919058606,8157084568,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,26,15.028901734104046,1,15,1732.5,15251.88,Destination reached successfully.
+22,9919058606,8157084568,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,25,13.812154696132598,1,12,1652.06,15260.37,Destination reached successfully.
+22,9919058606,8157084568,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,25,13.812154696132598,1,12,1652.06,15260.37,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,170,90.42553191489363,1,8,1766.41,16587.23,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,171,90.0,1,9,1784.45,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,171,90.0,1,9,1784.45,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,171,90.0,1,9,1784.45,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,171,90.0,1,9,1784.45,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,171,90.0,1,9,1784.45,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,171,90.0,1,9,1784.45,16687.5,Destination reached successfully.
+23,3714709032,10132690705,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,163,86.70212765957447,1,3,1859.63,17134.36,Destination reached successfully.
+23,3714709032,10132690705,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,163,86.70212765957447,1,3,1859.63,17134.36,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,110,75.34246575342466,1,4,1568.6,13055.24,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,88,55.00000000000001,1,3,1716.08,13888.04,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,88,55.00000000000001,1,3,1716.08,13888.04,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,88,55.00000000000001,1,3,1716.08,13888.04,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,88,55.00000000000001,1,3,1716.08,13888.04,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,88,55.00000000000001,1,3,1716.08,13888.04,Destination reached successfully.
+24,3722532375,8127692776,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,88,55.00000000000001,1,3,1716.08,13888.04,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,120,85.1063829787234,1,4,1642.28,15884.9,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,125,82.78145695364239,1,9,1713.33,16279.59,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,125,82.78145695364239,1,9,1713.33,16279.59,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,125,82.78145695364239,1,9,1713.33,16279.59,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,125,82.78145695364239,1,9,1713.33,16279.59,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,125,82.78145695364239,1,9,1713.33,16279.59,Destination reached successfully.
+25,10254604783,569909799,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,125,82.78145695364239,1,9,1713.33,16279.59,Destination reached successfully.
+25,10254604783,569909799,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,117,79.05405405405406,1,5,1797.62,16774.48,Destination reached successfully.
+25,10254604783,569909799,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,117,79.05405405405406,1,5,1797.62,16774.48,Destination reached successfully.
+26,4713176922,4714939512,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,66,71.73913043478261,1,1,1252.39,9989.91,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,59,66.29213483146067,1,1,1168.35,8879.68,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,59,41.54929577464789,1,5,1689.56,11869.79,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,59,41.54929577464789,1,5,1689.56,11869.79,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,59,41.54929577464789,1,5,1689.56,11869.79,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,59,41.54929577464789,1,5,1689.56,11869.79,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,59,41.54929577464789,1,5,1689.56,11869.79,Destination reached successfully.
+27,2365788091,10267000474,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,59,41.54929577464789,1,5,1689.56,11869.79,Destination reached successfully.
+27,2365788091,10267000474,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,52,30.057803468208093,1,6,2029.57,13770.8,Destination reached successfully.
+27,2365788091,10267000474,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,52,30.057803468208093,1,6,2029.57,13770.8,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,16,17.77777777777778,1,7,956.71,8688.74,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,29,18.83116883116883,1,8,1471.94,11350.67,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,29,18.83116883116883,1,8,1471.94,11350.67,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,29,18.83116883116883,1,8,1471.94,11350.67,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,29,18.83116883116883,1,8,1471.94,11350.67,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,29,18.83116883116883,1,8,1471.94,11350.67,Destination reached successfully.
+28,4478448738,6604714345,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,29,18.83116883116883,1,8,1471.94,11350.67,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware Two-Edge (no corridor),2026-01-15T20:00:00+00:00,True,False,96,54.54545454545454,1,2,1958.53,17831.34,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 5 (ranking),2026-01-15T20:00:00+00:00,True,False,91,43.127962085308056,1,5,2507.94,21339.43,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,91,43.127962085308056,1,5,2507.94,21339.43,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 20 (ranking),2026-01-15T20:00:00+00:00,True,False,91,43.127962085308056,1,5,2507.94,21339.43,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 5 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,91,43.127962085308056,1,5,2507.94,21339.43,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,91,43.127962085308056,1,5,2507.94,21339.43,Destination reached successfully.
+29,4721825589,10132690705,Destination-Aware + Corridor cap 20 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,91,43.127962085308056,1,5,2507.94,21339.43,Destination reached successfully.
+29,4721825589,10132690705,Depth-5 Lookahead + Corridor cap 10 (ranking),2026-01-15T20:00:00+00:00,True,False,13,7.344632768361582,1,7,2233.98,16092.98,Destination reached successfully.
+29,4721825589,10132690705,Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2026-01-15T20:00:00+00:00,True,False,13,7.344632768361582,1,7,2233.98,16092.98,Destination reached successfully.

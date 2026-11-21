@@ -1,0 +1,111 @@
+{
+  "prediction_timestamp_utc": "2026-01-15T14:00:00+00:00",
+  "prediction_rows": 700,
+  "prediction_segments": 700,
+  "graph_nodes": 18260,
+  "graph_directed_edges": 46679,
+  "dynamic_weighted_edges": 690,
+  "od_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "od_pairs": [
+    {
+      "od_id": 0,
+      "source_node": "3722327026",
+      "destination_node": "2443921849",
+      "haversine_distance_m": 8215.17
+    },
+    {
+      "od_id": 1,
+      "source_node": "2283167591",
+      "destination_node": "293464723",
+      "haversine_distance_m": 3408.2
+    },
+    {
+      "od_id": 2,
+      "source_node": "3727013594",
+      "destination_node": "2392383587",
+      "haversine_distance_m": 11494.64
+    },
+    {
+      "od_id": 3,
+      "source_node": "8144958910",
+      "destination_node": "5875519688",
+      "haversine_distance_m": 4456.32
+    },
+    {
+      "od_id": 4,
+      "source_node": "8167025447",
+      "destination_node": "8166852655",
+      "haversine_distance_m": 4832.03
+    },
+    {
+      "od_id": 5,
+      "source_node": "3725763498",
+      "destination_node": "293464962",
+      "haversine_distance_m": 7774.39
+    },
+    {
+      "od_id": 6,
+      "source_node": "2841381812",
+      "destination_node": "8182316367",
+      "haversine_distance_m": 2525.17
+    },
+    {
+      "od_id": 7,
+      "source_node": "8124118501",
+      "destination_node": "293464897",
+      "haversine_distance_m": 3201.55
+    },
+    {
+      "od_id": 8,
+      "source_node": "3725657841",
+      "destination_node": "6986305647",
+      "haversine_distance_m": 4956.69
+    },
+    {
+      "od_id": 9,
+      "source_node": "3725560599",
+      "destination_node": "2443937252",
+      "haversine_distance_m": 10701.36
+    }
+  ],
+  "inputs_sha256": {
+    "graphml": "7d363f7109fea13b426c3d76d34b1bb9bf58654704fe07c132f7cbcb101d8cf8",
+    "mapping_parquet": "060c87810a7e2695fb473b875a4f7c5554b120c105189d62a233400f9ce19cce",
+    "predictions_parquet": "2217eb8a01639e34178ced5b96a728e9105022177794d5bffafa8f6152a819d1",
+    "od_csv": "2eb82d3710b284070ff951a0524a4870c619d0bd56de68956040c2945d0d5c19"
+  },
+  "evaluation_seed": 42,
+  "default_heuristic_speed_kmh": 25.0,
+  "safe_heuristic_speed_kmh": 120.0,
+  "safe_heuristic_note": "The current speed model caps dynamic mapped speeds at 120 km/h and static speeds are at most 50 km/h. Straight-line distance divided by 120 km/h is therefore a lower bound under these configured edge speeds.",
+  "algorithm_configurations": [
+    "Dijkstra",
+    "Greedy Two-Edge",
+    "Destination-Aware Two-Edge (25 km/h)",
+    "Lookahead Two-Edge (depth=2)",
+    "Adaptive Two-Edge",
+    "Destination-Aware Two-Edge (safe h=120 km/h)"
+  ],
+  "safety_recovery_enabled": true,
+  "strict_active_path_loop_avoidance": true,
+  "local_backtracking_enabled": true,
+  "max_hops_multiplier": 10.0,
+  "success_definitions": {
+    "journey_success": "Destination reached with any enabled safety recovery.",
+    "two_edge_only_success": "Destination reached with no Dijkstra fallback and no backtracking.",
+    "two_edge_with_local_backtracking_success": "Destination reached without Dijkstra fallback; local backtracking may be used."
+  },
+  "fallback_counting": "RECOVERY_FORWARD, RECOVERY_CYCLE_BREAKER, and RECOVERY_SHORTEST_PATH edges are Dijkstra fallback steps. All BACKTRACK-tagged edges are counted separately.",
+  "results_rows": 60
+}

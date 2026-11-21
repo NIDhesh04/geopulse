@@ -17,7 +17,7 @@ from typing import Dict, List, Tuple, Set, Optional, Any
 import time
 
 from src.routing.candidate_generator import CandidateEdge
-from src.routing.lookahead import LimitedLookaheadEvaluator
+from src.routing.lookahead import BoundedReachabilityEvaluator, LimitedLookaheadEvaluator
 
 
 class StrategyType(str, Enum):
@@ -61,6 +61,57 @@ class BaseDecisionStrategy(ABC):
         If Candidate B is None (e.g. forced continuation), Candidate A is chosen.
         """
         pass
+
+
+class CorridorRankingDecisionStrategy(BaseDecisionStrategy):
+    """Add bounded-corridor evidence as the primary pair-ranking signal."""
+
+    def __init__(self, delegate: BaseDecisionStrategy):
+        super().__init__(name=f"Corridor Ranking ({delegate.name})")
+        self.delegate = delegate
+
+    @staticmethod
+    def _rank(candidate: CandidateEdge) -> int:
+        assessment = candidate.attributes.get("forced_corridor")
+        if assessment is None:
+            return 1
+        status = assessment.status if hasattr(assessment, "status") else assessment.get("status")
+        return {
+            "destination": 0,
+            "junction": 0,
+            "edge_cap": 1,
+            "dead_end": 2,
+            "active_path_return": 2,
+        }.get(status, 1)
+
+    def evaluate_candidates(
+        self,
+        candidate_a: CandidateEdge,
+        candidate_b: Optional[CandidateEdge],
+        current_node: str,
+        destination: str,
+        visited_nodes: Optional[Set[str]] = None,
+    ) -> DecisionEvaluationResult:
+        result = self.delegate.evaluate_candidates(
+            candidate_a,
+            candidate_b,
+            current_node,
+            destination,
+            visited_nodes,
+        )
+        if candidate_b is not None:
+            rank_a, rank_b = self._rank(candidate_a), self._rank(candidate_b)
+            if rank_a != rank_b:
+                result.selected_candidate = candidate_a if rank_a < rank_b else candidate_b
+                result.decision_reason = (
+                    f"Corridor evidence ranked {result.selected_candidate.v} ahead "
+                    f"(status rank {min(rank_a, rank_b)} vs {max(rank_a, rank_b)}); "
+                    f"delegate: {result.decision_reason}"
+                )
+            else:
+                result.decision_reason = f"Corridor evidence tied; delegate: {result.decision_reason}"
+        result.strategy_used = f"Corridor Ranking -> {result.strategy_used}"
+        return result
 
 
 class GreedyDecisionStrategy(BaseDecisionStrategy):
@@ -127,7 +178,9 @@ class GreedyDecisionStrategy(BaseDecisionStrategy):
 
 class DestinationAwareDecisionStrategy(BaseDecisionStrategy):
     """
-    Destination-aware decision strategy: evaluates immediate travel time + admissible heuristic distance to destination.
+    Destination-aware strategy: immediate travel time plus the configured
+    straight-line remaining-time estimate. That estimate is admissible only
+    when its speed bound is at least the maximum speed allowed on graph edges.
     """
 
     def __init__(self, heuristic_weight: float = 1.0):
@@ -262,6 +315,87 @@ class LimitedLookaheadDecisionStrategy(BaseDecisionStrategy):
             decision_reason=reason,
             is_forced=False,
             evaluation_time_ms=exec_ms
+        )
+
+
+class BoundedReachabilityDecisionStrategy(BaseDecisionStrategy):
+    """Compare two edges using bounded onward viability before travel time."""
+
+    def __init__(self, evaluator: BoundedReachabilityEvaluator):
+        super().__init__(name=f"Bounded Reachability (Depth {evaluator.depth})")
+        self.evaluator = evaluator
+
+    def evaluate_candidates(
+        self,
+        candidate_a: CandidateEdge,
+        candidate_b: Optional[CandidateEdge],
+        current_node: str,
+        destination: str,
+        visited_nodes: Optional[Set[str]] = None,
+    ) -> DecisionEvaluationResult:
+        t0 = time.perf_counter()
+        visited = visited_nodes or set()
+
+        def estimate(candidate: CandidateEdge):
+            detail = self.evaluator.evaluate_edge_details(
+                candidate.edge_tuple, destination, visited
+            )
+            # When a forced edge has no bounded viable continuation, or both
+            # pair members are locally trapped, retain a finite fallback score
+            # so sequential movement can continue and the controller can report
+            # the later loop trap through its normal safety path.
+            fallback = candidate.travel_time_s + candidate.heuristic_remaining_s
+            if candidate.v in visited:
+                fallback += 1000.0
+            return detail, detail.estimated_cost_s if detail.viable else fallback
+
+        detail_a, score_a = estimate(candidate_a)
+        if candidate_b is None:
+            elapsed_ms = (time.perf_counter() - t0) * 1000.0
+            return DecisionEvaluationResult(
+                candidate_a=candidate_a,
+                candidate_b=None,
+                selected_candidate=candidate_a,
+                score_a=score_a,
+                score_b=None,
+                strategy_used=self.name,
+                decision_reason=(
+                    "Forced continuation; bounded continuation is "
+                    f"{'viable' if detail_a.viable else 'unresolved/trapped'} "
+                    f"after {detail_a.expanded_edges} local edge expansions."
+                ),
+                is_forced=True,
+                evaluation_time_ms=elapsed_ms,
+            )
+
+        detail_b, score_b = estimate(candidate_b)
+        if detail_a.viable != detail_b.viable:
+            selected = candidate_a if detail_a.viable else candidate_b
+        elif detail_a.viable:
+            key_a = (score_a, -detail_a.viable_frontiers, candidate_a.travel_time_s)
+            key_b = (score_b, -detail_b.viable_frontiers, candidate_b.travel_time_s)
+            selected = candidate_a if key_a <= key_b else candidate_b
+        else:
+            selected = candidate_a if score_a <= score_b else candidate_b
+
+        elapsed_ms = (time.perf_counter() - t0) * 1000.0
+        selected_detail = detail_a if selected is candidate_a else detail_b
+        decision_reason = (
+            f"Selected {selected.u}->{selected.v}; bounded viability="
+            f"{selected_detail.viable}, estimated continuation="
+            f"{selected_detail.estimated_cost_s:.1f}s, "
+            f"expanded={selected_detail.expanded_edges}."
+        )
+        return DecisionEvaluationResult(
+            candidate_a=candidate_a,
+            candidate_b=candidate_b,
+            selected_candidate=selected,
+            score_a=score_a,
+            score_b=score_b,
+            strategy_used=self.name,
+            decision_reason=decision_reason,
+            is_forced=False,
+            evaluation_time_ms=elapsed_ms,
         )
 
 

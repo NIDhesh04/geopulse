@@ -300,7 +300,7 @@ with st.sidebar:
 
     st.markdown("---")
     
-    run_btn = st.button("▶ RE-RUN PIPELINE", type="primary", use_container_width=True)
+    run_btn = st.button("▶ RE-RUN PIPELINE", type="primary", width="stretch")
 
 
 # -----------------------------------------------------------------------------
@@ -474,14 +474,14 @@ with map_col:
             current_step=st.session_state.vehicle_step,
             dark_mode=False
         )
-        st.pyplot(fig_map, use_container_width=True)
+        st.pyplot(fig_map, width="stretch")
     else:
         deck = create_pydeck_map(
             G=G,
             run_result=run_result,
             current_step=st.session_state.vehicle_step
         )
-        st.pydeck_chart(deck, use_container_width=True)
+        st.pydeck_chart(deck, width="stretch")
 
     # Visual Legend for Red vs Green Routes (Requirement 3)
     if run_result['reroute_triggered']:
@@ -520,25 +520,25 @@ with sim_col:
     # Playback buttons
     b_c1, b_c2, b_c3 = st.columns(3)
     with b_c1:
-        if st.button("⏪ Reset", use_container_width=True):
+        if st.button("⏪ Reset", width="stretch"):
             reset_playback()
             st.rerun()
     with b_c2:
-        if st.button("◀ Step", use_container_width=True):
+        if st.button("◀ Step", width="stretch"):
             step_backward()
             st.rerun()
     with b_c3:
-        if st.button("▶ Step", type="primary", use_container_width=True):
+        if st.button("▶ Step", type="primary", width="stretch"):
             step_forward()
             st.rerun()
 
     j_c1, j_c2 = st.columns(2)
     with j_c1:
-        if st.button("⚡ Traffic Update", use_container_width=True, help="Jump directly to the traffic update decision point"):
+        if st.button("⚡ Traffic Update", width="stretch", help="Jump directly to the traffic update decision point"):
             jump_to_decision()
             st.rerun()
     with j_c2:
-        if st.button("🏁 Destination", use_container_width=True, help="Jump directly to trip completion"):
+        if st.button("🏁 Destination", width="stretch", help="Jump directly to trip completion"):
             jump_to_destination()
             st.rerun()
 
@@ -834,7 +834,7 @@ with res_col2:
 st.markdown("---")
 st.markdown("### ⏱️ Chronological Journey Milestone Timeline")
 fig_tl = render_journey_timeline_figure(run_result)
-st.pyplot(fig_tl, use_container_width=True)
+st.pyplot(fig_tl, width="stretch")
 
 # -----------------------------------------------------------------------------
 # 9. PROTOTYPE SOFTWARE EXECUTION TIMES (EXPANDABLE)
@@ -852,7 +852,7 @@ with st.expander("⏱️ Prototype Software Execution Times (Measured Latency)",
         {"Pipeline Subsystem": "Edge Threshold Decision Logic", "Software Execution Time (ms)": exec_dict['edge_decision_evaluation_ms'], "Architecture Tier": "Edge Server"},
         {"Pipeline Subsystem": "Total Edge Server Decision Latency", "Software Execution Time (ms)": exec_dict['total_edge_decision_ms'], "Architecture Tier": "Edge Server"}
     ])
-    st.dataframe(exec_df, use_container_width=True, hide_index=True)
+    st.dataframe(exec_df, width="stretch", hide_index=True)
 
 # -----------------------------------------------------------------------------
 # 10. RESULTS EXPORT & DOWNLOAD
@@ -876,7 +876,7 @@ with d_c1:
         data=json_str,
         file_name=f"geopulse_run_scenario_{run_result['scenario_id']}.json",
         mime="application/json",
-        use_container_width=True
+        width="stretch"
     )
 with d_c2:
     st.download_button(
@@ -884,7 +884,7 @@ with d_c2:
         data=csv_str,
         file_name=f"geopulse_timeline_scenario_{run_result['scenario_id']}.csv",
         mime="text/csv",
-        use_container_width=True
+        width="stretch"
     )
 with d_c3:
     st.caption("All interactive runs are automatically saved to `results/dashboard_runs/` with unique execution timestamps.")

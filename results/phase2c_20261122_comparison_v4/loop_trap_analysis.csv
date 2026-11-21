@@ -1,0 +1,32 @@
+algorithm,out_degree,loop_traps
+"Lookahead Two-Edge (depth=5, branches=4)",1,35
+"Lookahead Two-Edge (depth=5, branches=4)",4,3
+"Lookahead Two-Edge (depth=5, branches=4)",3,9
+Destination-Aware Two-Edge (no corridor),1,72
+Destination-Aware + Corridor cap 5 (ranking),1,59
+Destination-Aware + Corridor cap 10 (ranking),1,59
+Destination-Aware + Corridor cap 20 (ranking),1,59
+Destination-Aware + Corridor cap 5 (conservative rejection),1,59
+Destination-Aware + Corridor cap 10 (conservative rejection),1,59
+Destination-Aware + Corridor cap 20 (conservative rejection),1,59
+Depth-5 Lookahead + Corridor cap 10 (ranking),1,27
+Depth-5 Lookahead + Corridor cap 10 (conservative rejection),1,27
+Depth-5 Lookahead + Corridor cap 10 (ranking),4,3
+Depth-5 Lookahead + Corridor cap 10 (conservative rejection),4,3
+Depth-5 Lookahead + Corridor cap 10 (ranking),2,3
+Depth-5 Lookahead + Corridor cap 10 (conservative rejection),2,3
+Destination-Aware Two-Edge (no corridor),2,7
+Destination-Aware + Corridor cap 5 (ranking),2,5
+Destination-Aware + Corridor cap 10 (ranking),2,5
+Destination-Aware + Corridor cap 20 (ranking),2,5
+Destination-Aware + Corridor cap 5 (conservative rejection),2,5
+Destination-Aware + Corridor cap 10 (conservative rejection),2,5
+Destination-Aware + Corridor cap 20 (conservative rejection),2,5
+Destination-Aware + Corridor cap 5 (ranking),3,7
+Destination-Aware + Corridor cap 10 (ranking),3,7
+Destination-Aware + Corridor cap 20 (ranking),3,7
+Destination-Aware + Corridor cap 5 (conservative rejection),3,7
+Destination-Aware + Corridor cap 10 (conservative rejection),3,7
+Destination-Aware + Corridor cap 20 (conservative rejection),3,7
+Depth-5 Lookahead + Corridor cap 10 (ranking),3,12
+Depth-5 Lookahead + Corridor cap 10 (conservative rejection),3,12

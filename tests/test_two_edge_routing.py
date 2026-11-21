@@ -33,11 +33,14 @@ from src.routing.candidate_generator import (
     CandidateEdge,
     CandidateGenerationStrategy
 )
-from src.routing.lookahead import LimitedLookaheadEvaluator
+from src.routing.lookahead import BoundedReachabilityEvaluator, LimitedLookaheadEvaluator
+from src.routing.forced_corridor import ForcedCorridorEvaluator
 from src.routing.decision_strategies import (
     GreedyDecisionStrategy,
     DestinationAwareDecisionStrategy,
+    CorridorRankingDecisionStrategy,
     LimitedLookaheadDecisionStrategy,
+    BoundedReachabilityDecisionStrategy,
     AdaptiveDecisionStrategy
 )
 from src.routing.two_edge_selector import TwoEdgeSelector
@@ -96,7 +99,7 @@ def diamond_graph():
         'C': (20.00018, 85.00018),  # ~20m from A, ~30m to D
         'B': (20.00045, 85.00045),  # ~50m from A
         'X': (20.00090, 85.00090),  # ~100m from A
-        'D': (20.00040, 85.00040)
+        'D': (20.00020, 85.00020)
     }
     return adj, lengths, weights, speeds, coords
 
@@ -198,6 +201,62 @@ def test_candidate_generation_reversal_pruning():
     assert res.is_forced is True
 
 
+def test_strict_loop_avoidance_chooses_unvisited_candidate_even_if_costlier():
+    """A finite 1000s penalty must not allow a visited edge to win by score."""
+    adj = {'A': [('Visited', 0), ('Fresh', 0)], 'Visited': [], 'Fresh': []}
+    lengths = {('A', 'Visited', 0): 10.0, ('A', 'Fresh', 0): 20.0}
+    weights = {('A', 'Visited', 0): 1.0, ('A', 'Fresh', 0): 2001.0}
+    generator = CandidateGenerator(adj, lengths)
+
+    result = generator.generate_candidates(
+        current_node='A',
+        destination='Fresh',
+        edge_weights=weights,
+        visited_nodes={'A', 'Visited'},
+        strategy=CandidateGenerationStrategy.LOWEST_IMMEDIATE_COST,
+        avoid_visited_successors=True,
+    )
+
+    assert result.eligible_count == 1
+    assert [candidate.v for candidate in result.candidates] == ['Fresh']
+
+
+def test_twenty_five_kmh_heuristic_is_not_admissible_at_120_kmh():
+    """The configured 25 km/h estimate can exceed a legal edge traversal cost."""
+    coords = {'A': (0.0, 0.0), 'B': (0.0, 0.01)}
+    lengths = {('A', 'B', 0): 1112.0}
+    slow_bound = CandidateGenerator(
+        {'A': [('B', 0)], 'B': []},
+        lengths,
+        coords,
+        default_free_flow_speed_kmh=25.0,
+    )
+    safe_bound = CandidateGenerator(
+        {'A': [('B', 0)], 'B': []},
+        lengths,
+        coords,
+        default_free_flow_speed_kmh=120.0,
+    )
+    actual_edge_time_s = lengths[('A', 'B', 0)] / (120.0 / 3.6)
+
+    assert slow_bound.estimate_remaining_time('A', 'B') > actual_edge_time_s
+    assert safe_bound.estimate_remaining_time('A', 'B') <= actual_edge_time_s + 0.1
+
+
+def test_strict_loop_avoidance_is_scoped_to_route_controller():
+    """Direct selector callers keep legacy behavior; the route controller opts in."""
+    adj = {'A': [('B', 0)], 'B': []}
+    lengths = {('A', 'B', 0): 10.0}
+    selector = TwoEdgeSelector(
+        CandidateGenerator(adj, lengths),
+        GreedyDecisionStrategy(),
+    )
+
+    assert selector.avoid_visited_successors is False
+    RouteController(adj, lengths, selector)
+    assert selector.avoid_visited_successors is True
+
+
 # -----------------------------------------------------------------------------
 # 2. DECISION STRATEGIES TESTS
 # -----------------------------------------------------------------------------
@@ -293,6 +352,290 @@ def test_limited_lookahead_evaluation():
 
     assert step.next_node == 'C'
     assert step.selected_edge == ('A', 'C', 0)
+
+
+def test_lookahead_candidate_generation_uses_current_weights():
+    """Lookahead ranking handles 3+ outgoing edges and refreshes live costs."""
+    adj = {
+        'A': [('B', 0), ('C', 0), ('X', 0)],
+        'B': [('D', 0)],
+        'C': [('D', 0)],
+        'X': [('D', 0)],
+        'D': [],
+    }
+    lengths = {edge: 10.0 for edge in [
+        ('A', 'B', 0), ('A', 'C', 0), ('A', 'X', 0),
+        ('B', 'D', 0), ('C', 'D', 0), ('X', 'D', 0),
+    ]}
+    original_weights = {
+        ('A', 'B', 0): 100.0, ('B', 'D', 0): 1.0,
+        ('A', 'C', 0): 2.0, ('C', 'D', 0): 2.0,
+        ('A', 'X', 0): 3.0, ('X', 'D', 0): 3.0,
+    }
+    updated_weights = {
+        ('A', 'B', 0): 2.0, ('B', 'D', 0): 2.0,
+        ('A', 'C', 0): 100.0, ('C', 'D', 0): 1.0,
+        ('A', 'X', 0): 1.0, ('X', 'D', 0): 1.0,
+    }
+    generator = CandidateGenerator(adj, lengths)
+    evaluator = LimitedLookaheadEvaluator(
+        adj, original_weights, lambda _u, _v: 0.0, depth=2
+    )
+    selector = TwoEdgeSelector(generator, LimitedLookaheadDecisionStrategy(evaluator))
+
+    decision = selector.decide_next_edge(
+        step_index=0,
+        current_node='A',
+        destination='D',
+        edge_weights=updated_weights,
+    )
+
+    assert decision.next_node == 'X'
+    assert decision.selected_edge == ('A', 'X', 0)
+
+
+def test_adaptive_candidate_pair_includes_lookahead_favored_successor():
+    """Adaptive's candidate pool must not be destination-ranked only."""
+    adj = {'A': [('B', 0), ('C', 0), ('X', 0)]}
+    lengths = {
+        ('A', 'B', 0): 10.0,
+        ('A', 'C', 0): 10.0,
+        ('A', 'X', 0): 10.0,
+    }
+    weights = {edge: 1.0 for edge in lengths}
+    generator = CandidateGenerator(
+        adj,
+        lengths,
+        node_coords={
+            'A': (0.0, 0.0),
+            'B': (0.0, 1.0),
+            'C': (0.0, 0.01),
+            'X': (0.0, 0.1),
+            'D': (0.0, 0.02),
+        },
+    )
+    lookahead_scores = {
+        ('A', 'B', 0): 30.0,
+        ('A', 'C', 0): 20.0,
+        ('A', 'X', 0): 1.0,
+    }
+    result = generator.generate_candidates(
+        current_node='A',
+        destination='D',
+        edge_weights=weights,
+        strategy=CandidateGenerationStrategy.ADAPTIVE_DIVERSE,
+        lookahead_evaluator=lambda edge: lookahead_scores[edge],
+    )
+
+    assert {candidate.v for candidate in result.candidates} == {'C', 'X'}
+
+
+def test_adaptive_selector_defaults_to_diverse_candidate_generation():
+    """Adaptive's default pool construction considers both scoring branches."""
+    adj = {'A': [('B', 0), ('C', 0), ('X', 0)], 'B': [], 'C': [], 'X': []}
+    lengths = {('A', node, 0): 10.0 for node in ('B', 'C', 'X')}
+    weights = {edge: 1.0 for edge in lengths}
+    generator = CandidateGenerator(adj, lengths)
+    adaptive = AdaptiveDecisionStrategy(
+        DestinationAwareDecisionStrategy(),
+        LimitedLookaheadDecisionStrategy(
+            LimitedLookaheadEvaluator(adj, weights, lambda _u, _v: 0.0, depth=2)
+        ),
+    )
+    selector = TwoEdgeSelector(generator, adaptive)
+
+    assert selector.candidate_strategy == CandidateGenerationStrategy.ADAPTIVE_DIVERSE
+
+
+def test_bounded_reachability_rejects_corridor_returning_to_active_path():
+    """Bounded search marks a short one-exit return corridor nonviable."""
+    adj = {
+        'A': [('B', 0), ('C', 0)],
+        'B': [('X', 0)],
+        'X': [('A', 0)],
+        'C': [('D', 0)],
+        'D': [('T', 0)],
+        'T': [],
+    }
+    lengths = {edge: 10.0 for u, edges in adj.items() for v, key in edges for edge in [(u, v, key)]}
+    weights = {edge: 1.0 for edge in lengths}
+    generator = CandidateGenerator(adj, lengths, default_free_flow_speed_kmh=120.0)
+    evaluator = BoundedReachabilityEvaluator(
+        adj, weights, generator.estimate_remaining_time, depth=3, max_expansions_per_node=2
+    )
+    selector = TwoEdgeSelector(
+        generator,
+        BoundedReachabilityDecisionStrategy(evaluator),
+        avoid_visited_successors=True,
+    )
+
+    decision = selector.decide_next_edge(
+        step_index=0,
+        current_node='A',
+        destination='T',
+        edge_weights=weights,
+        visited_nodes={'A'},
+    )
+
+    assert decision.next_node == 'C'
+    assert evaluator.evaluate_edge_details(('A', 'B', 0), 'T', {'A'}).viable is False
+    assert evaluator.evaluate_edge_details(('A', 'C', 0), 'T', {'A'}).viable is True
+
+
+def test_bounded_reachability_branch_ranking_uses_destination_potential():
+    """Destination-potential ranking keeps a slower useful branch in a capped search."""
+    adj = {
+        'A': [('B', 0)],
+        'B': [('X', 0), ('Y', 0)],
+        'X': [('T', 0)],
+        'Y': [('T', 0)],
+        'T': [],
+    }
+    weights = {
+        ('A', 'B', 0): 1.0,
+        ('B', 'X', 0): 1.0,
+        ('B', 'Y', 0): 2.0,
+        ('X', 'T', 0): 10.0,
+        ('Y', 'T', 0): 1.0,
+    }
+    heuristic = lambda node, _target: {'X': 100.0, 'Y': 1.0}.get(node, 0.0)
+    immediate = BoundedReachabilityEvaluator(
+        adj, weights, heuristic, depth=3, max_expansions_per_node=1, branch_ranking='immediate'
+    )
+    destination = BoundedReachabilityEvaluator(
+        adj, weights, heuristic, depth=3, max_expansions_per_node=1, branch_ranking='destination'
+    )
+
+    immediate_cost = immediate.evaluate_edge(('A', 'B', 0), 'T')
+    destination_cost = destination.evaluate_edge(('A', 'B', 0), 'T')
+
+    assert destination_cost < immediate_cost
+    assert destination.evaluate_edge_details(('A', 'B', 0), 'T').viable
+
+
+def test_forced_corridor_check_stops_at_junction_and_tracks_cost():
+    adj = {'A': [('B', 0)], 'B': [('C', 0), ('D', 1)], 'C': [], 'D': []}
+    edge_costs = {('A', 'B', 0): 2.0, ('B', 'C', 0): 3.0, ('B', 'D', 1): 4.0}
+    lengths = {edge: 10.0 for edge in edge_costs}
+    check = ForcedCorridorEvaluator(adj, edge_costs, lengths, edge_cap=5).evaluate(
+        ('A', 'B', 0), 'T', {'A'}
+    )
+
+    assert check.status == 'junction'
+    assert check.reaches_junction
+    assert check.corridor_edge_count == 1
+    assert check.accumulated_time_s == 2.0
+    assert not check.returns_to_active_path
+    assert not check.reaches_dead_end
+    assert not check.incomplete_edge_cap
+
+
+def test_forced_corridor_return_and_dead_end_are_distinguished():
+    return_adj = {'A': [('B', 0)], 'B': [('C', 0)], 'C': [('A', 0)]}
+    costs = {('A', 'B', 0): 2.0, ('B', 'C', 0): 3.0, ('C', 'A', 0): 5.0}
+    lengths = {edge: 10.0 for edge in costs}
+    return_check = ForcedCorridorEvaluator(
+        return_adj, costs, lengths, edge_cap=5
+    ).evaluate(('A', 'B', 0), 'T', {'A'})
+
+    dead_adj = {'A': [('B', 0)], 'B': [('C', 0)], 'C': []}
+    dead_costs = {('A', 'B', 0): 2.0, ('B', 'C', 0): 3.0}
+    dead_check = ForcedCorridorEvaluator(
+        dead_adj, dead_costs, {edge: 10.0 for edge in dead_costs}, edge_cap=5
+    ).evaluate(('A', 'B', 0), 'T', {'A'})
+
+    assert return_check.status == 'active_path_return'
+    assert return_check.returns_to_active_path and return_check.is_proven_trap
+    assert return_check.corridor_edge_count == 2
+    assert return_check.accumulated_time_s == 5.0
+    assert dead_check.status == 'dead_end'
+    assert dead_check.reaches_dead_end and dead_check.is_proven_trap
+    assert dead_check.corridor_edge_count == 2
+    assert dead_check.accumulated_time_s == 5.0
+
+
+def test_forced_corridor_cap_is_incomplete_not_dead_end():
+    adj = {'A': [('B', 0)], 'B': [('C', 0)], 'C': [('D', 0)], 'D': []}
+    costs = {('A', 'B', 0): 2.0, ('B', 'C', 0): 3.0, ('C', 'D', 0): 4.0}
+    check = ForcedCorridorEvaluator(
+        adj, costs, {edge: 10.0 for edge in costs}, edge_cap=1
+    ).evaluate(('A', 'B', 0), 'T', {'A'})
+
+    assert check.status == 'edge_cap'
+    assert check.incomplete_edge_cap
+    assert not check.reaches_dead_end
+    assert not check.returns_to_active_path
+    assert not check.is_proven_trap
+    assert check.corridor_edge_count == 1
+    assert check.accumulated_time_s == 2.0
+
+
+def test_conservative_corridor_rejection_keeps_incomplete_candidate():
+    adj = {
+        'A': [('Incomplete', 0), ('Trap', 0), ('Safe', 0)],
+        'Incomplete': [], 'Trap': [], 'Safe': [],
+    }
+    lengths = {('A', node, 0): 10.0 for node in ('Incomplete', 'Trap', 'Safe')}
+    weights = {edge: 1.0 for edge in lengths}
+    statuses = {
+        ('A', 'Incomplete', 0): 'edge_cap',
+        ('A', 'Trap', 0): 'dead_end',
+        ('A', 'Safe', 0): 'junction',
+    }
+
+    class Assessment:
+        def __init__(self, status):
+            self.status = status
+            self.returns_to_active_path = status == 'active_path_return'
+            self.reaches_dead_end = status == 'dead_end'
+            self.is_proven_trap = self.returns_to_active_path or self.reaches_dead_end
+
+        def to_dict(self):
+            return {
+                'status': self.status,
+                'returns_to_active_path': self.returns_to_active_path,
+                'reaches_dead_end': self.reaches_dead_end,
+                'is_proven_trap': self.is_proven_trap,
+                'check_latency_ms': 0.01,
+            }
+
+    generator = CandidateGenerator(adj, lengths)
+    result = generator.generate_candidates(
+        'A',
+        'T',
+        weights,
+        strategy=CandidateGenerationStrategy.DESTINATION_AWARE,
+        corridor_assessor=lambda edge: Assessment(statuses[edge]),
+        corridor_policy='conservative_rejection',
+    )
+
+    assert {candidate.v for candidate in result.candidates} == {'Incomplete', 'Safe'}
+    assert result.eligible_count == 2
+    assert len(generator.last_corridor_checks) == 3
+
+
+def test_corridor_ranking_is_wired_into_selector_and_avoids_proven_dead_end():
+    adj = {'A': [('Dead', 0), ('T', 0)], 'Dead': [], 'T': []}
+    lengths = {('A', 'Dead', 0): 10.0, ('A', 'T', 0): 20.0}
+    weights = {('A', 'Dead', 0): 1.0, ('A', 'T', 0): 2.0}
+    selector = TwoEdgeSelector(
+        CandidateGenerator(adj, lengths),
+        CorridorRankingDecisionStrategy(DestinationAwareDecisionStrategy()),
+        avoid_visited_successors=True,
+        corridor_policy='ranking',
+        corridor_edge_cap=5,
+    )
+
+    decision = selector.decide_next_edge(
+        step_index=0,
+        current_node='A',
+        destination='T',
+        edge_weights=weights,
+        visited_nodes={'A'},
+    )
+
+    assert decision.next_node == 'T'
+    assert {check['status'] for check in selector.last_corridor_checks} == {'dead_end', 'destination'}
 
 
 def test_adaptive_strategy_switches_under_congestion():
@@ -440,32 +783,103 @@ def test_sequential_journey_with_dynamic_traffic_update(diamond_graph):
 
     assert result.is_success is True
     assert result.node_path[-1] == 'D'
-    assert result.reroute_events > 0
+    # The only remaining route is C -> D, so the update cannot create a detour.
+    assert result.reroute_events == 0
+    assert result.traffic_updates_accepted == 0
+    assert result.total_travel_time_s == 4.0
 
 
 def test_backtrack_recovery_records_reverse_movement():
-    """A dead-end node backtracks to the previous node and records the reverse edge.
-    The graph includes a reverse edge with defined length and weight.
-    """
+    """A dead end reverses along its incoming segment and resumes at the junction."""
     adj = {
-        'A': [('B', 0)],
-        'B': [('A', 0), ('C', 0)],
-        'C': []
+        'A': [('B', 0), ('C', 0)],
+        'B': [],
+        'C': [('D', 0)],
+        'D': [],
     }
-    lengths = {('A', 'B', 0): 10.0, ('B', 'A', 0): 10.0, ('B', 'C', 0): 20.0}
-    weights = {('A', 'B', 0): 1.0, ('B', 'A', 0): 1.0, ('B', 'C', 0): 2.0}
+    lengths = {
+        ('A', 'B', 0): 10.0,
+        ('B', 'A', 1): 10.0,
+        ('A', 'C', 0): 20.0,
+        ('C', 'D', 0): 20.0,
+    }
+    weights = {
+        ('A', 'B', 0): 1.0,
+        ('B', 'A', 1): 1.5,
+        ('A', 'C', 0): 2.0,
+        ('C', 'D', 0): 2.0,
+    }
     generator = CandidateGenerator(adj, lengths)
     selector = TwoEdgeSelector(generator, GreedyDecisionStrategy())
     controller = RouteController(adj, lengths, selector)
-    # Force backtrack by allowing only one visit per node
-    controller.max_node_visits = 0
     result = controller.execute_journey(source='A', destination='C', initial_weights=weights)
-    assert result.node_path == ['A', 'B', 'A', 'B', 'C']
+    assert result.node_path == ['A', 'B', 'A', 'C']
     assert result.edge_path[0] == ('A', 'B', 0)
-    assert result.edge_path[1] == ('B', 'A', 0)
-    assert result.edge_path[-1] == ('B', 'C', 0)
-    expected_time = weights[('A', 'B', 0)] + weights[('B', 'A', 0)] + weights[('B', 'C', 0)]
+    assert result.edge_path[1] == ('B', 'A', 1)
+    assert result.edge_path[-1] == ('A', 'C', 0)
+    expected_time = weights[('A', 'B', 0)] + weights[('B', 'A', 1)] + weights[('A', 'C', 0)]
     assert abs(result.total_travel_time_s - expected_time) < 1e-6
+    assert result.recovery_events == 1
+
+
+def test_local_backtracking_retries_two_edge_branch_without_dijkstra():
+    """A failed one-exit branch is not re-entered after backtracking past it."""
+    adj = {
+        'A': [('B', 0), ('D', 0)],
+        'B': [('DeadLoop', 0)],
+        'DeadLoop': [('B', 0)],
+        'D': [('T', 0)],
+        'T': [],
+    }
+    lengths = {
+        ('A', 'B', 0): 10.0,
+        ('A', 'D', 0): 20.0,
+        ('B', 'DeadLoop', 0): 10.0,
+        ('DeadLoop', 'B', 0): 10.0,
+        ('D', 'T', 0): 10.0,
+    }
+    weights = {
+        ('A', 'B', 0): 1.0,
+        ('A', 'D', 0): 4.0,
+        ('B', 'DeadLoop', 0): 1.0,
+        ('DeadLoop', 'B', 0): 1.0,
+        ('D', 'T', 0): 1.0,
+    }
+    selector = TwoEdgeSelector(
+        CandidateGenerator(adj, lengths),
+        GreedyDecisionStrategy(),
+        avoid_visited_successors=True,
+    )
+    controller = RouteController(
+        adj,
+        lengths,
+        selector,
+        local_backtracking=True,
+    )
+
+    result = controller.execute_journey('A', 'T', weights)
+
+    assert result.is_success
+    assert result.node_path == ['A', 'B', 'DeadLoop', 'B', 'A', 'D', 'T']
+    assert sum(
+        'BACKTRACK]' in step.strategy_name
+        for step in result.decision_steps
+    ) == 2
+    assert not any(
+        '[RECOVERY_LOOP_BACKTRACK]' in step.strategy_name
+        and step.current_node == 'B'
+        and step.next_node == 'DeadLoop'
+        for step in result.decision_steps
+    )
+    assert not any(
+        tag in step.strategy_name
+        for step in result.decision_steps
+        for tag in (
+            '[RECOVERY_FORWARD]',
+            '[RECOVERY_CYCLE_BREAKER]',
+            '[RECOVERY_SHORTEST_PATH]',
+        )
+    )
 
 
 def test_cycle_detection_breaks_loop():

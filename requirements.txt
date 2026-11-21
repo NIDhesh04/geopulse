@@ -1,0 +1,20 @@
+# Verified with Python 3.13.9 in the project environment.
+duckdb==1.5.6
+joblib==1.6.0
+lightgbm==4.7.0
+matplotlib==3.11.2
+networkx==3.7
+numpy==2.5.3
+osmnx==2.1.1
+pandas==3.0.6
+Pillow==12.3.0
+pyarrow==25.0.1
+pydeck==0.9.3
+pygame==2.6.1
+pyproj==3.8.0
+pytest==9.1.1
+scikit-learn==1.9.1
+scipy==1.18.1
+seaborn==0.13.2
+shapely==2.1.2
+streamlit==1.65.0

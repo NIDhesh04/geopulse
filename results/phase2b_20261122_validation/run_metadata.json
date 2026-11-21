@@ -1,0 +1,147 @@
+{
+  "graph_nodes": 18260,
+  "graph_directed_edges": 46679,
+  "prediction_rows_total": 30800,
+  "od_rows_available": 50,
+  "inputs_sha256": {
+    "graphml": "7d363f7109fea13b426c3d76d34b1bb9bf58654704fe07c132f7cbcb101d8cf8",
+    "mapping_parquet": "060c87810a7e2695fb473b875a4f7c5554b120c105189d62a233400f9ce19cce",
+    "predictions_parquet": "2217eb8a01639e34178ced5b96a728e9105022177794d5bffafa8f6152a819d1",
+    "od_csv": "2eb82d3710b284070ff951a0524a4870c619d0bd56de68956040c2945d0d5c19"
+  },
+  "stage": "validate",
+  "od_ids": [
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29
+  ],
+  "timestamps": [
+    "2026-01-15T08:00:00+00:00",
+    "2026-01-15T14:00:00+00:00",
+    "2026-01-15T20:00:00+00:00"
+  ],
+  "scenario_weights": [
+    {
+      "prediction_timestamp_utc": "2026-01-15T08:00:00+00:00",
+      "prediction_rows": 700,
+      "dynamic_weighted_edges": 690
+    },
+    {
+      "prediction_timestamp_utc": "2026-01-15T14:00:00+00:00",
+      "prediction_rows": 700,
+      "dynamic_weighted_edges": 690
+    },
+    {
+      "prediction_timestamp_utc": "2026-01-15T20:00:00+00:00",
+      "prediction_rows": 700,
+      "dynamic_weighted_edges": 690
+    }
+  ],
+  "seed": 42,
+  "algorithm_configurations": [
+    {
+      "name": "Dijkstra",
+      "kind": "dijkstra",
+      "heuristic_speed_kmh": 25.0,
+      "depth": 2,
+      "branch_limit": 4,
+      "branch_ranking": "immediate",
+      "candidate_policy": null,
+      "congestion_threshold_kmh": 25.0,
+      "local_backtracking": false,
+      "max_hops_multiplier": 3.0
+    },
+    {
+      "name": "Destination-Aware Two-Edge (25 km/h)",
+      "kind": "destination",
+      "heuristic_speed_kmh": 25.0,
+      "depth": 2,
+      "branch_limit": 4,
+      "branch_ranking": "immediate",
+      "candidate_policy": null,
+      "congestion_threshold_kmh": 25.0,
+      "local_backtracking": false,
+      "max_hops_multiplier": 3.0
+    },
+    {
+      "name": "Lookahead Two-Edge (depth=2, branches=4)",
+      "kind": "lookahead",
+      "heuristic_speed_kmh": 25.0,
+      "depth": 2,
+      "branch_limit": 4,
+      "branch_ranking": "immediate",
+      "candidate_policy": null,
+      "congestion_threshold_kmh": 25.0,
+      "local_backtracking": false,
+      "max_hops_multiplier": 3.0
+    },
+    {
+      "name": "Adaptive Two-Edge (Phase 2A candidate pool)",
+      "kind": "adaptive",
+      "heuristic_speed_kmh": 25.0,
+      "depth": 2,
+      "branch_limit": 4,
+      "branch_ranking": "immediate",
+      "candidate_policy": "destination_aware",
+      "congestion_threshold_kmh": 25.0,
+      "local_backtracking": false,
+      "max_hops_multiplier": 3.0
+    },
+    {
+      "name": "Adaptive Two-Edge (diverse destination/lookahead pair)",
+      "kind": "adaptive",
+      "heuristic_speed_kmh": 25.0,
+      "depth": 2,
+      "branch_limit": 4,
+      "branch_ranking": "immediate",
+      "candidate_policy": "adaptive_diverse",
+      "congestion_threshold_kmh": 25.0,
+      "local_backtracking": false,
+      "max_hops_multiplier": 3.0
+    },
+    {
+      "name": "Lookahead Two-Edge (depth=5, branches=4)",
+      "kind": "lookahead",
+      "heuristic_speed_kmh": 25.0,
+      "depth": 5,
+      "branch_limit": 4,
+      "branch_ranking": "immediate",
+      "candidate_policy": null,
+      "congestion_threshold_kmh": 25.0,
+      "local_backtracking": false,
+      "max_hops_multiplier": 3.0
+    }
+  ],
+  "safety_recovery_enabled": true,
+  "strict_active_path_loop_avoidance": true,
+  "local_backtracking_enabled": false,
+  "max_hops_multiplier_by_algorithm": {
+    "Dijkstra": 3.0,
+    "Destination-Aware Two-Edge (25 km/h)": 3.0,
+    "Lookahead Two-Edge (depth=2, branches=4)": 3.0,
+    "Adaptive Two-Edge (Phase 2A candidate pool)": 3.0,
+    "Adaptive Two-Edge (diverse destination/lookahead pair)": 3.0,
+    "Lookahead Two-Edge (depth=5, branches=4)": 3.0
+  },
+  "two_edge_only_definition": "Destination reached with zero Dijkstra fallback steps and zero backtracking steps.",
+  "dijkstra_fallback_counting": "RECOVERY_FORWARD, RECOVERY_CYCLE_BREAKER, and RECOVERY_SHORTEST_PATH route edges only.",
+  "result_rows": 360,
+  "trace_rows": 16479
+}

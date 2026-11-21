@@ -14,10 +14,15 @@ from src.routing.candidate_generator import (
     CandidateGenerationResult,
     CandidateGenerationStrategy
 )
-from src.routing.lookahead import LimitedLookaheadEvaluator
+from src.routing.lookahead import BoundedReachabilityEvaluator, LimitedLookaheadEvaluator
+from src.routing.forced_corridor import ForcedCorridorEvaluator
+from src.routing.decision_strategies import (
+    AdaptiveDecisionStrategy,
     BaseDecisionStrategy,
+    BoundedReachabilityDecisionStrategy,
+    CorridorRankingDecisionStrategy,
     DecisionEvaluationResult,
-    LimitedLookaheadDecisionStrategy
+    LimitedLookaheadDecisionStrategy,
 )
 
 
@@ -52,10 +57,19 @@ class TwoEdgeSelector:
         self,
         candidate_generator: CandidateGenerator,
         decision_strategy: BaseDecisionStrategy,
-        candidate_strategy: Optional[CandidateGenerationStrategy] = None
+        candidate_strategy: Optional[CandidateGenerationStrategy] = None,
+        avoid_visited_successors: bool = False,
+        corridor_policy: Optional[str] = None,
+        corridor_edge_cap: int = 10,
     ):
         self.candidate_generator = candidate_generator
         self.decision_strategy = decision_strategy
+        self.avoid_visited_successors = bool(avoid_visited_successors)
+        if corridor_policy not in (None, "ranking", "conservative_rejection"):
+            raise ValueError(f"Unknown forced-corridor policy: {corridor_policy}")
+        self.corridor_policy = corridor_policy
+        self.corridor_edge_cap = max(1, int(corridor_edge_cap))
+        self.last_corridor_checks: List[Dict[str, Any]] = []
         if candidate_strategy is not None:
             self.candidate_strategy = candidate_strategy
         else:
@@ -63,7 +77,11 @@ class TwoEdgeSelector:
             strat_name = getattr(decision_strategy, 'name', '').lower()
             if 'greedy' in strat_name:
                 self.candidate_strategy = CandidateGenerationStrategy.LOWEST_IMMEDIATE_COST
+            elif 'adaptive' in strat_name:
+                self.candidate_strategy = CandidateGenerationStrategy.ADAPTIVE_DIVERSE
             elif 'lookahead' in strat_name:
+                self.candidate_strategy = CandidateGenerationStrategy.LOOKAHEAD
+            elif 'reachability' in strat_name:
                 self.candidate_strategy = CandidateGenerationStrategy.LOOKAHEAD
             else:
                 self.candidate_strategy = CandidateGenerationStrategy.DESTINATION_AWARE
@@ -76,7 +94,8 @@ class TwoEdgeSelector:
         edge_weights: Dict[Tuple[str, str, int], float],
         edge_speeds: Optional[Dict[Tuple[str, str, int], float]] = None,
         previous_node: Optional[str] = None,
-        visited_nodes: Optional[Set[str]] = None
+        visited_nodes: Optional[Set[str]] = None,
+        excluded_edges: Optional[Set[Tuple[str, str, int]]] = None,
     ) -> TwoEdgeDecisionStep:
         """
         Executes a single two-edge decision step at current_node.
@@ -84,16 +103,70 @@ class TwoEdgeSelector:
         # 1. Generate candidates
         # Determine if a lookahead evaluator should be supplied (for LOOKAHEAD strategy)
         lookahead_evaluator = None
-        if isinstance(self.decision_strategy, LimitedLookaheadDecisionStrategy):
+        active_strategy = (
+            self.decision_strategy.delegate
+            if isinstance(self.decision_strategy, CorridorRankingDecisionStrategy)
+            else self.decision_strategy
+        )
+        if isinstance(
+            active_strategy,
+            (
+                LimitedLookaheadDecisionStrategy,
+                AdaptiveDecisionStrategy,
+                BoundedReachabilityDecisionStrategy,
+            ),
+        ):
             # Create a fresh LimitedLookaheadEvaluator using the current edge_weights to avoid stale data
-            eval_instance = LimitedLookaheadEvaluator(
-                self.candidate_generator.adjacency,
-                edge_weights,
-                self.candidate_generator.estimate_remaining_time,
-                depth=self.decision_strategy.evaluator.depth,
-                max_expansions_per_node=self.decision_strategy.evaluator.max_expansions
+            strategy = active_strategy
+            if isinstance(strategy, AdaptiveDecisionStrategy):
+                lookahead_strategy = strategy.lookahead
+                eval_instance = LimitedLookaheadEvaluator(
+                    self.candidate_generator.adjacency,
+                    edge_weights,
+                    self.candidate_generator.estimate_remaining_time,
+                    depth=lookahead_strategy.evaluator.depth,
+                    max_expansions_per_node=lookahead_strategy.evaluator.max_expansions,
+                )
+                strategy.lookahead.evaluator = eval_instance
+            elif isinstance(strategy, BoundedReachabilityDecisionStrategy):
+                old_eval = strategy.evaluator
+                eval_instance = BoundedReachabilityEvaluator(
+                    self.candidate_generator.adjacency,
+                    edge_weights,
+                    self.candidate_generator.estimate_remaining_time,
+                    depth=old_eval.depth,
+                    max_expansions_per_node=old_eval.max_expansions,
+                    branch_ranking=old_eval.branch_ranking,
+                )
+                strategy.evaluator = eval_instance
+            else:
+                lookahead_strategy = strategy
+                eval_instance = LimitedLookaheadEvaluator(
+                    self.candidate_generator.adjacency,
+                    edge_weights,
+                    self.candidate_generator.estimate_remaining_time,
+                    depth=lookahead_strategy.evaluator.depth,
+                    max_expansions_per_node=lookahead_strategy.evaluator.max_expansions,
+                )
+                strategy.evaluator = eval_instance
+            lookahead_evaluator = lambda edge: eval_instance.evaluate_edge(
+                edge, destination, visited_nodes
             )
-            lookahead_evaluator = eval_instance.evaluate_edge
+
+        corridor_assessor = None
+        if self.corridor_policy is not None:
+            corridor_evaluator = ForcedCorridorEvaluator(
+                adjacency=self.candidate_generator.adjacency,
+                edge_weights=edge_weights,
+                edge_lengths=self.candidate_generator.edge_lengths,
+                node_coords=self.candidate_generator.node_coords,
+                edge_cap=self.corridor_edge_cap,
+            )
+            corridor_assessor = lambda edge: corridor_evaluator.evaluate(
+                edge,
+                destination,
+                visited_nodes,
+            )
 
         gen_result: CandidateGenerationResult = self.candidate_generator.generate_candidates(
             current_node=current_node,
@@ -103,8 +176,13 @@ class TwoEdgeSelector:
             previous_node=previous_node,
             visited_nodes=visited_nodes,
             strategy=self.candidate_strategy,
-            lookahead_evaluator=lookahead_evaluator
+            lookahead_evaluator=lookahead_evaluator,
+            avoid_visited_successors=self.avoid_visited_successors,
+            excluded_edges=excluded_edges,
+            corridor_assessor=corridor_assessor,
+            corridor_policy=self.corridor_policy,
         )
+        self.last_corridor_checks = list(self.candidate_generator.last_corridor_checks)
 
         # 2. Dead-end check
         if gen_result.is_dead_end or not gen_result.candidates:
@@ -121,7 +199,10 @@ class TwoEdgeSelector:
                 length_m=0.0,
                 speed_kmh=0.0,
                 strategy_name=self.decision_strategy.name,
-                decision_reason=f"Dead end: No outgoing eligible edges from node {current_node}.",
+                decision_reason=(
+                    gen_result.status_message
+                    or f"Dead end: No outgoing eligible edges from node {current_node}."
+                ),
                 is_forced=False,
                 is_dead_end=True,
                 evaluation_time_ms=0.0

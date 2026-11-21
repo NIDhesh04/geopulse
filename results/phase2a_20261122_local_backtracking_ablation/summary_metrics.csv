@@ -1,0 +1,7 @@
+algorithm,journeys,journey_success_rate_pct,two_edge_only_success_rate_pct,two_edge_with_local_backtracking_success_rate_pct,mean_travel_time_s,mean_distance_m,mean_intersection_decisions,mean_two_edge_traversal_steps,mean_total_route_steps,mean_repeated_node_visits,cycle_recoveries,loop_trap_recoveries,dijkstra_fallback_steps,dijkstra_fallback_step_share_pct,backtracking_steps,mean_execution_time_ms,mean_decision_latency_ms,mean_p95_decision_latency_ms
+Dijkstra,10,100.0,,,980.4817670340011,8214.429632801784,0.0,0.0,67.1,0.0,0,0,0,0.0,0,21.657439990667626,,
+Greedy Two-Edge,10,0.0,0.0,0.0,7468.592,43189.518,199.8,413.6,681.0,468.3,0,2673,0,0.0,2674,1225.9579100064002,0.023731825576152065,0.03611650608945638
+Destination-Aware Two-Edge (25 km/h),10,50.0,20.0,50.0,5209.283,31443.790999999997,188.6,322.6,473.7,243.1,0,1511,0,0.0,1511,706.2206599977799,0.02720232515904032,0.04321200394770129
+Lookahead Two-Edge (depth=2),10,80.0,30.0,80.0,3585.7369999999996,22967.336,187.5,257.8,320.5,84.1,0,627,0,0.0,627,298.8978300068993,0.04112045872756304,0.06959000107599422
+Adaptive Two-Edge,10,80.0,20.0,80.0,4460.912000000001,27793.25,180.8,280.4,386.8,169.0,0,1064,0,0.0,1064,492.3745200037956,0.03983337871365335,0.061580497422255555
+Destination-Aware Two-Edge (safe h=120 km/h),10,0.0,0.0,0.0,6611.840000000001,38312.484,209.0,426.6,681.0,443.2,0,2544,0,0.0,2544,1165.0647500064224,0.02677222730527586,0.045381493982858956

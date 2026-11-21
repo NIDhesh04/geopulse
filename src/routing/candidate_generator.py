@@ -28,6 +28,9 @@ class CandidateGenerationStrategy(str, Enum):
     LOWEST_IMMEDIATE_COST = "lowest_immediate_cost"
     DESTINATION_AWARE = "destination_aware"
     LOOKAHEAD = "lookahead"
+    FASTEST_PLUS_PROGRESS = "fastest_plus_progress"
+    DESTINATION_PLUS_LOOKAHEAD = "destination_plus_lookahead"
+    ADAPTIVE_DIVERSE = "adaptive_diverse"
 
 
 @dataclass
@@ -97,8 +100,9 @@ class CandidateGenerator:
         node_coords : Optional[Dict[str, Tuple[float, float]]]
             Mapping of node -> (lat, lon) or (y, x) for heuristic estimation.
         default_free_flow_speed_kmh : float
-            Speed used for optimistic Euclidean/Haversine heuristic travel-time calculation.
-            Calibrated to realistic urban speed (25 km/h for Bhubaneswar network).
+            Speed used in the straight-line Haversine travel-time estimate.
+            The default 25 km/h matches the existing research configuration but is
+            not an admissible lower bound when any edge can be faster than 25 km/h.
         random_seed : Optional[int]
             Random seed for reproducibility in stochastic selection.
         """
@@ -111,7 +115,8 @@ class CandidateGenerator:
 
     def estimate_remaining_time(self, from_node: str, to_node: str) -> float:
         """
-        Admissible optimistic remaining travel-time heuristic based on straight-line distance.
+        Straight-line remaining-time estimate. It is a lower bound only when the
+        configured speed is at least the maximum speed allowed on every graph edge.
         """
         if from_node == to_node:
             return 0.0
@@ -134,7 +139,11 @@ class CandidateGenerator:
         previous_node: Optional[str] = None,
         visited_nodes: Optional[Set[str]] = None,
         strategy: CandidateGenerationStrategy = CandidateGenerationStrategy.DESTINATION_AWARE,
-        lookahead_evaluator: Optional[Callable[[Tuple[str, str, int]], float]] = None
+        lookahead_evaluator: Optional[Callable[[Tuple[str, str, int]], float]] = None,
+        avoid_visited_successors: bool = False,
+        excluded_edges: Optional[Set[Tuple[str, str, int]]] = None,
+        corridor_assessor: Optional[Callable[[Tuple[str, str, int]], Any]] = None,
+        corridor_policy: Optional[str] = None,
     ) -> CandidateGenerationResult:
         """
         Generates candidate outgoing edges from current_node.
@@ -152,11 +161,23 @@ class CandidateGenerator:
         previous_node : Optional[str]
             Node from which vehicle entered current_node (used for reversal pruning).
         visited_nodes : Optional[Set[str]]
-            Set of already visited nodes (used for loop penalization).
+            Nodes on the active journey path.
         strategy : CandidateGenerationStrategy
             Strategy used to reduce >2 eligible edges down to exactly 2 candidates.
         lookahead_evaluator : Optional[Callable]
             Evaluation function for lookahead candidate ranking.
+        avoid_visited_successors : bool
+            When true, do not select an edge back into the active path while any
+            successor remains unvisited. If every successor is on the active path,
+            return a loop trap so the controller can backtrack and retry a branch.
+        excluded_edges : Optional[Set[Tuple[str, str, int]]]
+            Directed edges already explored and rejected during local backtracking.
+        corridor_assessor : Optional[Callable]
+            Bounded forced-corridor inspection for one outgoing edge.
+        corridor_policy : Optional[str]
+            ``ranking`` ranks proven safe corridors ahead of incomplete paths and
+            proven traps. ``conservative_rejection`` filters proven traps only
+            when another candidate remains; cap-incomplete paths are retained.
 
         Returns
         -------
@@ -164,6 +185,8 @@ class CandidateGenerator:
             Result containing selected candidates (0 for dead-end, 1 for forced, 2 for choice).
         """
         visited = visited_nodes or set()
+        excluded = excluded_edges or set()
+        self.last_corridor_checks = []
         raw_out = self.adjacency.get(str(current_node), [])
         total_out_count = len(raw_out)
 
@@ -183,6 +206,8 @@ class CandidateGenerator:
         for v_raw, key in raw_out:
             v_str = str(v_raw)
             edge_tuple = (str(current_node), v_str, int(key))
+            if edge_tuple in excluded:
+                continue
             length_m = self.edge_lengths.get(edge_tuple, 25.0)
             cost_s = edge_weights.get(edge_tuple, 10.0)
             speed_kmh = (
@@ -205,12 +230,57 @@ class CandidateGenerator:
                 )
             )
 
-        # 3. Filter immediate reversal (unless cul-de-sac)
+        if not all_candidates:
+            return CandidateGenerationResult(
+                current_node=str(current_node),
+                candidates=[],
+                total_outgoing_count=total_out_count,
+                eligible_count=0,
+                is_dead_end=True,
+                status_message=f"Loop trap at {current_node}: no untried outgoing edge remains.",
+            )
+
+        # 3. Prefer non-reversal exits, while retaining lane-specific edge records.
         filtered_candidates = all_candidates
         if previous_node is not None and len(all_candidates) > 1:
             non_reversal = [c for c in all_candidates if c.v != str(previous_node)]
             if non_reversal:
                 filtered_candidates = non_reversal
+
+        # A fixed finite loop penalty can be smaller than destination/lookahead
+        # score differences. In local-backtracking mode, never choose a successor
+        # already on the active path when any unvisited successor is available.
+        if avoid_visited_successors and visited:
+            unvisited_candidates = [c for c in filtered_candidates if c.v not in visited]
+            if unvisited_candidates:
+                filtered_candidates = unvisited_candidates
+            else:
+                return CandidateGenerationResult(
+                    current_node=str(current_node),
+                    candidates=[],
+                    total_outgoing_count=total_out_count,
+                    eligible_count=0,
+                    is_dead_end=True,
+                    status_message=f"Loop trap at {current_node}: no untried eligible successor remains.",
+                )
+
+        if corridor_assessor is not None:
+            for candidate in filtered_candidates:
+                assessment = corridor_assessor(candidate.edge_tuple)
+                candidate.attributes["forced_corridor"] = assessment
+                details = assessment.to_dict() if hasattr(assessment, "to_dict") else dict(assessment)
+                self.last_corridor_checks.append(details)
+
+            if corridor_policy == "conservative_rejection":
+                alternatives = [
+                    candidate
+                    for candidate in filtered_candidates
+                    if not self._is_proven_corridor_trap(candidate)
+                ]
+                # Never discard every choice. An incomplete corridor is not a
+                # proven trap and is therefore always retained here.
+                if alternatives:
+                    filtered_candidates = alternatives
 
         eligible_count = len(filtered_candidates)
 
@@ -242,7 +312,8 @@ class CandidateGenerator:
             filtered_candidates,
             strategy,
             visited,
-            lookahead_evaluator
+            lookahead_evaluator,
+            corridor_policy,
         )
 
         return CandidateGenerationResult(
@@ -258,12 +329,28 @@ class CandidateGenerator:
         candidates: List[CandidateEdge],
         strategy: CandidateGenerationStrategy,
         visited: Set[str],
-        lookahead_evaluator: Optional[Callable[[Tuple[str, str, int]], float]]
+        lookahead_evaluator: Optional[Callable[[Tuple[str, str, int]], float]],
+        corridor_policy: Optional[str] = None,
     ) -> List[CandidateEdge]:
         """Reduces >2 candidates down to exactly 2 candidates according to strategy."""
         # Loop avoidance ranking penalty: unvisited nodes preferred
         def loop_penalty(c: CandidateEdge) -> float:
             return 1000.0 if c.v in visited else 0.0
+
+        def corridor_rank(c: CandidateEdge) -> int:
+            if corridor_policy != "ranking":
+                return 0
+            assessment = c.attributes.get("forced_corridor")
+            if assessment is None:
+                return 1
+            status = assessment.status if hasattr(assessment, "status") else assessment.get("status")
+            return {
+                "destination": 0,
+                "junction": 0,
+                "edge_cap": 1,
+                "dead_end": 2,
+                "active_path_return": 2,
+            }.get(status, 1)
 
         if strategy == CandidateGenerationStrategy.RANDOM:
             # Deterministic pseudo-random selection
@@ -273,14 +360,14 @@ class CandidateGenerator:
         elif strategy == CandidateGenerationStrategy.LOWEST_IMMEDIATE_COST:
             sorted_candidates = sorted(
                 candidates,
-                key=lambda c: (loop_penalty(c), c.travel_time_s)
+                key=lambda c: (loop_penalty(c), corridor_rank(c), c.travel_time_s)
             )
             return sorted_candidates[:2]
 
         elif strategy == CandidateGenerationStrategy.DESTINATION_AWARE:
             sorted_candidates = sorted(
                 candidates,
-                key=lambda c: (loop_penalty(c), c.total_estimated_s)
+                key=lambda c: (loop_penalty(c), corridor_rank(c), c.total_estimated_s)
             )
             return sorted_candidates[:2]
 
@@ -288,16 +375,68 @@ class CandidateGenerator:
             if lookahead_evaluator is not None:
                 sorted_candidates = sorted(
                     candidates,
-                    key=lambda c: (loop_penalty(c), lookahead_evaluator(c.edge_tuple))
+                    key=lambda c: (loop_penalty(c), corridor_rank(c), lookahead_evaluator(c.edge_tuple))
                 )
                 return sorted_candidates[:2]
-            else:
-                # Fallback to destination-aware
-                sorted_candidates = sorted(
-                    candidates,
-                    key=lambda c: (loop_penalty(c), c.total_estimated_s)
-                )
-                return sorted_candidates[:2]
+            # Fallback to destination-aware when no bounded evaluator exists.
+            sorted_candidates = sorted(
+                candidates,
+                key=lambda c: (loop_penalty(c), c.total_estimated_s)
+            )
+            return sorted_candidates[:2]
+
+        elif strategy == CandidateGenerationStrategy.FASTEST_PLUS_PROGRESS:
+            # Preserve two-edge comparison while ensuring the pair contains a
+            # locally cheap option and the successor closest to the destination.
+            fastest = min(
+                candidates,
+                key=lambda c: (loop_penalty(c), c.travel_time_s, c.total_estimated_s),
+            )
+            progress = min(
+                (c for c in candidates if c.edge_tuple != fastest.edge_tuple),
+                key=lambda c: (loop_penalty(c), c.heuristic_remaining_s, c.travel_time_s),
+                default=None,
+            )
+            return [fastest, progress] if progress is not None else [fastest]
+
+        elif strategy in (
+            CandidateGenerationStrategy.DESTINATION_PLUS_LOOKAHEAD,
+            CandidateGenerationStrategy.ADAPTIVE_DIVERSE,
+        ):
+            # The old Adaptive selector inherited DESTINATION_AWARE candidate
+            # ranking, so its Lookahead branch could never compare an omitted
+            # lookahead-favored successor. Build a two-edge pair that includes
+            # the best candidate under each signal, then let the decision
+            # strategy compare only those two edges.
+            by_destination = sorted(
+                candidates,
+                key=lambda c: (loop_penalty(c), c.total_estimated_s, c.travel_time_s),
+            )
+            first = by_destination[0]
+            if lookahead_evaluator is None:
+                return by_destination[:2]
+            by_lookahead = sorted(
+                candidates,
+                key=lambda c: (
+                    loop_penalty(c),
+                    lookahead_evaluator(c.edge_tuple),
+                    c.total_estimated_s,
+                ),
+            )
+            second = next(
+                (candidate for candidate in by_lookahead if candidate.edge_tuple != first.edge_tuple),
+                None,
+            )
+            return [first, second] if second is not None else [first]
 
         # Default fallback
         return candidates[:2]
+
+    @staticmethod
+    def _is_proven_corridor_trap(candidate: CandidateEdge) -> bool:
+        assessment = candidate.attributes.get("forced_corridor")
+        if assessment is None:
+            return False
+        if hasattr(assessment, "is_proven_trap"):
+            return bool(assessment.is_proven_trap)
+        return bool(assessment.get("returns_to_active_path") or assessment.get("reaches_dead_end"))
