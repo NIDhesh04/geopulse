@@ -1,0 +1,121 @@
+artifact,entity,field,dtype,records,missing_count,missing_pct,unique_non_null,minimum,maximum,sample_values,notes
+datasets\traffic_structured_v1.parquet,traffic,segment_id,int64,275800,0,0.0,700.0,0,699,"[0, 0, 0]",
+datasets\traffic_structured_v1.parquet,traffic,hour,"timestamp[ns, tz=UTC]",275800,0,0.0,394.0,2025-12-31T19:00:00+00:00,2026-01-17T04:00:00+00:00,"[""2025-12-31T19:00:00+00:00"", ""2025-12-31T20:00:00+00:00"", ""2025-12-31T21:00:00+00:00""]",
+datasets\traffic_structured_v1.parquet,traffic,timestamp,"timestamp[ns, tz=UTC]",275800,29401,10.660261,509.0,2025-12-31T19:39:50+00:00,2026-01-17T04:00:01+00:00,"[""2025-12-31T19:39:50+00:00"", ""2026-01-02T07:35:21+00:00"", ""2026-01-02T08:00:02+00:00""]",
+datasets\traffic_structured_v1.parquet,traffic,currentSpeed,double,275800,29401,10.660261,53.0,1.0,54.0,"[54.0, 54.0, 54.0]",
+datasets\traffic_structured_v1.parquet,traffic,freeFlowSpeed,double,275800,29401,10.660261,35.0,16.0,55.0,"[54.0, 54.0, 54.0]",
+datasets\traffic_structured_v1.parquet,traffic,currentTravelTime,double,275800,29401,10.660261,450.0,2.0,3213.0,"[1376.0, 1376.0, 1376.0]",
+datasets\traffic_structured_v1.parquet,traffic,freeFlowTravelTime,double,275800,29401,10.660261,134.0,2.0,2718.0,"[1376.0, 1376.0, 1376.0]",
+datasets\traffic_structured_v1.parquet,traffic,confidence,double,275800,29401,10.660261,6458.0,0.505346,1.0,"[1.0, 1.0, 1.0]",
+datasets\traffic_structured_v1.parquet,traffic,is_observed,bool,275800,0,0.0,2.0,False,True,"[true, false, false]",
+datasets\traffic_structured_v1.parquet,traffic,is_missing,bool,275800,0,0.0,2.0,False,True,"[false, true, true]",
+datasets\traffic_structured_v1.parquet,traffic,roadClosure,bool,275800,29401,10.660261,2.0,,,"[false, false, false]",
+datasets\traffic_structured_v1.parquet,traffic,osmid,string,275800,29401,10.660261,266.0,,,"[""[1209033472, 280421140, 1317533102]"", ""[1209033472, 280421140, 1317533102]"", ""[1209033472, 280421140, 1317533102]""]",
+datasets\traffic_structured_v1.parquet,traffic,road_name,double,275800,29401,10.660261,350.0,0.0,349.0,"[0.0, 0.0, 0.0]",
+datasets\traffic_structured_v1.parquet,traffic,road_type,string,275800,29401,10.660261,3.0,,,"[""trunk"", ""trunk"", ""trunk""]",
+datasets\traffic_structured_v1.parquet,traffic,length_m,double,275800,29401,10.660261,663.0,60.36897279670646,3016.9979383186064,"[3016.9979383186064, 3016.9979383186064, 3016.9979383186064]",
+datasets\traffic_structured_v1.parquet,traffic,lat,double,275800,29401,10.660261,662.0,20.21161811932942,20.36393124372287,"[20.283950272583752, 20.283950272583752, 20.283950272583752]",
+datasets\traffic_structured_v1.parquet,traffic,lon,double,275800,29401,10.660261,663.0,85.78037964643454,85.88927091495788,"[85.80626747532335, 85.80626747532335, 85.80626747532335]",
+datasets\traffic_v1.duckdb,main.traffic,segment_id,BIGINT,275800,0,0.0,700.0,0,699,"[0, 0, 0]",
+datasets\traffic_v1.duckdb,main.traffic,hour,TIMESTAMP WITH TIME ZONE,275800,0,0.0,394.0,2026-01-01T00:30:00+05:30,2026-01-17T09:30:00+05:30,"[""2026-01-01T00:30:00+05:30"", ""2026-01-01T01:30:00+05:30"", ""2026-01-01T02:30:00+05:30""]",
+datasets\traffic_v1.duckdb,main.traffic,timestamp,TIMESTAMP WITH TIME ZONE,275800,29401,10.660261,509.0,2026-01-01T01:09:50+05:30,2026-01-17T09:30:01+05:30,"[""2026-01-01T01:09:50+05:30"", ""2026-01-02T13:05:21+05:30"", ""2026-01-02T13:30:02+05:30""]",
+datasets\traffic_v1.duckdb,main.traffic,currentSpeed,DOUBLE,275800,29401,10.660261,53.0,1.0,54.0,"[54.0, 54.0, 54.0]",
+datasets\traffic_v1.duckdb,main.traffic,freeFlowSpeed,DOUBLE,275800,29401,10.660261,35.0,16.0,55.0,"[54.0, 54.0, 54.0]",
+datasets\traffic_v1.duckdb,main.traffic,currentTravelTime,DOUBLE,275800,29401,10.660261,450.0,2.0,3213.0,"[1376.0, 1376.0, 1376.0]",
+datasets\traffic_v1.duckdb,main.traffic,freeFlowTravelTime,DOUBLE,275800,29401,10.660261,134.0,2.0,2718.0,"[1376.0, 1376.0, 1376.0]",
+datasets\traffic_v1.duckdb,main.traffic,confidence,DOUBLE,275800,29401,10.660261,6458.0,0.505346,1.0,"[1.0, 1.0, 1.0]",
+datasets\traffic_v1.duckdb,main.traffic,is_observed,BOOLEAN,275800,0,0.0,2.0,False,True,"[true, false, false]",
+datasets\traffic_v1.duckdb,main.traffic,is_missing,BOOLEAN,275800,0,0.0,2.0,False,True,"[false, true, true]",
+datasets\traffic_v1.duckdb,main.traffic,roadClosure,BOOLEAN,275800,29401,10.660261,2.0,False,True,"[false, false, false]",
+datasets\traffic_v1.duckdb,main.traffic,osmid,VARCHAR,275800,29401,10.660261,266.0,,,"[""[1209033472, 280421140, 1317533102]"", ""[1209033472, 280421140, 1317533102]"", ""[1209033472, 280421140, 1317533102]""]",
+datasets\traffic_v1.duckdb,main.traffic,road_name,DOUBLE,275800,29401,10.660261,350.0,0.0,349.0,"[0.0, 0.0, 0.0]",
+datasets\traffic_v1.duckdb,main.traffic,road_type,VARCHAR,275800,29401,10.660261,3.0,,,"[""trunk"", ""trunk"", ""trunk""]",
+datasets\traffic_v1.duckdb,main.traffic,length_m,DOUBLE,275800,29401,10.660261,663.0,60.36897279670646,3016.9979383186064,"[3016.9979383186064, 3016.9979383186064, 3016.9979383186064]",
+datasets\traffic_v1.duckdb,main.traffic,lat,DOUBLE,275800,29401,10.660261,662.0,20.21161811932942,20.36393124372287,"[20.283950272583752, 20.283950272583752, 20.283950272583752]",
+datasets\traffic_v1.duckdb,main.traffic,lon,DOUBLE,275800,29401,10.660261,663.0,85.78037964643454,85.88927091495788,"[85.80626747532335, 85.80626747532335, 85.80626747532335]",
+data\processed\traffic_to_osm_mapping_final.parquet,traffic_to_osm_mapping,traffic_segment_id,int64,700,0,0.0,700.0,0,699,"[0, 1, 2]",
+data\processed\traffic_to_osm_mapping_final.parquet,traffic_to_osm_mapping,osm_id,str,700,0,0.0,265.0,,,"[""[1209033472, 280421140, 1317533102]"", ""[44948707, 1317533101, 1317533103]"", ""[279958946, 1317535730, 1209009343]""]",
+data\processed\traffic_to_osm_mapping_final.parquet,traffic_to_osm_mapping,u,int64,700,0,0.0,644.0,293452702,13957674836,"[2845389661, 2845389637, 8182316352]",
+data\processed\traffic_to_osm_mapping_final.parquet,traffic_to_osm_mapping,v,int64,700,0,0.0,645.0,293452701,13957674836,"[4875425580, 8182316403, 3320289784]",
+data\processed\traffic_to_osm_mapping_final.parquet,traffic_to_osm_mapping,key,int64,700,0,0.0,1.0,0,0,"[0, 0, 0]",
+data\processed\traffic_to_osm_mapping_final.parquet,traffic_to_osm_mapping,mapping_status,str,700,0,0.0,3.0,,,"[""MAPPED"", ""MAPPED"", ""MAPPED""]",
+data\processed\traffic_to_osm_mapping_final.parquet,traffic_to_osm_mapping,confidence,str,700,0,0.0,3.0,,,"[""HIGH"", ""HIGH"", ""HIGH""]",
+data\processed\traffic_to_osm_mapping_final.parquet,traffic_to_osm_mapping,direction_status,str,700,0,0.0,2.0,,,"[""CLEAR"", ""CLEAR"", ""CLEAR""]",
+data\processed\traffic_to_osm_mapping_final.parquet,traffic_to_osm_mapping,routing_eligibility,str,700,0,0.0,3.0,,,"[""DYNAMIC"", ""DYNAMIC"", ""DYNAMIC""]",
+data\processed\traffic_to_osm_mapping_final.parquet,traffic_to_osm_mapping,length_m,float64,700,0,0.0,654.0,60.369,3016.9979,"[3016.9979, 2971.2836, 2001.051]",
+data\processed\traffic_to_osm_mapping_final.parquet,traffic_to_osm_mapping,osm_edge_length_m,float64,700,0,0.0,649.0,60.369,3016.9979,"[3016.9979, 2971.2836, 2001.051]",
+data\processed\traffic_to_osm_mapping_final.parquet,traffic_to_osm_mapping,length_error_m,float64,700,0,0.0,24.0,0.0,1420.9057,"[0.0, 0.0, 0.0]",
+data\processed\traffic_to_osm_mapping_final.parquet,traffic_to_osm_mapping,length_error_pct,float64,700,0,0.0,25.0,0.0,968.1519,"[0.0, 0.0, 0.0]",
+data\processed\traffic_to_osm_mapping_final.parquet,traffic_to_osm_mapping,geometry_distance_m,float64,700,0,0.0,507.0,0.0,133.4146,"[11.3583, 13.5105, 1.7423]",
+data\processed\traffic_to_osm_mapping_final.parquet,traffic_to_osm_mapping,candidate_count,int64,700,0,0.0,26.0,1,36,"[1, 1, 1]",
+data\processed\traffic_to_osm_mapping_final.parquet,traffic_to_osm_mapping,mapping_reason,str,700,0,0.0,12.0,,,"[""High-confidence exact physical match on one-way or dominant directed edge."", ""High-confidence exact physical match on one-way or dominant directed edge."", ""High-confidence exact physical match on one-way or dominant directed edge.""]",
+results\phase7_predictions.parquet,phase7_predictions,timestamp,"datetime64[ns, UTC]",30800,0,0.0,56.0,2026-01-15T08:00:01+00:00,2026-01-17T03:00:01+00:00,"[""2026-01-15T08:00:01+00:00"", ""2026-01-15T09:00:01+00:00"", ""2026-01-15T10:00:02+00:00""]",
+results\phase7_predictions.parquet,phase7_predictions,traffic_segment_id,int64,30800,0,0.0,700.0,0,699,"[0, 0, 0]",
+results\phase7_predictions.parquet,phase7_predictions,actual_speed,float64,30800,0,0.0,48.0,1.0,54.0,"[54.0, 54.0, 54.0]",
+results\phase7_predictions.parquet,phase7_predictions,predicted_speed,float64,30800,0,0.0,5167.0,15.764343122512594,53.217935047334805,"[53.21316505194615, 53.21316505194615, 53.21316505194615]",
+results\phase7_predictions.parquet,phase7_predictions,persistence_prediction,float64,30800,0,0.0,48.0,1.0,54.0,"[54.0, 54.0, 54.0]",
+results\phase7_predictions.parquet,phase7_predictions,historical_prediction,float64,30800,0,0.0,463.0,9.875,54.0,"[54.0, 54.0, 54.0]",
+results\phase7_predictions.parquet,phase7_predictions,residual,float64,30800,0,0.0,5742.0,-20.039166167995095,9.908550838862691,"[0.7868349480538512, 0.7868349480538512, 0.7868349480538512]",
+results\phase7_predictions.parquet,phase7_predictions,hour,int32,30800,0,0.0,24.0,0,23,"[13, 14, 15]",
+results\phase7_predictions.parquet,phase7_predictions,day_of_week,int32,30800,0,0.0,3.0,3,5,"[3, 3, 3]",
+results\phase7_predictions.parquet,phase7_predictions,is_peak,int64,30800,0,0.0,2.0,0,1,"[0, 0, 0]",
+results\phase7_predictions.parquet,phase7_predictions,is_weekend,int64,30800,0,0.0,2.0,0,1,"[0, 0, 0]",
+data\raw\osm\bhubaneswar_drive.graphml,node,highway,string,18260,18249,99.939759,,,,"[""crossing"", ""traffic_signals"", ""traffic_signals""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,node,junction,string,18260,18252,99.956188,,,,"[""yes"", ""yes"", ""yes""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,node,street_count,string,18260,0,0.0,,,,"[""4"", ""1"", ""3""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,node,x,string,18260,0,0.0,,,,"[""85.8435461"", ""85.8367"", ""85.829545""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,node,y,string,18260,0,0.0,,,,"[""20.250559"", ""20.24684"", ""20.2711715""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,edge,access,string,46679,46459,99.528696,,,,"[""yes"", ""yes"", ""no""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,edge,bridge,string,46679,46383,99.365882,,,,"[""yes"", ""yes"", ""yes""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,edge,geometry,string,46679,26485,56.738576,,,,"[""LINESTRING (85.829545 20.2711715, 85.8296991 20.2712809, 85.8301106 20.2721443, 85.8301681 20.2722651, 85.8301466 20.272458, 85.8302218 20.2726869, 85.8301804 20.2727818, 85.82889 20.27323)"", ""LINESTRING (85.829545 20.2711715, 85.8294677 20.2712925, 85.8293307 20.2714461, 85.8292097 20.271567, 85.8291193 20.2716591, 85.829048 20.2717275, 85.82897 20.27179, 85.8288555 20.2718636, 85.82869 20.27194, 85.8282188 20.2721474)"", ""LINESTRING (85.829545 20.2711715, 85.8295443 20.2710699, 85.8295176 20.2709624, 85.8293176 20.2706428, 85.8290245 20.2701743, 85.8287883 20.2697759)""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,edge,highway,string,46679,0,0.0,,,,"[""residential"", ""residential"", ""residential""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,edge,junction,string,46679,46596,99.82219,,,,"[""circular"", ""circular"", ""roundabout""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,edge,lanes,string,46679,45952,98.442554,,,,"[""3"", ""3"", ""2""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,edge,length,string,46679,0,0.0,,,,"[""104.9429051067469"", ""57.534304422454305"", ""53.55409627586195""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,edge,maxspeed,string,46679,46228,99.033827,,,,"[""20"", ""50"", ""50""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,edge,name,string,46679,44002,94.265087,,,,"[""Sachivalaya Marg"", ""Raj Path"", ""Aurobindo Marg""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,edge,oneway,string,46679,0,0.0,,,,"[""False"", ""False"", ""False""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,edge,osmid,string,46679,0,0.0,,,,"[""26755288"", ""26755288"", ""26755308""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,edge,ref,string,46679,46559,99.742925,,,,"[""NH316"", ""NH16"", ""NH16""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,edge,reversed,string,46679,0,0.0,,,,"[""False"", ""True"", ""False""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,edge,tunnel,string,46679,46672,99.985004,,,,"[""yes"", ""yes"", ""yes""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+data\raw\osm\bhubaneswar_drive.graphml,edge,width,string,46679,46611,99.854324,,,,"[""3.5"", ""3"", ""3.5""]",GraphML key declared as string; NetworkX exposes the stored value without typed numeric conversion.
+models\feature_metadata.json,model_metadata,model_type,str,1,0,0.0,1.0,,,"""LightGBMRegressor""",
+models\feature_metadata.json,model_metadata,n_features,int,1,0,0.0,1.0,,,25,
+models\feature_metadata.json,model_metadata,best_iteration,int,1,0,0.0,1.0,,,112,
+models\feature_metadata.json,model_metadata,train_samples,int,1,0,0.0,1.0,,,142799,
+models\feature_metadata.json,model_metadata,val_samples,int,1,0,0.0,1.0,,,30800,
+models\feature_metadata.json,model_metadata,test_samples,int,1,0,0.0,1.0,,,30800,
+models\speed_predictor.joblib,model_input_feature,hour,int32,30800,0,0.0,24.0,0,23,"[13, 14, 15]",Feature order 1; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,day_of_week,int32,30800,0,0.0,3.0,3,5,"[3, 3, 3]",Feature order 2; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,is_weekend,int64,30800,0,0.0,2.0,0,1,"[0, 0, 0]",Feature order 3; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,sin_hour,float64,30800,0,0.0,21.0,-1.0,1.0,"[-0.2588190451025208, -0.4999999999999997, -0.7071067811865471]",Feature order 4; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,cos_hour,float64,30800,0,0.0,22.0,-1.0,1.0,"[-0.9659258262890683, -0.8660254037844388, -0.7071067811865479]",Feature order 5; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,sin_dow,float64,30800,0,0.0,3.0,-0.9749279121818236,0.43388373911755823,"[0.43388373911755823, 0.43388373911755823, 0.43388373911755823]",Feature order 6; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,cos_dow,float64,30800,0,0.0,3.0,-0.9009688679024191,-0.2225209339563146,"[-0.900968867902419, -0.900968867902419, -0.900968867902419]",Feature order 7; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,speed_lag_1h,float64,30800,0,0.0,48.0,1.0,54.0,"[54.0, 54.0, 54.0]",Feature order 8; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,speed_lag_2h,float64,30800,0,0.0,48.0,1.0,54.0,"[54.0, 54.0, 54.0]",Feature order 9; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,speed_lag_3h,float64,30800,0,0.0,48.0,1.0,54.0,"[54.0, 54.0, 54.0]",Feature order 10; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,speed_lag_6h,float64,30800,0,0.0,48.0,1.0,54.0,"[54.0, 54.0, 54.0]",Feature order 11; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,speed_lag_12h,float64,30800,0,0.0,48.0,1.0,54.0,"[54.0, 54.0, 54.0]",Feature order 12; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,speed_lag_24h,float64,30800,0,0.0,48.0,1.0,54.0,"[54.0, 54.0, 54.0]",Feature order 13; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,rolling_mean_3h,float64,30800,0,0.0,120.0,6.666666666666667,54.0,"[54.0, 54.0, 54.0]",Feature order 14; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,rolling_mean_6h,float64,30800,0,0.0,220.0,9.333333333333334,54.0,"[54.0, 54.0, 54.0]",Feature order 15; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,rolling_mean_24h,float64,30800,0,0.0,438.0,16.25,54.0,"[54.0, 54.0, 54.0]",Feature order 16; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,rolling_std_6h,float64,30800,0,0.0,3437.0,0.0,10.801234497346435,"[0.0, 0.0, 0.0]",Feature order 17; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,rolling_std_24h,float64,30800,0,0.0,5877.0,0.0,7.074013476568068,"[0.0, 0.0, 0.0]",Feature order 18; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,currentSpeed,float64,30800,0,0.0,48.0,1.0,54.0,"[54.0, 54.0, 54.0]",Feature order 19; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,freeFlowSpeed,float64,30800,0,0.0,32.0,16.0,55.0,"[54.0, 54.0, 54.0]",Feature order 20; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,speed_ratio,float64,30800,0,0.0,195.0,0.05263157894736842,1.0,"[1.0, 1.0, 1.0]",Feature order 21; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,length_m,float64,30800,0,0.0,663.0,60.36897279670646,3016.9979383186064,"[3016.9979383186064, 3016.9979383186064, 3016.9979383186064]",Feature order 22; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,road_type_code,int8,30800,0,0.0,3.0,0,2,"[2, 2, 2]",Feature order 23; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,conf_code,int64,30800,0,0.0,3.0,0,2,"[2, 2, 2]",Feature order 24; order is part of the saved model contract.
+models\speed_predictor.joblib,model_input_feature,hist_speed,float64,30800,0,0.0,463.0,9.875,54.0,"[54.0, 54.0, 54.0]",Feature order 25; order is part of the saved model contract.
+datasets\traffic_structured_v1.parquet,file_metadata,sha256,hex string,1,0,0.0,1.0,,,"""039e07e43af8b79fd289b5644fc593a27f1fca993f0150e67030c8daff250447""",file size 612145 bytes
+datasets\traffic_v1.duckdb,file_metadata,sha256,hex string,1,0,0.0,1.0,,,"""c4404344c56c785dbf03a8b4bb3d3eab83031018c5168539c2ac23dbf71c4c12""",file size 11808768 bytes
+data\processed\traffic_to_osm_mapping_final.parquet,file_metadata,sha256,hex string,1,0,0.0,1.0,,,"""060c87810a7e2695fb473b875a4f7c5554b120c105189d62a233400f9ce19cce""",file size 44990 bytes
+data\raw\osm\bhubaneswar_drive.graphml,file_metadata,sha256,hex string,1,0,0.0,1.0,,,"""7d363f7109fea13b426c3d76d34b1bb9bf58654704fe07c132f7cbcb101d8cf8""",file size 18569800 bytes
+models\feature_metadata.json,file_metadata,sha256,hex string,1,0,0.0,1.0,,,"""0b7683b7d124d766c85e0b1f9773d123381b6d3a01c338a7f4382b70d356f757""",file size 1121 bytes
+models\speed_predictor.joblib,file_metadata,sha256,hex string,1,0,0.0,1.0,,,"""2b96bc2c8715fa35853cba8adff7e01a48ab4e43147c1eb05ac8a8711d57bcdc""",file size 337656 bytes
+results\phase7_predictions.parquet,file_metadata,sha256,hex string,1,0,0.0,1.0,,,"""2217eb8a01639e34178ced5b96a728e9105022177794d5bffafa8f6152a819d1""",file size 207275 bytes
+results\phase7_metrics.csv,file_metadata,sha256,hex string,1,0,0.0,1.0,,,"""0159414834df4889cff8cf8537a79f693b4b322c42f706511d4e58b0cee42b5b""",file size 1025 bytes

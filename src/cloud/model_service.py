@@ -11,16 +11,18 @@ import os
 import json
 import time
 from typing import Dict, Any, Optional, Tuple
-import pandas as pd
 import joblib
 
 from src.edge.messages import ModelUpdateMessage
+from src.traffic.replay import HistoricalTrafficReplay
 
 
 class CloudModelService:
     """
-    Centralized Cloud Service managing training artifacts, feature schemas,
-    and batch traffic prediction inference.
+    Compatibility wrapper for model metadata and saved historical predictions.
+
+    The current Phase 7 Parquet is a historical prediction artifact. This class
+    replays it; loading the model here does not perform live inference.
     """
 
     def __init__(
@@ -41,12 +43,8 @@ class CloudModelService:
         self.model = None
         self._load_model()
 
-        # Cache predictions table for efficient real-time broadcast simulation
-        self._pred_df = pd.read_parquet(self.predictions_path)
-        if 'ts_round' not in self._pred_df.columns:
-            self._pred_df['ts_round'] = pd.to_datetime(self._pred_df['timestamp']).dt.round('h')
-        else:
-            self._pred_df['ts_round'] = pd.to_datetime(self._pred_df['ts_round'])
+        # Replay exact stored hours; never substitute a nearby timestamp.
+        self.replay = HistoricalTrafficReplay(self.predictions_path)
 
     def _load_model(self):
         """Loads serialized model artifact from persistent storage."""
@@ -70,7 +68,11 @@ class CloudModelService:
 
     def generate_predictions_broadcast(self, target_timestamp: Any) -> Tuple[ModelUpdateMessage, float]:
         """
-        Executes prediction generation for a given timestamp and packages a MODEL_UPDATE broadcast.
+        Replays saved predictions for one exact origin hour and packages MODEL_UPDATE.
+
+        `target_timestamp` is retained as the existing parameter name for caller
+        compatibility; it identifies the frame's origin hour. The forecast applies
+        at the separate target-valid timestamp.
 
         Returns
         -------
@@ -78,24 +80,18 @@ class CloudModelService:
         execution_time_ms : float (Prototype software execution time in milliseconds)
         """
         t0 = time.perf_counter()
-        ts_val = pd.to_datetime(target_timestamp)
-
-        # Retrieve predictions for all 700 monitored segments at target_timestamp
-        sub = self._pred_df[self._pred_df['ts_round'] == ts_val]
-        if len(sub) == 0:
-            # Fallback to closest timestamp
-            closest_ts = min(self._pred_df['ts_round'], key=lambda x: abs(x - ts_val))
-            sub = self._pred_df[self._pred_df['ts_round'] == closest_ts]
-
-        pred_dict = dict(zip(sub['traffic_segment_id'], sub['predicted_speed']))
+        frame = self.replay.get_frame(target_timestamp)
+        pred_dict = dict(frame.predicted_speeds)
         execution_time_ms = (time.perf_counter() - t0) * 1000.0
 
         message = ModelUpdateMessage(
             model_version=self.model_version,
             feature_metadata=self.get_metadata(),
-            prediction_timestamp=str(target_timestamp),
+            prediction_timestamp=frame.origin_timestamp.isoformat(),
             predicted_speeds=pred_dict,
-            total_segments=len(pred_dict)
+            total_segments=len(pred_dict),
+            origin_timestamp=frame.origin_timestamp.isoformat(),
+            target_valid_timestamp=frame.target_valid_timestamp.isoformat(),
         )
 
         return message, execution_time_ms

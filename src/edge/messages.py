@@ -11,12 +11,14 @@ from typing import Dict, List, Tuple, Any, Optional
 
 @dataclass
 class ModelUpdateMessage:
-    """Dispatched from Cloud to Edge to broadcast model metadata and predictions."""
+    """Saved forecast frame with distinct feature-origin and target-valid times."""
     model_version: str
     feature_metadata: Dict[str, Any]
     prediction_timestamp: str
     predicted_speeds: Dict[int, float]
     total_segments: int
+    origin_timestamp: Optional[str] = None
+    target_valid_timestamp: Optional[str] = None
 
 
 @dataclass

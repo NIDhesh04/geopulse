@@ -15,6 +15,9 @@ from src.routing.dijkstra import custom_dijkstra, DijkstraResult
 from src.routing.astar import custom_astar, AStarResult
 from src.routing.traffic_weights import (
     GraphWeightManager,
+    TrafficCoverageDiagnostics,
+    TrafficEdgeCostUpdate,
+    TrafficEdgeCostUpdater,
     calculate_travel_time_seconds,
     get_static_speed_kmh
 )
@@ -49,6 +52,9 @@ __all__ = [
     "custom_dijkstra",
     "DijkstraResult",
     "GraphWeightManager",
+    "TrafficCoverageDiagnostics",
+    "TrafficEdgeCostUpdate",
+    "TrafficEdgeCostUpdater",
     "calculate_travel_time_seconds",
     "get_static_speed_kmh",
     "CandidateGenerator",
