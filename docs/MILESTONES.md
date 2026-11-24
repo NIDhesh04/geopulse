@@ -98,3 +98,5 @@
 **Decision:** Add scenario-calibrated, time-indexed historical profiles with predictable bottlenecks during M3/M4 and freeze them before M5 evaluation fixtures are prepared.
 
 **Fact:** The first M3 engine checkpoint connects equal-priority request ordering to the existing signal phase controller. It keeps the current grant when an updated ETA or an earlier competing request arrives and preserves clearance and recovery when the grant ends. Shared fleet movement and the operator and driver workflows are subsequent M3 slices.
+
+**Fact:** The M3 backend adds the `fleet-conflict-5x5` scenario with ten independently activated missions sharing one clock and traffic world. The scenario response provides each ambulance's station through `departureByAmbulance`. Activation, retry, and suspension accept an `ambulanceId`. The operational snapshot includes the fleet, signal state, and confirmed reports. Individual mission snapshots provide routing explanations with their own live neighborhoods. The simulation truth endpoint provides physical effects separately. Obstruction reports enter review before they affect confirmed network knowledge.

@@ -14,8 +14,13 @@ public final class JunctionService {
         }
     }
 
-    /** An M2 movement may contain one ambulance between two aggregate civilian batches. */
-    public record Queue(double ahead, boolean ambulance, double behind) {}
+    /** Only the first ambulance in a movement queue is eligible for service. */
+    public record Queue(double ahead, String ambulanceId, double behind) {
+        public Queue(double ahead, boolean ambulance, double behind) {
+            this(ahead, ambulance ? "AMB-001" : null, behind);
+        }
+        public boolean ambulance() { return ambulanceId != null; }
+    }
     public record Request(Movement movement, long routeRevision, String ambulanceId,
                           double predictedArrival, long requestedAt) {
         public Request(Movement movement, long routeRevision) {
@@ -29,9 +34,17 @@ public final class JunctionService {
     }
     public record State(NormalSignal.Phase phase, int approach, int ordinaryCursor, long startedAt,
                         Request grant, boolean recoveryPending, boolean recoveryGreen,
-                        Movement credited, double credit) {}
+                        Movement credited, double credit, Map<Movement, Credit> credits,
+                        boolean grantPassed) {
+        State(NormalSignal.Phase phase, int approach, int ordinaryCursor, long startedAt,
+              Request grant, boolean recoveryPending, boolean recoveryGreen, Movement credited, double credit) {
+            this(phase, approach, ordinaryCursor, startedAt, grant, recoveryPending, recoveryGreen,
+                    credited, credit, Map.of(), false);
+        }
+    }
+    public record Credit(String ambulanceId, double amount) {}
     public record Result(State state, Map<Movement, Double> civilianTransfers,
-                         Movement ambulanceTransfer, String priority) {}
+                         Movement ambulanceTransfer, String priority, Map<String, Movement> crossings) {}
 
     private final List<String> approaches;
     private final NormalSignal signal;
@@ -68,7 +81,7 @@ public final class JunctionService {
                 productive.add(request.movement());
             }
         }
-        var active = previous.grant() == null ? null : previous.grant().arbitrationRequest();
+        var active = previous.grant() == null || previous.grantPassed() ? null : previous.grant().arbitrationRequest();
         var decision = arbitrator.decide(active, requests.stream().map(Request::arbitrationRequest).toList(),
                 productive, Set.of());
         Request selected = decision.grant() == null ? null : requests.stream()
@@ -85,7 +98,7 @@ public final class JunctionService {
         }
         if (requests.size() == 1) {
             result = new Result(result.state(), result.civilianTransfers(), result.ambulanceTransfer(),
-                    statuses.get(requests.getFirst().ambulanceId()));
+                    statuses.get(requests.getFirst().ambulanceId()), result.crossings());
         }
         return new ContendedResult(result, Collections.unmodifiableMap(statuses));
     }
@@ -103,13 +116,21 @@ public final class JunctionService {
         State phase = phase(previous, tick, productive, eligible ? request : null);
         String priority = request == null ? "NONE" : !eligible ? "DOWNSTREAM_BLOCKED"
                 : request.equals(phase.grant()) ? "GRANTED" : "REQUESTED";
-        if (phase.phase() != NormalSignal.Phase.GREEN) return new Result(phase, Map.of(), null, priority);
+        if (phase.phase() != NormalSignal.Phase.GREEN) return new Result(phase, Map.of(), null, priority, Map.of());
 
         String incoming = approaches.get(phase.approach());
+        Map<Movement, Credit> credits = new TreeMap<>();
+        if (previous.phase() == NormalSignal.Phase.GREEN && previous.approach() == phase.approach()
+                && previous.startedAt() == phase.startedAt()) {
+            previous.credits().forEach((movement, credit) -> {
+                var queue = queues.get(movement);
+                if (queue != null && credit.ambulanceId().equals(queue.ambulanceId())) credits.put(movement, credit);
+            });
+        }
         Map<Movement, Double> demands = new TreeMap<>();
         queues.forEach((movement, queue) -> {
             if (movement.incoming().equals(incoming)) {
-                double carried = movement.equals(phase.credited()) ? phase.credit() : 0;
+                double carried = credits.containsKey(movement) ? credits.get(movement).amount() : 0;
                 double amount = demand(queue, room(receiving, movement), carried);
                 if (amount > 0) demands.put(movement, amount);
             }
@@ -117,13 +138,8 @@ public final class JunctionService {
         double total = demands.values().stream().mapToDouble(Double::doubleValue).sum();
         double share = total == 0 ? 0 : Math.min(1, rates.getOrDefault(incoming, 0.0) / total);
         Map<Movement, Double> civilians = new TreeMap<>();
-        Movement transfer = null;
-        Movement credited = phase.credited();
-        double credit = phase.credit();
-        if (credited != null && !queues.getOrDefault(credited, new Queue(0, false, 0)).ambulance()) {
-            credited = null;
-            credit = 0;
-        }
+        Map<String, Movement> crossings = new TreeMap<>();
+        Map<String, Integer> reserved = new TreeMap<>();
         for (var item : demands.entrySet()) {
             Movement movement = item.getKey();
             Queue queue = queues.get(movement);
@@ -132,12 +148,15 @@ public final class JunctionService {
             if (civilian > 0) civilians.put(movement, civilian);
             if (queue.ambulance() && civilian + EPSILON >= queue.ahead()
                     && room(receiving, movement) + EPSILON >= 1 + civilian) {
-                credit = Math.min(1, credit + Math.max(0, budget - civilian));
-                credited = movement;
-                if (credit + EPSILON >= 1) {
-                    transfer = movement;
-                    credit = 0;
-                    credited = null;
+                double carried = credits.containsKey(movement) ? credits.get(movement).amount() : 0;
+                double credit = Math.min(1, carried + Math.max(0, budget - civilian));
+                int taken = reserved.getOrDefault(movement.outgoing(), 0);
+                if (credit + EPSILON >= 1 && room(receiving, movement) + EPSILON >= taken + 1 + civilian) {
+                    crossings.put(queue.ambulanceId(), movement);
+                    reserved.merge(movement.outgoing(), 1, Integer::sum);
+                    credits.remove(movement);
+                } else if (credit > 0) {
+                    credits.put(movement, new Credit(queue.ambulanceId(), credit));
                 }
             }
         }
@@ -145,15 +164,17 @@ public final class JunctionService {
         // Reserve the indivisible ambulance slot before distributing remaining receiving space.
         Map<String, Double> totalByRoad = new TreeMap<>();
         civilians.forEach((movement, count) -> totalByRoad.merge(movement.outgoing(), count, Double::sum));
-        Movement crossing = transfer;
         civilians.replaceAll((movement, count) -> {
-            double free = room(receiving, movement);
-            if (crossing != null && crossing.outgoing().equals(movement.outgoing())) free -= 1;
+            double free = room(receiving, movement) - reserved.getOrDefault(movement.outgoing(), 0);
             return count * Math.min(1, Math.max(0, free) / totalByRoad.get(movement.outgoing()));
         });
+        var first = credits.entrySet().stream().findFirst().orElse(null);
         State next = new State(phase.phase(), phase.approach(), phase.ordinaryCursor(), phase.startedAt(),
-                phase.grant(), phase.recoveryPending(), phase.recoveryGreen(), credited, credit);
-        return new Result(next, Collections.unmodifiableMap(civilians), transfer, priority);
+                phase.grant(), phase.recoveryPending(), phase.recoveryGreen(),
+                first == null ? null : first.getKey(), first == null ? 0 : first.getValue().amount(),
+                Map.copyOf(credits), phase.grant() != null && crossings.containsKey(phase.grant().ambulanceId()));
+        return new Result(next, Collections.unmodifiableMap(civilians),
+                crossings.values().stream().findFirst().orElse(null), priority, Map.copyOf(crossings));
     }
 
     private State phase(State old, long tick, Set<String> productive, Request request) {
@@ -165,8 +186,10 @@ public final class JunctionService {
             if (old.recoveryGreen()) {
                 return elapsed >= 10 ? amber(old, tick, false) : old;
             }
-            if (grant != null && (request == null || !AmbulanceArbitrator.sameGrant(
-                    grant.arbitrationRequest(), request.arbitrationRequest()) || elapsed >= 45)) {
+            boolean followingOnSameGreen = old.grantPassed() && sameApproach && elapsed < 45;
+            if (grant != null && (!followingOnSameGreen && (old.grantPassed() || request == null
+                    || !AmbulanceArbitrator.sameGrant(grant.arbitrationRequest(), request.arbitrationRequest()))
+                    || elapsed >= 45)) {
                 if (elapsed >= 10) return amber(old, tick, true);
                 return new State(old.phase(), old.approach(), old.ordinaryCursor(), old.startedAt(),
                         null, true, false, old.credited(), old.credit());
@@ -233,7 +256,8 @@ public final class JunctionService {
         queues.forEach((movement, queue) -> projected.put(movement, movement.equals(candidate)
                 ? queue : new Queue(queue.ahead() + queue.behind(), false, 0)));
         var existing = projected.getOrDefault(candidate, new Queue(0, false, 0));
-        projected.put(candidate, new Queue(existing.ahead(), true, existing.behind()));
+        projected.put(candidate, new Queue(existing.ahead(),
+                existing.ambulance() ? existing.ambulanceId() : "forecast", existing.behind()));
         if (!existing.ambulance() || !candidate.equals(state.credited())) {
             state = new State(state.phase(), state.approach(), state.ordinaryCursor(), state.startedAt(),
                     state.grant(), state.recoveryPending(), state.recoveryGreen(), null, 0);
@@ -248,7 +272,7 @@ public final class JunctionService {
             step.civilianTransfers().forEach((movement, count) -> {
                 Queue before = projected.get(movement);
                 projected.put(movement, new Queue(Math.max(0, before.ahead() - count),
-                        before.ambulance(), before.behind()));
+                        before.ambulanceId(), before.behind()));
                 predictedRoom.computeIfPresent(movement.outgoing(), (road, free) -> Math.max(0, free - count));
             });
             expectedReleases.forEach((road, release) ->
@@ -262,7 +286,7 @@ public final class JunctionService {
                 projected.compute(movement, (key, prior) -> {
                     Queue before = prior == null ? new Queue(0, false, 0) : prior;
                     return before.ambulance()
-                            ? new Queue(before.ahead(), true, before.behind() + admitted)
+                            ? new Queue(before.ahead(), before.ambulanceId(), before.behind() + admitted)
                             : new Queue(before.ahead() + admitted, false, 0);
                 });
                 remainingByApproach.put(movement.incoming(), occupied + admitted);

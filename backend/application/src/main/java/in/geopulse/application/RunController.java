@@ -16,7 +16,9 @@ public class RunController {
     @GetMapping("/runs/{id}/commands/{command}") public Object command(@PathVariable UUID id,@PathVariable UUID command){return runs.command(id,command);}
     @GetMapping("/runs/{id}/events") public Object events(@PathVariable UUID id,@RequestParam(defaultValue="0") long after){return runs.events(id,after);}
     @GetMapping("/runs/{id}/results") public Object results(@PathVariable UUID id){return runs.results(id);}
-    @GetMapping("/runs/{id}/ambulances/{ambulanceId}/route-explanation") public Object explanation(@PathVariable UUID id,@PathVariable String ambulanceId){if(!ambulanceId.equals("AMB-001"))throw new RunService.ApiException(404,"Ambulance not found");return runs.snapshot(id).get("explanation");}
+    @GetMapping("/runs/{id}/ambulances/{ambulanceId}/route-explanation") public Object explanation(@PathVariable UUID id,@PathVariable String ambulanceId){return runs.mission(id,ambulanceId).explanation();}
+    @GetMapping("/runs/{id}/ambulances/{ambulanceId}/snapshot") public Object ambulance(@PathVariable UUID id,@PathVariable String ambulanceId){return runs.mission(id,ambulanceId);}
+    @GetMapping("/runs/{id}/simulation-truth") public Object truth(@PathVariable UUID id){return runs.simulationTruth(id);}
     @ExceptionHandler(RunService.ApiException.class) public ResponseEntity<?> error(RunService.ApiException e){return ResponseEntity.status(e.status).body(Map.of("message",e.getMessage()));}
     @ExceptionHandler(IllegalArgumentException.class) public ResponseEntity<?> invalid(IllegalArgumentException e){return ResponseEntity.badRequest().body(Map.of("message",e.getMessage()));}
 }

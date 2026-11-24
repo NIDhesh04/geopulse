@@ -50,6 +50,7 @@ public final class OperationalReports {
     }
 
     public Map<String, Report> reports() { return Collections.unmodifiableMap(reports); }
+    void reopen(String road) { confirmedClosures.remove(road); }
     public Set<String> confirmedClosures() { return Collections.unmodifiableSet(confirmedClosures); }
     public Map<String, Long> acknowledgements() { return Collections.unmodifiableMap(acknowledgements); }
 }

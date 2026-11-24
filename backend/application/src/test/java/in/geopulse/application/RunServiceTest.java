@@ -13,6 +13,32 @@ import static org.junit.jupiter.api.Assertions.*;
 @Testcontainers
 @SpringBootTest
 class RunServiceTest {
+    @Test void fleetCommandsPublishSeparateOperationalRoutingAndTruthViews() throws Exception {
+        var run = UUID.fromString(runs.create("2", 108, "fleet-conflict-5x5", true).get("runId").toString());
+        assertEquals(10, ((List<?>) runs.snapshot(run).get("fleet")).size());
+        for (var entry : Map.of("AMB-001","n00_00", "AMB-008","n04_00").entrySet()) {
+            assertEquals("APPLIED", command(run, UUID.randomUUID(), "ACTIVATE",
+                    Map.of("ambulanceId",entry.getKey(),"origin",entry.getValue(),"destination","n04_04")).get("status"));
+        }
+        String road = runs.mission(run, "AMB-001").ambulance().route().getFirst();
+        assertEquals("APPLIED", command(run, UUID.randomUUID(), "INCIDENT",
+                Map.of("edge",road,"effect","ENTRY_CLOSED")).get("status"));
+        assertNull(runs.snapshot(run).get("explanation"));
+        assertFalse(runs.snapshot(run).containsKey("physicalEffects"));
+        assertEquals(Set.of(), runs.snapshot(run).get("reportedClosures"));
+        assertTrue(((Map<?,?>) runs.simulationTruth(run).get("physicalEffects")).containsKey(road));
+        assertEquals("BLOCKED", runs.mission(run,"AMB-001").explanation().roads().get(road).status());
+        assertEquals("HISTORICAL", runs.mission(run,"AMB-008").explanation().roads().get(road).source());
+        assertEquals("APPLIED", command(run, UUID.randomUUID(), "SUBMIT_OBSTRUCTION",
+                Map.of("reportId","r1","ambulanceId","AMB-001","edge",road,"closure",true)).get("status"));
+        assertEquals(Set.of(), runs.snapshot(run).get("reportedClosures"));
+        assertEquals("APPLIED", command(run, UUID.randomUUID(), "REVIEW_OBSTRUCTION",
+                Map.of("reportId","r1","confirmed",true)).get("status"));
+        assertEquals(Set.of(road), runs.snapshot(run).get("reportedClosures"));
+        assertEquals("BLOCKED", runs.mission(run,"AMB-008").explanation().roads().get(road).status());
+        assertEquals("CONFIRMED", ((com.fasterxml.jackson.databind.JsonNode) runs.results(run).get("traffic"))
+                .path("reports").path("r1").path("status").asText());
+    }
     @Autowired org.springframework.transaction.support.TransactionTemplate tx;
     @Container static PostgreSQLContainer<?> db=new PostgreSQLContainer<>("postgres:18.7-alpine");
     @DynamicPropertySource static void properties(DynamicPropertyRegistry r){r.add("spring.datasource.url",db::getJdbcUrl);r.add("spring.datasource.username",db::getUsername);r.add("spring.datasource.password",db::getPassword);}
