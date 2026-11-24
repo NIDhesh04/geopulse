@@ -1,6 +1,6 @@
-# Milestones — M2 verified
+# Milestones — M3 in progress
 
-**Fact:** Prepared on 2026-11-23 after consolidation of Topics 1–10 and the design risk review. M1 was explicitly approved by the user on 2026-11-23; M2 was subsequently authorized; M3–M6 remain proposals. Original phase names are Phase 1 Design, Phase 2 Plan, Phase 3 Build.
+**Fact:** Prepared on 2026-11-23 after consolidation of Topics 1–10 and the design risk review. M1 and M2 have been verified. M3 is authorized. M4–M6 remain proposals.
 
 ## Delivery approach
 
@@ -11,7 +11,7 @@
 |---|---|---|---|
 | **Decision: M1 approved** | One ambulance follows explainable hybrid routes on a synthetic map | Scaffold builds; real PostgreSQL/Flyway; deterministic routing; HTTP/STOMP controls and event history; no-signal fixture explicitly identified | Background flow, production junction forecasts, priority, multi-ambulance contention, polished driver screen |
 | **Decision: M2 authorized** | Ordinary traffic queues and signals affect a single ambulance | Conservation/storage/credits; signal timings and clearance; reported versus physical incidents; bounded forecasts; actual delays | Multi-ambulance conflict workflow and full benchmark suite |
-| **Assumption: M3** | Multiple ambulances share junctions correctly | 10-ambulance contention, deterministic ordering, active-grant commitment, suspension and recovery; fleet/driver state isolation | 30-ambulance performance claim and external integration |
+| **Decision: M3 authorized** | Multiple ambulances share junctions correctly | 10-ambulance contention, deterministic ordering, active-grant commitment, suspension and recovery; fleet/driver state isolation | 30-ambulance performance claim and external integration |
 | **Assumption: M4** | Complete polished control-room/driver product | Approved information modes, inspectors, report review, ETA states, responsive/keyboard behavior, local synthetic map, concise landing | Real operational deployment, individual civilian physics, auth expansion |
 | **Assumption: M5** | Reproducible comparison report and scale results | Paired schedules/warm starts, seven scenarios, completion-aware delays, exact recovery, seed summaries, 30-ambulance profiling | Claims about CoSiCoSt superiority or real-world accuracy |
 | **Assumption: M6** | Test Emergency108 hospital-leg handoff | Inspect real code; mapping/dedup/reassignment tests; pending police authorization; read-only simulated status | Real GPS ingestion/map matching, production completion writes, pickup-leg integration |
@@ -82,3 +82,19 @@
 - **Fact:** Dijkstra uses a 300-second junction forecast through the existing estimator interface. Forecasts reuse junction service, use permitted observations and frozen historical expectations, and return unknown on timeout.
 - **Fact:** The full backend, frontend production build, frontend stream tests, and browser walkthroughs for both scenarios passed. PostgreSQL stores the latest committed traffic measurements.
 - **Assumption:** The M2 demo uses constant calibrated historical inputs for its stationary synthetic demand. Full time-of-day profiles, the Jaipur import and multi-ambulance contention remain future work.
+
+## M3 — coordinated multi-ambulance operations
+
+**Decision:** M3 is authorized with these delivery slices.
+
+1. Add a 10-ambulance conflict fixture with stable IDs, individual routes and ordered movement-queue positions in one shared traffic world.
+2. Arbitrate equal-priority requests by predicted junction arrival, request time and ambulance ID. Preserve an active grant until passage, unproductivity or the 45-second emergency limit, then apply the approved recovery green while preserving the ordinary cursor.
+3. Support mission-level priority suspension for one ambulance without cancelling other ambulances' requests or bypassing signal transitions.
+4. Keep physical incident injection, operational report submission/review and alert acknowledgement as distinct commands and persisted records. Driver obstruction reports remain pending until police review.
+5. Publish fleet-isolated snapshots and explanations from the single authoritative backend. Add synchronized fleet selection and a Driver Navigation view for the selected ambulance.
+6. Add mutually exclusive Operational, Ambulance Routing and Simulation Truth map modes. Operational views expose confirmed knowledge, and Simulation Truth exposes physical effects.
+7. Verify deterministic 10-ambulance contention, request tie-breaking, grant commitment, recovery, capacity and queue ordering, report workflow separation, reconnect, and control-room/driver state isolation.
+
+**Decision:** Add scenario-calibrated, time-indexed historical profiles with predictable bottlenecks during M3/M4 and freeze them before M5 evaluation fixtures are prepared.
+
+**Fact:** The first M3 engine checkpoint connects equal-priority request ordering to the existing signal phase controller. It keeps the current grant when an updated ETA or an earlier competing request arrives and preserves clearance and recovery when the grant ends. Shared fleet movement and the operator and driver workflows are subsequent M3 slices.

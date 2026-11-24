@@ -13,6 +13,8 @@ public final class RoutingSimulation {
     private boolean prioritySuspended;
     private long routeVersion;
     private long junctionWait;
+    private long junctionArrival;
+    private JunctionService.Request priorityRequest;
     private String observedDepartureJunction;
     private long time,replans,reroutes;private Long activatedAt,arrivedAt;private Double initialEta,estimatedArrival;
     private String node="n00_00",destination="n04_04",incoming="station-entry",edge,status="IDLE",reason;
@@ -47,6 +49,7 @@ public final class RoutingSimulation {
     public void suspendPriority(boolean suspended) {
         if (traffic == null || !priorityEnabled) throw new IllegalArgumentException("Priority is disabled for this run");
         prioritySuspended = suspended;
+        if (suspended) priorityRequest = null;
         emit("PRIORITY_POLICY", suspended ? "Priority suspended" : "Priority resumed");
     }
 
@@ -58,6 +61,8 @@ public final class RoutingSimulation {
         c.prioritySuspended = prioritySuspended;
         c.routeVersion = routeVersion;
         c.junctionWait = junctionWait;
+        c.junctionArrival = junctionArrival;
+        c.priorityRequest = priorityRequest;
         c.observedDepartureJunction = observedDepartureJunction;
         c.physical.putAll(physical);
         c.incidents.putAll(incidents);
@@ -77,7 +82,7 @@ public final class RoutingSimulation {
         if(!status.equals("IDLE"))throw new IllegalArgumentException("This scenario supports one mission per run; create a new run to restart");
         graph.node(from);graph.node(to);
         if (traffic != null && !from.equals("n00_00")) throw new IllegalArgumentException("Use the configured station entry");
-        node=from;destination=to;incoming="station-entry:"+from;activatedAt=time;status="AT_JUNCTION";emit("MISSION_ACTIVATED","AMB-001 activated");
+        node=from;destination=to;incoming="station-entry:"+from;activatedAt=time;junctionArrival=time;status="AT_JUNCTION";emit("MISSION_ACTIVATED","AMB-001 activated");
         if(from.equals(to)){initialEta=0.0;arrive();return;}plan();
     }
     public void incident(String road,String effect,boolean report){
@@ -204,10 +209,12 @@ public final class RoutingSimulation {
                 toRoadEnd = (road.length() - progress) / speed;
             }
         }
-        var request = priorityEnabled && !prioritySuspended ? traffic.request(next, toRoadEnd, routeVersion, physical) : null;
+        priorityRequest = priorityEnabled && !prioritySuspended
+                ? traffic.request("AMB-001", next, toRoadEnd, routeVersion, time, junctionArrival, priorityRequest, physical)
+                : null;
         String oldPriority = traffic.priority();
         double actualSpeed = edge == null ? 0 : speed(graph.edge(edge));
-        var passed = traffic.step(time, physical, ambulanceRoad(), edge != null, waiting, request);
+        var passed = traffic.step(time, physical, ambulanceRoad(), edge != null, waiting, priorityRequest);
         if (!oldPriority.equals(passed.priority())) {
             emit("PRIORITY_" + passed.priority(), passed.priority().replace('_', ' '));
         }
@@ -238,6 +245,7 @@ public final class RoutingSimulation {
         reason = null;
         progress = Math.min(road.length(), progress + actualSpeed);
         if (progress >= road.length()) {
+            junctionArrival = time;
             node = road.to();
             incoming = edge;
             edge = null;

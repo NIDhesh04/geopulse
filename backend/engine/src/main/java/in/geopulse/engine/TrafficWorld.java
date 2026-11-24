@@ -247,12 +247,19 @@ public final class TrafficWorld {
         };
     }
 
-    Request request(Movement movement, double secondsToEnd, long routeRevision, Map<String, Set<String>> physical) {
+    Request request(String ambulanceId, Movement movement, double secondsToEnd, long routeRevision,
+                    long tick, long junctionArrival, Request previous, Map<String, Set<String>> physical) {
         if (movement == null) return null;
+        boolean alreadyRequested = previous != null && previous.ambulanceId().equals(ambulanceId)
+                && previous.movement().equals(movement) && previous.routeRevision() == routeRevision;
         double service = rate(physical.get(movement.incoming()));
         double count = movement.equals(queuedAmbulance) ? ahead : queues.getOrDefault(movement, 0.0);
-        if (secondsToEnd != 0 && (service <= 0 || secondsToEnd > count / service + 15)) return null;
-        return new Request(movement, routeRevision);
+        if (!alreadyRequested && secondsToEnd > 0 && (service <= 0 || secondsToEnd > count / service + 15)) {
+            return null;
+        }
+        double arrival = secondsToEnd > 0 ? tick + secondsToEnd : junctionArrival;
+        return new Request(movement, routeRevision, ambulanceId, arrival,
+                alreadyRequested ? previous.requestedAt() : tick);
     }
 
     Crossing step(long tick, Map<String, Set<String>> physical, String ambulanceRoad, boolean moving,
@@ -283,10 +290,18 @@ public final class TrafficWorld {
             junction.approaches().forEach(id -> rates.put(id, rate(physical.get(id))));
             Request local = request != null
                     && network.roads().get(request.movement().outgoing()).from().equals(node) ? request : null;
-            var result = junction.service().step(signals.get(node), tick, localQueues(junction, true),
-                    rates, room, local);
+            var previous = signals.get(node);
+            var waitingQueues = localQueues(junction, true);
+            JunctionService.Result result;
+            if (local == null) {
+                result = junction.service().step(previous, tick, waitingQueues, rates, room, null);
+            } else {
+                var contention = junction.service().stepContended(previous, tick, waitingQueues,
+                        rates, room, List.of(local));
+                result = contention.service();
+                requestStatus = contention.priorityByAmbulance().get(local.ambulanceId());
+            }
             signals.put(node, result.state());
-            if (local != null) requestStatus = result.priority();
             if (result.ambulanceTransfer() != null) {
                 crossing = result.ambulanceTransfer();
                 receivingUsed.merge(crossing.outgoing(), 1.0, Double::sum);

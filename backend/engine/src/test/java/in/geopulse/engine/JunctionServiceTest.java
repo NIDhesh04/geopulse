@@ -83,4 +83,39 @@ class JunctionServiceTest {
         state = service.step(state, 60, queues, rates, room, request).state();
         assertEquals(NormalSignal.Phase.AMBER, state.phase());
     }
+    @Test
+    void earlierRequestWaitsForCommittedGrantAndRecoveryClearance() {
+        var controller = new JunctionService(List.of("a", "b", "c"));
+        var a = new JunctionService.Movement("a", "out-a");
+        var b = new JunctionService.Movement("b", "out-b");
+        var c = new JunctionService.Movement("c", "out-c");
+        var queues = Map.of(c, new JunctionService.Queue(3, false, 0));
+        var rates = Map.of("a", 0.6, "b", 0.6, "c", 0.6);
+        var room = Map.of("out-a", 2.0, "out-b", 2.0, "out-c", 2.0);
+        var active = new JunctionService.Request(a, 1, "AMB-002", 20, 0);
+        var contender = new JunctionService.Request(b, 1, "AMB-001", 4, 1);
+        var state = controller.stepContended(controller.initial(), 0, queues, rates, room,
+                List.of(active)).service().state();
+        var updated = new JunctionService.Request(a, 1, "AMB-002", 23, 0);
+        var contested = controller.stepContended(state, 5, queues, rates, room,
+                List.of(contender, updated));
+        assertEquals(Map.of("AMB-001", "REQUESTED", "AMB-002", "GRANTED"),
+                contested.priorityByAmbulance());
+
+        state = controller.stepContended(contested.service().state(), 6, queues, rates, room,
+                List.of(contender)).service().state();
+        assertEquals(NormalSignal.Phase.GREEN, state.phase());
+        assertNull(state.grant());
+        state = controller.stepContended(state, 10, queues, rates, room, List.of(contender)).service().state();
+        assertEquals(NormalSignal.Phase.AMBER, state.phase());
+        state = controller.stepContended(state, 13, queues, rates, room, List.of(contender)).service().state();
+        assertEquals(NormalSignal.Phase.ALL_RED, state.phase());
+        state = controller.stepContended(state, 15, queues, rates, room, List.of(contender)).service().state();
+        assertTrue(state.recoveryGreen());
+        assertEquals(List.of(0, 0, 1), controller.permissions(state));
+        state = controller.stepContended(state, 25, queues, rates, room, List.of(contender)).service().state();
+        state = controller.stepContended(state, 28, queues, rates, room, List.of(contender)).service().state();
+        state = controller.stepContended(state, 30, queues, rates, room, List.of(contender)).service().state();
+        assertEquals(contender, state.grant());
+    }
 }

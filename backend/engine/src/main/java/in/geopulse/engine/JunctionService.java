@@ -16,7 +16,17 @@ public final class JunctionService {
 
     /** An M2 movement may contain one ambulance between two aggregate civilian batches. */
     public record Queue(double ahead, boolean ambulance, double behind) {}
-    public record Request(Movement movement, long routeRevision) {}
+    public record Request(Movement movement, long routeRevision, String ambulanceId,
+                          double predictedArrival, long requestedAt) {
+        public Request(Movement movement, long routeRevision) {
+            this(movement, routeRevision, "AMB-001", 0, 0);
+        }
+
+        AmbulanceArbitrator.Request arbitrationRequest() {
+            return new AmbulanceArbitrator.Request(ambulanceId, movement, predictedArrival,
+                    requestedAt, routeRevision);
+        }
+    }
     public record State(NormalSignal.Phase phase, int approach, int ordinaryCursor, long startedAt,
                         Request grant, boolean recoveryPending, boolean recoveryGreen,
                         Movement credited, double credit) {}
@@ -25,6 +35,7 @@ public final class JunctionService {
 
     private final List<String> approaches;
     private final NormalSignal signal;
+    private final AmbulanceArbitrator arbitrator = new AmbulanceArbitrator();
 
     public JunctionService(List<String> approaches) {
         this.approaches = List.copyOf(approaches);
@@ -41,6 +52,46 @@ public final class JunctionService {
 
     public Result step(State previous, long tick, Map<Movement, Queue> queues, Map<String, Double> rates,
                        Map<String, Double> receiving, Request request) {
+        return serve(previous, tick, queues, rates, receiving, request);
+    }
+
+    public record ContendedResult(Result service, Map<String, String> priorityByAmbulance) {}
+
+    public ContendedResult stepContended(State previous, long tick, Map<Movement, Queue> queues,
+                                         Map<String, Double> rates, Map<String, Double> receiving,
+                                         List<Request> requests) {
+        Set<Movement> productive = new HashSet<>();
+        for (var request : requests) {
+            if (approaches.contains(request.movement().incoming())
+                    && room(receiving, request.movement()) + EPSILON >= 1
+                    && rate(rates, request.movement()) > 0) {
+                productive.add(request.movement());
+            }
+        }
+        var active = previous.grant() == null ? null : previous.grant().arbitrationRequest();
+        var decision = arbitrator.decide(active, requests.stream().map(Request::arbitrationRequest).toList(),
+                productive, Set.of());
+        Request selected = decision.grant() == null ? null : requests.stream()
+                .filter(candidate -> candidate.arbitrationRequest().equals(decision.grant()))
+                .findFirst().orElseThrow();
+        var result = serve(previous, tick, queues, rates, receiving, selected);
+        Map<String, String> statuses = new TreeMap<>();
+        for (var request : requests) {
+            String status = !productive.contains(request.movement()) ? "DOWNSTREAM_BLOCKED"
+                    : result.state().grant() != null && AmbulanceArbitrator.sameGrant(
+                            result.state().grant().arbitrationRequest(), request.arbitrationRequest())
+                        ? "GRANTED" : "REQUESTED";
+            statuses.put(request.ambulanceId(), status);
+        }
+        if (requests.size() == 1) {
+            result = new Result(result.state(), result.civilianTransfers(), result.ambulanceTransfer(),
+                    statuses.get(requests.getFirst().ambulanceId()));
+        }
+        return new ContendedResult(result, Collections.unmodifiableMap(statuses));
+    }
+
+    private Result serve(State previous, long tick, Map<Movement, Queue> queues, Map<String, Double> rates,
+                         Map<String, Double> receiving, Request request) {
         boolean eligible = request != null && room(receiving, request.movement()) + EPSILON >= 1
                 && rate(rates, request.movement()) > 0;
         Set<String> productive = new HashSet<>();
@@ -114,7 +165,8 @@ public final class JunctionService {
             if (old.recoveryGreen()) {
                 return elapsed >= 10 ? amber(old, tick, false) : old;
             }
-            if (grant != null && (!grant.equals(request) || elapsed >= 45)) {
+            if (grant != null && (request == null || !AmbulanceArbitrator.sameGrant(
+                    grant.arbitrationRequest(), request.arbitrationRequest()) || elapsed >= 45)) {
                 if (elapsed >= 10) return amber(old, tick, true);
                 return new State(old.phase(), old.approach(), old.ordinaryCursor(), old.startedAt(),
                         null, true, false, old.credited(), old.credit());
