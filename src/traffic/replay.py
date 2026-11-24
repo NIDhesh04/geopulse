@@ -26,9 +26,13 @@ class TrafficReplayFrame:
     origin_timestamp: pd.Timestamp
     target_valid_timestamp: pd.Timestamp
     predicted_speeds: Mapping[int, float]
+    realized_speeds: Mapping[int, float]
     source_origin_timestamps: Mapping[int, pd.Timestamp]
     missing_segment_ids: frozenset[int]
     invalid_segment_ids: frozenset[int]
+    missing_realized_segment_ids: frozenset[int]
+    invalid_realized_segment_ids: frozenset[int]
+    has_realized_observations: bool
 
     @property
     def missing_prediction_count(self) -> int:
@@ -37,6 +41,14 @@ class TrafficReplayFrame:
     @property
     def invalid_prediction_count(self) -> int:
         return len(self.invalid_segment_ids)
+
+    @property
+    def missing_realized_count(self) -> int:
+        return len(self.missing_realized_segment_ids)
+
+    @property
+    def invalid_realized_count(self) -> int:
+        return len(self.invalid_realized_segment_ids)
 
 
 class HistoricalTrafficReplay:
@@ -89,6 +101,8 @@ class HistoricalTrafficReplay:
             _segment_id=segment_ids.astype("int64"),
             _speed=pd.to_numeric(frame["predicted_speed"], errors="coerce"),
         )
+        if "actual_speed" in frame.columns:
+            frame["_realized_speed"] = pd.to_numeric(frame["actual_speed"], errors="coerce")
         duplicate_keys = frame.duplicated(["_origin_hour", "_segment_id"], keep=False)
         if duplicate_keys.any():
             example = frame.loc[duplicate_keys, ["_origin_hour", "_segment_id"]].iloc[0]
@@ -143,27 +157,51 @@ class HistoricalTrafficReplay:
             )
 
         speeds: Dict[int, float] = {}
+        realized_speeds: Dict[int, float] = {}
         source_timestamps: Dict[int, pd.Timestamp] = {}
         invalid_ids = set()
-        rows = source[["_segment_id", "_speed", "_source_origin"]].itertuples(
+        invalid_realized_ids = set()
+        columns = ["_segment_id", "_speed", "_source_origin"]
+        if "_realized_speed" in source.columns:
+            columns.append("_realized_speed")
+        rows = source[columns].itertuples(
             index=False, name=None
         )
-        for raw_segment_id, raw_speed, raw_origin in rows:
+        has_realized = "_realized_speed" in source.columns
+        for row in rows:
+            raw_segment_id, raw_speed, raw_origin = row[:3]
             segment_id = int(raw_segment_id)
             speed = float(raw_speed) if pd.notna(raw_speed) else float("nan")
             speeds[segment_id] = speed
             source_timestamps[segment_id] = pd.Timestamp(raw_origin)
             if not np.isfinite(speed) or speed <= 0:
                 invalid_ids.add(segment_id)
+            if has_realized:
+                raw_realized_speed = row[3]
+                realized_speed = (
+                    float(raw_realized_speed)
+                    if pd.notna(raw_realized_speed)
+                    else float("nan")
+                )
+                realized_speeds[segment_id] = realized_speed
+                if not np.isfinite(realized_speed) or realized_speed <= 0:
+                    invalid_realized_ids.add(segment_id)
 
         missing_ids = self.expected_segment_ids - set(speeds)
+        missing_realized_ids = (
+            self.expected_segment_ids - set(realized_speeds) if has_realized else self.expected_segment_ids
+        )
         return TrafficReplayFrame(
             origin_timestamp=origin,
             target_valid_timestamp=origin + self.HOUR,
             predicted_speeds=speeds,
+            realized_speeds=realized_speeds,
             source_origin_timestamps=source_timestamps,
             missing_segment_ids=frozenset(missing_ids),
             invalid_segment_ids=frozenset(invalid_ids),
+            missing_realized_segment_ids=frozenset(missing_realized_ids),
+            invalid_realized_segment_ids=frozenset(invalid_realized_ids),
+            has_realized_observations=has_realized,
         )
 
     def start(self, origin_timestamp: Any) -> TrafficReplayFrame:

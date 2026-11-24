@@ -50,6 +50,10 @@ class Vehicle:
         # Timeline history log
         self.timeline: List[Dict[str, Any]] = []
 
+        # Temporal experiments keep the executed path separate from the mutable
+        # route guidance maintained by the existing edge/server simulation.
+        self.temporal_traversed_edges: List[Tuple[str, str, int]] = []
+
     def receive_initial_route(self, route_msg: RouteUpdateMessage):
         """Initializes vehicle path guidance from Edge Server."""
         self.current_route_nodes = list(route_msg.node_path)
@@ -69,6 +73,129 @@ class Vehicle:
             'elapsed_time_s': 0.0,
             'accumulated_dist_m': 0.0,
             'description': f"Departed origin {self.origin} on initial route R0 ({len(self.current_route_edges)} links)"
+        })
+
+    def begin_temporal_journey(
+        self,
+        node_path: List[str],
+        edge_path: List[Tuple[str, str, int]],
+        timestamp: str,
+    ) -> None:
+        """Initialize temporal simulation with a predicted-cost route plan."""
+        if not node_path or node_path[0] != self.origin:
+            raise ValueError("Initial temporal route must start at the vehicle origin")
+        if len(node_path) != len(edge_path) + 1:
+            raise ValueError("Temporal route node and edge paths are inconsistent")
+        self.current_node = self.origin
+        self.current_route_nodes = list(node_path)
+        self.current_route_edges = list(edge_path)
+        self.initial_route_nodes = list(node_path)
+        self.initial_route_edges = list(edge_path)
+        self.edge_index = 0
+        self.progress_pct = 0.0
+        self.timeline.append({
+            "timestamp": timestamp,
+            "event": "DEPARTURE",
+            "current_node": self.current_node,
+            "edge_index": 0,
+            "progress_pct": 0.0,
+            "elapsed_time_s": 0.0,
+            "accumulated_dist_m": 0.0,
+            "description": f"Temporal journey started from {self.origin}",
+        })
+
+    def set_temporal_plan(
+        self,
+        node_path: List[str],
+        edge_path: List[Tuple[str, str, int]],
+        timestamp: str,
+        reason: str,
+    ) -> None:
+        """Replace future guidance at the current intersection, preserving motion."""
+        if not node_path or node_path[0] != self.current_node:
+            raise ValueError("Updated temporal route must start at the current node")
+        if len(node_path) != len(edge_path) + 1:
+            raise ValueError("Temporal route node and edge paths are inconsistent")
+        self.current_route_nodes = list(node_path)
+        self.current_route_edges = list(edge_path)
+        self.timeline.append({
+            "timestamp": timestamp,
+            "event": "ROUTE_DECISION",
+            "current_node": self.current_node,
+            "edge_index": self.edge_index,
+            "progress_pct": round(self.progress_pct, 2),
+            "elapsed_time_s": round(self.elapsed_travel_time_s, 2),
+            "accumulated_dist_m": round(self.accumulated_distance_m, 2),
+            "description": reason,
+        })
+
+    def record_realized_edge_traversal(
+        self,
+        edge: Tuple[str, str, int],
+        travel_time_s: float,
+        distance_m: float,
+        arrival_timestamp: str,
+    ) -> None:
+        """Advance one edge using realized motion costs, never route predictions."""
+        import math
+
+        try:
+            duration = float(travel_time_s)
+            distance = float(distance_m)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ValueError("Realized edge time and distance must be numeric") from exc
+        if not math.isfinite(duration) or duration <= 0:
+            raise ValueError("Realized edge time must be finite and positive")
+        if not math.isfinite(distance) or distance <= 0:
+            raise ValueError("Realized edge distance must be finite and positive")
+        if str(edge[0]) != str(self.current_node):
+            raise ValueError(
+                f"Temporal edge {edge!r} does not leave current node {self.current_node!r}"
+            )
+
+        normalized_edge = (str(edge[0]), str(edge[1]), edge[2])
+        self.current_edge = normalized_edge
+        self.current_node = normalized_edge[1]
+        self.edge_index += 1
+        self.temporal_traversed_edges.append(normalized_edge)
+        self.elapsed_travel_time_s += duration
+        self.accumulated_distance_m += distance
+        self.progress_pct = (
+            min(100.0, 100.0 * self.edge_index / len(self.initial_route_edges))
+            if self.initial_route_edges else 100.0
+        )
+        self.timeline.append({
+            "timestamp": arrival_timestamp,
+            "event": "REALIZED_LINK_TRAVERSAL",
+            "current_node": self.current_node,
+            "edge_index": self.edge_index,
+            "progress_pct": round(self.progress_pct, 2),
+            "elapsed_time_s": round(self.elapsed_travel_time_s, 2),
+            "accumulated_dist_m": round(self.accumulated_distance_m, 2),
+            "description": (
+                f"Traversed edge {normalized_edge[0]} -> {normalized_edge[1]} "
+                f"in {duration:.1f}s using realized speed ({distance:.1f}m)"
+            ),
+        })
+
+    def finish_temporal_journey(self, arrival_timestamp: str) -> None:
+        """Mark a temporal journey complete at its requested destination."""
+        if str(self.current_node) != str(self.destination):
+            raise ValueError("Cannot complete a temporal journey before reaching its destination")
+        self.is_journey_complete = True
+        self.progress_pct = 100.0
+        self.timeline.append({
+            "timestamp": arrival_timestamp,
+            "event": "ARRIVAL",
+            "current_node": self.current_node,
+            "edge_index": self.edge_index,
+            "progress_pct": 100.0,
+            "elapsed_time_s": round(self.elapsed_travel_time_s, 2),
+            "accumulated_dist_m": round(self.accumulated_distance_m, 2),
+            "description": (
+                f"Arrived at destination {self.destination} in "
+                f"{self.elapsed_travel_time_s:.1f}s"
+            ),
         })
 
     def advance_to_step(

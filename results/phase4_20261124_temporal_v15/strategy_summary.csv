@@ -1,0 +1,4 @@
+strategy,journeys,completed,two_edge_only_completed,mean_actual_travel_time_s,mean_distance_m,mean_intersection_decisions,total_two_edge_alternative_selections,mean_prediction_updates,total_dijkstra_fallback_steps,total_backtracking_steps,total_repeated_node_visits,total_loop_traps,mean_decision_latency_ms,p95_journey_decision_latency_ms,mean_two_edge_latency_ms,p95_two_edge_latency_ms,mean_execution_time_s
+static_dijkstra,10,10,0,938.3502792053165,8214.429632801784,0.0,0,0.0,0,0,0,0,,,,,0.07855931000085548
+dynamic_dijkstra,10,10,0,908.7825723503727,8157.168881615056,0.0,0,1.0,0,0,0,0,1.0550071800229834,4.244494496633694,,,0.10138261999818496
+geopulse_two_edge,10,10,10,908.7825723503727,8157.168881615056,42.9,4,1.0,0,0,0,0,30.18338435551571,131.1945724995894,34.535466334885044,132.2696359982001,1.8759628400017392

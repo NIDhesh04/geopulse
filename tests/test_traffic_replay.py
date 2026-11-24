@@ -19,7 +19,6 @@ from src.routing.traffic_weights import (
 )
 from src.traffic.replay import HistoricalTrafficReplay, MissingReplayTimestampError
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 

@@ -1,0 +1,366 @@
+{
+  "experiment": "GeoPulse Phase 4 temporal journey comparison",
+  "departure_timestamp": "2026-01-15T09:59:00Z",
+  "strategies": [
+    "static_dijkstra",
+    "dynamic_dijkstra",
+    "geopulse_two_edge"
+  ],
+  "od_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "graph_nodes": 18260,
+  "graph_directed_edges": 46679,
+  "mapped_dynamic_edges": 690,
+  "prediction_frames": 44,
+  "target_valid_range": [
+    "2026-01-15T09:00:00+00:00",
+    "2026-01-17T04:00:00+00:00"
+  ],
+  "actual_speed_observations": 30800,
+  "realized_dynamic_edge_coverage": [
+    {
+      "target_valid_timestamp": "2026-01-15T09:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-15T10:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-15T11:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-15T12:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-15T13:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-15T14:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-15T15:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-15T16:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-15T17:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-15T18:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-15T19:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-15T20:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-15T21:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-15T22:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-15T23:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T00:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T01:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T02:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T03:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T04:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T05:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T06:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T07:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T08:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T09:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T10:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T11:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T12:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T13:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T14:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T15:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T16:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T17:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T18:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T19:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T20:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T21:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T22:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-16T23:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-17T00:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-17T01:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-17T02:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-17T03:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    },
+    {
+      "target_valid_timestamp": "2026-01-17T04:00:00+00:00",
+      "dynamic_edges_with_valid_observations": 690,
+      "missing_realized_segments": 0,
+      "invalid_realized_segments": 0
+    }
+  ],
+  "input_files": {
+    "data\\raw\\osm\\bhubaneswar_drive.graphml": "7d363f7109fea13b426c3d76d34b1bb9bf58654704fe07c132f7cbcb101d8cf8",
+    "data\\processed\\traffic_to_osm_mapping_final.parquet": "060c87810a7e2695fb473b875a4f7c5554b120c105189d62a233400f9ce19cce",
+    "results\\phase7_predictions.parquet": "2217eb8a01639e34178ced5b96a728e9105022177794d5bffafa8f6152a819d1",
+    "results\\phase8_od_pairs.csv": "2eb82d3710b284070ff951a0524a4870c619d0bd56de68956040c2945d0d5c19"
+  },
+  "prediction_actual_semantics": "actual_speed is stored next-hour observed currentSpeed; it is used only for motion",
+  "routing_semantics": "all three strategies use the same departure-time predicted route weights and the same hourly realized-speed stream; updates affect route choice at the next reached node",
+  "strategy_summary": [
+    {
+      "strategy": "static_dijkstra",
+      "journeys": 10,
+      "completed": 10,
+      "two_edge_only_completed": 0,
+      "mean_actual_travel_time_s": 940.6265077825663,
+      "mean_distance_m": 8132.446373193941,
+      "mean_intersection_decisions": 0.0,
+      "total_two_edge_alternative_selections": 0,
+      "mean_prediction_updates": 0.0,
+      "total_dijkstra_fallback_steps": 0,
+      "total_backtracking_steps": 0,
+      "total_repeated_node_visits": 0,
+      "total_loop_traps": 0,
+      "mean_decision_latency_ms": NaN,
+      "p95_journey_decision_latency_ms": NaN,
+      "mean_two_edge_latency_ms": NaN,
+      "p95_two_edge_latency_ms": NaN,
+      "mean_execution_time_s": 0.06984813999879406
+    },
+    {
+      "strategy": "dynamic_dijkstra",
+      "journeys": 10,
+      "completed": 10,
+      "two_edge_only_completed": 0,
+      "mean_actual_travel_time_s": 942.3337152366836,
+      "mean_distance_m": 8205.429892756532,
+      "mean_intersection_decisions": 0.0,
+      "total_two_edge_alternative_selections": 0,
+      "mean_prediction_updates": 1.0,
+      "total_dijkstra_fallback_steps": 0,
+      "total_backtracking_steps": 0,
+      "total_repeated_node_visits": 0,
+      "total_loop_traps": 0,
+      "mean_decision_latency_ms": 1.0595234735306067,
+      "p95_journey_decision_latency_ms": 4.203453495756536,
+      "mean_two_edge_latency_ms": NaN,
+      "p95_two_edge_latency_ms": NaN,
+      "mean_execution_time_s": 0.12790586000337498
+    },
+    {
+      "strategy": "geopulse_two_edge",
+      "journeys": 10,
+      "completed": 10,
+      "two_edge_only_completed": 10,
+      "mean_actual_travel_time_s": 942.3337152366836,
+      "mean_distance_m": 8205.429892756532,
+      "mean_intersection_decisions": 43.3,
+      "total_two_edge_alternative_selections": 1,
+      "mean_prediction_updates": 1.0,
+      "total_dijkstra_fallback_steps": 0,
+      "total_backtracking_steps": 0,
+      "total_repeated_node_visits": 0,
+      "total_loop_traps": 0,
+      "mean_decision_latency_ms": 30.553180110862836,
+      "p95_journey_decision_latency_ms": 130.02295000114827,
+      "mean_two_edge_latency_ms": 34.95902487980649,
+      "p95_two_edge_latency_ms": 134.95975124656977,
+      "mean_execution_time_s": 1.9186486400023568
+    }
+  ]
+}
