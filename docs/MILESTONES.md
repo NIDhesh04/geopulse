@@ -1,4 +1,4 @@
-# Milestones — M2 started
+# Milestones — M2 verified
 
 **Fact:** Prepared on 2026-11-23 after consolidation of Topics 1–10 and the design risk review. M1 was explicitly approved by the user on 2026-11-23; M2 was subsequently authorized; M3–M6 remain proposals. Original phase names are Phase 1 Design, Phase 2 Plan, Phase 3 Build.
 
@@ -74,3 +74,11 @@
 - **Decision:** Implement and test ordinary signal timing before coupling it to queue transfers. The same normal-service rules will be available to bounded junction forecasts.
 - **Fact:** This checkpoint adds minimum and maximum green, amber and all-red clearance, stable approach rotation, and a permission vector that includes station entries. Queue discharge, forecasts, priority and the M2 demo still need integration.
 - **Decision:** Keep the synthetic grid for repeatable tests. Track the Jaipur road network as a separate demo scenario in [JAIPUR_MAP.md](JAIPUR_MAP.md).
+
+## M2 verification checkpoint — 2026-11-24
+
+- **Fact:** The traffic-and-signals scenario integrates civilian cohorts, finite storage, movement queues, boundary backlog and component delay. Ambulances use whole receiving slots and continuous-green service credit. The scenario supports one active mission.
+- **Fact:** Next-junction requests, clearance, capped greens and cyclic recovery run in the same engine as normal traffic. The control room shows signal state, priority state and actual junction wait, with priority suspension and a priority-disabled run option.
+- **Fact:** Dijkstra uses a 300-second junction forecast through the existing estimator interface. Forecasts reuse junction service, use permitted observations and frozen historical expectations, and return unknown on timeout.
+- **Fact:** The full backend, frontend production build, frontend stream tests, and browser walkthroughs for both scenarios passed. PostgreSQL stores the latest committed traffic measurements.
+- **Assumption:** The M2 demo uses constant calibrated historical inputs for its stationary synthetic demand. Full time-of-day profiles, the Jaipur import and multi-ambulance contention remain future work.

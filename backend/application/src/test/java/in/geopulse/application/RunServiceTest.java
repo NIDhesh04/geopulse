@@ -76,4 +76,15 @@ class RunServiceTest {
             assertEquals(503,assertThrows(RunService.ApiException.class,()->service.accept(run,new RunService.Command(UUID.randomUUID(),"STEP",json.createObjectNode()))).status);
         }finally {service.shutdown();jdbc.execute("drop trigger test_event_failure on run_event");jdbc.execute("drop function fail_test_event()");}
     }
+    @Test void trafficRunPersistsScenarioAndMeasurement() throws Exception {
+        var created = runs.create("2", 108, "traffic-signals-5x5", false);
+        var run = UUID.fromString(created.get("runId").toString());
+        assertEquals("TRAFFIC_SIGNALS", created.get("mode"));
+        assertEquals("APPLIED", command(run, UUID.randomUUID(), "ACTIVATE",
+                Map.of("origin", "n00_00", "destination", "n04_04")).get("status"));
+        assertEquals("APPLIED", command(run, UUID.randomUUID(), "STEP", Map.of()).get("status"));
+        assertEquals("object", jdbc.queryForObject(
+                "select jsonb_typeof(traffic_result) from simulation_run where id=?", String.class, run));
+        assertNotNull(runs.results(run).get("traffic"));
+    }
 }

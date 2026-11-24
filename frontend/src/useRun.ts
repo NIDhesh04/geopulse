@@ -35,6 +35,6 @@ export function useRun(){
    const next=await api<Snapshot>(`/runs/${target}/snapshot`);if(idRef.current===target)setSnapshot(old=>newerSnapshot(old,next,target));
   }catch(e){setError(String(e));throw e;}finally{setPending('');}
  }
- async function create(horizon:string){setError('');try{if(snapshot&&!snapshot.paused)await send('PAUSE');const next=await api<Snapshot>('/runs',{horizon,seed:108});localStorage.setItem('geopulse.run',next.runId);setRunId(next.runId);}catch(e){setError(String(e));}}
+ async function create(horizon:string,scenarioId:string,priorityEnabled:boolean){setError('');try{if(snapshot&&!snapshot.paused)await send('PAUSE');const next=await api<Snapshot>('/runs',{horizon,seed:108,scenarioId,priorityEnabled});localStorage.setItem('geopulse.run',next.runId);setRunId(next.runId);}catch(e){setError(String(e));}}
  return{snapshot,events,connected,error,pending,send,create};
 }

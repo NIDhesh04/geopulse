@@ -47,3 +47,31 @@ test('mission controls, closures, recovery and reconnect',async({page,context})=
  await page.screenshot({path:'/tmp/geopulse-mobile.png',fullPage:true});
  expect(errors).toEqual([]);
 });
+
+test('M2 runs with queues, signal priority and bounded forecast costs', async ({page}) => {
+ const errors:string[]=[];
+ page.on('pageerror', error=>errors.push(error.message));
+ await page.goto('/');
+ await page.getByLabel('Scenario for next run').selectOption('traffic-signals-5x5');
+ await page.getByRole('button',{name:'Create run',exact:true}).click();
+ await page.getByRole('button',{name:'Activate mission',exact:true}).click();
+ await page.locator('.candidate.winner summary').click();
+ await expect(page.locator('.candidate.winner')).toContainText('LIVE_JUNCTION_FORECAST');
+
+ const id=await page.evaluate(()=>localStorage.getItem('geopulse.run'));
+ const snapshot=async()=>await (await page.request.get(`/api/runs/${id}/snapshot`)).json();
+ await page.getByRole('button',{name:'Step 1s'}).click();
+ await expect.poll(async()=>(await snapshot()).simulationTimeSeconds).toBe(1);
+ await expect(page.getByText('Priority granted',{exact:true})).toBeVisible();
+ expect((await snapshot()).ambulance.edge).toBeNull();
+ await page.getByRole('button',{name:'Suspend priority'}).click();
+ await expect(page.getByText('Priority suspended',{exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Resume priority'}).click();
+ await page.getByLabel('Playback speed').selectOption('60');
+ await page.getByRole('button',{name:'Play',exact:false}).click();
+ await expect(page.getByText('Journey completed',{exact:true})).toBeVisible({timeout:20000});
+ const done=await snapshot();
+ expect(done.traffic.totals.exited).toBeGreaterThan(0);
+ expect(done.ambulanceJunctionWait).toBeGreaterThan(0);
+ expect(errors).toEqual([]);
+});

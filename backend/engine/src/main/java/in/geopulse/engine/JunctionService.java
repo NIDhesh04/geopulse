@@ -1,0 +1,221 @@
+package in.geopulse.engine;
+
+import java.util.*;
+
+/** One junction's deterministic service boundary, shared by the world and forecasts. */
+public final class JunctionService {
+    private static final double EPSILON = 1e-9;
+    public static final int FORECAST_SECONDS = 300;
+
+    public record Movement(String incoming, String outgoing) implements Comparable<Movement> {
+        @Override public int compareTo(Movement other) {
+            int first = incoming.compareTo(other.incoming);
+            return first == 0 ? outgoing.compareTo(other.outgoing) : first;
+        }
+    }
+
+    /** An M2 movement may contain one ambulance between two aggregate civilian batches. */
+    public record Queue(double ahead, boolean ambulance, double behind) {}
+    public record Request(Movement movement, long routeRevision) {}
+    public record State(NormalSignal.Phase phase, int approach, int ordinaryCursor, long startedAt,
+                        Request grant, boolean recoveryPending, boolean recoveryGreen,
+                        Movement credited, double credit) {}
+    public record Result(State state, Map<Movement, Double> civilianTransfers,
+                         Movement ambulanceTransfer, String priority) {}
+
+    private final List<String> approaches;
+    private final NormalSignal signal;
+
+    public JunctionService(List<String> approaches) {
+        this.approaches = List.copyOf(approaches);
+        this.signal = new NormalSignal(approaches);
+    }
+
+    public State initial() {
+        return new State(NormalSignal.Phase.ALL_RED, -1, -1, -2, null, false, false, null, 0);
+    }
+
+    public List<Integer> permissions(State state) {
+        return signal.permissions(new NormalSignal.State(state.phase(), state.approach(), state.startedAt()));
+    }
+
+    public Result step(State previous, long tick, Map<Movement, Queue> queues, Map<String, Double> rates,
+                       Map<String, Double> receiving, Request request) {
+        boolean eligible = request != null && room(receiving, request.movement()) + EPSILON >= 1
+                && rate(rates, request.movement()) > 0;
+        Set<String> productive = new HashSet<>();
+        queues.forEach((movement, queue) -> {
+            if (demand(queue, room(receiving, movement), 0) > 0 && rate(rates, movement) > 0) {
+                productive.add(movement.incoming());
+            }
+        });
+        State phase = phase(previous, tick, productive, eligible ? request : null);
+        String priority = request == null ? "NONE" : !eligible ? "DOWNSTREAM_BLOCKED"
+                : request.equals(phase.grant()) ? "GRANTED" : "REQUESTED";
+        if (phase.phase() != NormalSignal.Phase.GREEN) return new Result(phase, Map.of(), null, priority);
+
+        String incoming = approaches.get(phase.approach());
+        Map<Movement, Double> demands = new TreeMap<>();
+        queues.forEach((movement, queue) -> {
+            if (movement.incoming().equals(incoming)) {
+                double carried = movement.equals(phase.credited()) ? phase.credit() : 0;
+                double amount = demand(queue, room(receiving, movement), carried);
+                if (amount > 0) demands.put(movement, amount);
+            }
+        });
+        double total = demands.values().stream().mapToDouble(Double::doubleValue).sum();
+        double share = total == 0 ? 0 : Math.min(1, rates.getOrDefault(incoming, 0.0) / total);
+        Map<Movement, Double> civilians = new TreeMap<>();
+        Movement transfer = null;
+        Movement credited = phase.credited();
+        double credit = phase.credit();
+        if (credited != null && !queues.getOrDefault(credited, new Queue(0, false, 0)).ambulance()) {
+            credited = null;
+            credit = 0;
+        }
+        for (var item : demands.entrySet()) {
+            Movement movement = item.getKey();
+            Queue queue = queues.get(movement);
+            double budget = item.getValue() * share;
+            double civilian = Math.min(queue.ahead(), budget);
+            if (civilian > 0) civilians.put(movement, civilian);
+            if (queue.ambulance() && civilian + EPSILON >= queue.ahead()
+                    && room(receiving, movement) + EPSILON >= 1 + civilian) {
+                credit = Math.min(1, credit + Math.max(0, budget - civilian));
+                credited = movement;
+                if (credit + EPSILON >= 1) {
+                    transfer = movement;
+                    credit = 0;
+                    credited = null;
+                }
+            }
+        }
+
+        // Reserve the indivisible ambulance slot before distributing remaining receiving space.
+        Map<String, Double> totalByRoad = new TreeMap<>();
+        civilians.forEach((movement, count) -> totalByRoad.merge(movement.outgoing(), count, Double::sum));
+        Movement crossing = transfer;
+        civilians.replaceAll((movement, count) -> {
+            double free = room(receiving, movement);
+            if (crossing != null && crossing.outgoing().equals(movement.outgoing())) free -= 1;
+            return count * Math.min(1, Math.max(0, free) / totalByRoad.get(movement.outgoing()));
+        });
+        State next = new State(phase.phase(), phase.approach(), phase.ordinaryCursor(), phase.startedAt(),
+                phase.grant(), phase.recoveryPending(), phase.recoveryGreen(), credited, credit);
+        return new Result(next, Collections.unmodifiableMap(civilians), transfer, priority);
+    }
+
+    private State phase(State old, long tick, Set<String> productive, Request request) {
+        long elapsed = tick - old.startedAt();
+        if (old.phase() == NormalSignal.Phase.GREEN) {
+            String active = approaches.get(old.approach());
+            boolean sameApproach = request != null && request.movement().incoming().equals(active);
+            Request grant = old.grant();
+            if (old.recoveryGreen()) {
+                return elapsed >= 10 ? amber(old, tick, false) : old;
+            }
+            if (grant != null && (!grant.equals(request) || elapsed >= 45)) {
+                if (elapsed >= 10) return amber(old, tick, true);
+                return new State(old.phase(), old.approach(), old.ordinaryCursor(), old.startedAt(),
+                        null, true, false, old.credited(), old.credit());
+            }
+            if (old.recoveryPending() && elapsed >= 10) return amber(old, tick, true);
+            if (sameApproach && !old.recoveryPending() && elapsed < 45) {
+                return new State(old.phase(), old.approach(), old.ordinaryCursor(), old.startedAt(),
+                        request, false, false, old.credited(), old.credit());
+            }
+            if (request != null && !sameApproach && elapsed >= 10) return amber(old, tick, false);
+            var normal = signal.atBoundary(new NormalSignal.State(old.phase(), old.approach(), old.startedAt()),
+                    tick, productive);
+            return normal.phase() == NormalSignal.Phase.AMBER ? amber(old, tick, false) : old;
+        }
+        if (old.phase() == NormalSignal.Phase.AMBER) {
+            if (elapsed < 3) return old;
+            return new State(NormalSignal.Phase.ALL_RED, -1, old.ordinaryCursor(), tick,
+                    null, old.recoveryPending(), false, null, 0);
+        }
+        if (elapsed < 2) return old;
+        var normal = signal.atBoundary(new NormalSignal.State(old.phase(), old.ordinaryCursor(), old.startedAt()),
+                tick, productive);
+        boolean normalReady = normal.phase() == NormalSignal.Phase.GREEN;
+        if (request != null && !(old.recoveryPending() && normalReady)) {
+            int approach = approaches.indexOf(request.movement().incoming());
+            if (approach >= 0) return new State(NormalSignal.Phase.GREEN, approach, old.ordinaryCursor(),
+                    tick, request, false, false, null, 0);
+        }
+        if (!normalReady) return old;
+        return new State(NormalSignal.Phase.GREEN, normal.cursor(), normal.cursor(), tick,
+                null, false, old.recoveryPending(), null, 0);
+    }
+
+    private State amber(State old, long tick, boolean recover) {
+        return new State(NormalSignal.Phase.AMBER, old.approach(), old.ordinaryCursor(), tick,
+                null, recover, false, null, 0);
+    }
+
+    private static double rate(Map<String, Double> rates, Movement movement) {
+        return rates.getOrDefault(movement.incoming(), 0.0);
+    }
+
+    private static double room(Map<String, Double> receiving, Movement movement) {
+        return receiving.getOrDefault(movement.outgoing(), 0.0);
+    }
+
+    private static double demand(Queue queue, double room, double credit) {
+        if (room <= 0) return 0;
+        if (!queue.ambulance()) return queue.ahead();
+        return queue.ahead() + (room + EPSILON >= 1 ? 1 - credit : 0);
+    }
+
+    public Estimate forecast(State state, long start, Movement candidate, Map<Movement, Queue> queues,
+                             Map<String, Double> rates, Map<String, Double> receiving, String source) {
+        return forecast(state, start, candidate, queues, rates, receiving,
+                Map.of(), Map.of(), source);
+    }
+
+    Estimate forecast(State state, long start, Movement candidate, Map<Movement, Queue> queues,
+                      Map<String, Double> rates, Map<String, Double> receiving,
+                      Map<Movement, Double> expectedQueueArrivals, Map<String, Double> expectedReleases,
+                      String source) {
+        var projected = new TreeMap<Movement, Queue>();
+        queues.forEach((movement, queue) -> projected.put(movement, movement.equals(candidate)
+                ? queue : new Queue(queue.ahead() + queue.behind(), false, 0)));
+        var existing = projected.getOrDefault(candidate, new Queue(0, false, 0));
+        projected.put(candidate, new Queue(existing.ahead(), true, existing.behind()));
+        if (!existing.ambulance() || !candidate.equals(state.credited())) {
+            state = new State(state.phase(), state.approach(), state.ordinaryCursor(), state.startedAt(),
+                    state.grant(), state.recoveryPending(), state.recoveryGreen(), null, 0);
+        }
+        Request established = state.grant();
+        var predictedRoom = new TreeMap<>(receiving);
+        for (int offset = 0; offset < FORECAST_SECONDS; offset++) {
+            var step = step(state, start + offset, projected, rates, predictedRoom, established);
+            if (candidate.equals(step.ambulanceTransfer())) return Estimate.available(offset + 1, source);
+            state = step.state();
+            if (state.grant() == null) established = null;
+            step.civilianTransfers().forEach((movement, count) -> {
+                Queue before = projected.get(movement);
+                projected.put(movement, new Queue(Math.max(0, before.ahead() - count),
+                        before.ambulance(), before.behind()));
+                predictedRoom.computeIfPresent(movement.outgoing(), (road, free) -> Math.max(0, free - count));
+            });
+            expectedReleases.forEach((road, release) ->
+                    predictedRoom.computeIfPresent(road, (id, free) -> Math.min(TrafficWorld.STORAGE, free + release)));
+            var remainingByApproach = new HashMap<String, Double>();
+            projected.forEach((movement, queue) -> remainingByApproach.merge(movement.incoming(),
+                    queue.ahead() + queue.behind() + (queue.ambulance() ? 1 : 0), Double::sum));
+            expectedQueueArrivals.forEach((movement, count) -> {
+                double occupied = remainingByApproach.getOrDefault(movement.incoming(), 0.0);
+                double admitted = Math.min(count, Math.max(0, TrafficWorld.STORAGE - occupied));
+                projected.compute(movement, (key, prior) -> {
+                    Queue before = prior == null ? new Queue(0, false, 0) : prior;
+                    return before.ambulance()
+                            ? new Queue(before.ahead(), true, before.behind() + admitted)
+                            : new Queue(before.ahead() + admitted, false, 0);
+                });
+                remainingByApproach.put(movement.incoming(), occupied + admitted);
+            });
+        }
+        return Estimate.unknown("Junction forecast exceeded 300 seconds");
+    }
+}

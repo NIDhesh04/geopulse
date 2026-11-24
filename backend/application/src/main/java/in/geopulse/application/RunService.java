@@ -17,14 +17,19 @@ public class RunService {
         public final int status;public ApiException(int status,String message){super(message);this.status=status;}
     }
     private static final String SCENARIO="routing-only-5x5";
+    private static final String TRAFFIC_SCENARIO = "traffic-signals-5x5";
     private final JdbcTemplate db;private final ObjectMapper json;private final TransactionTemplate tx;private final SimpMessagingTemplate messages;
     private final ConcurrentMap<UUID,Run> active=new ConcurrentHashMap<>();
     private static final class Run {
-        final UUID id;final long seed;final ScheduledExecutorService loop;
+        final UUID id;final long seed;final String scenarioId;final boolean priorityEnabled;final ScheduledExecutorService loop;
         RoutingSimulation simulation;long revision,eventSequence;boolean paused=true;int speed=1;
         volatile boolean fault;volatile Map<String,Object> view;
         long lastTick=System.nanoTime(),lastPublish;double credit;
-        Run(UUID id,long seed,int horizon){this.id=id;this.seed=seed;simulation=new RoutingSimulation(Graph.grid(5),horizon);loop=Executors.newSingleThreadScheduledExecutor(r->{Thread t=new Thread(r,"run-"+id);t.setDaemon(true);return t;});}
+        Run(UUID id,long seed,int horizon,String scenarioId,boolean priorityEnabled){
+            this.id=id;this.seed=seed;this.scenarioId=scenarioId;this.priorityEnabled=priorityEnabled;
+            simulation=TRAFFIC_SCENARIO.equals(scenarioId)
+                    ? RoutingSimulation.traffic(Graph.grid(5),horizon,priorityEnabled)
+                    : new RoutingSimulation(Graph.grid(5),horizon);loop=Executors.newSingleThreadScheduledExecutor(r->{Thread t=new Thread(r,"run-"+id);t.setDaemon(true);return t;});}
     }
     public RunService(JdbcTemplate db,ObjectMapper json,TransactionTemplate tx,SimpMessagingTemplate messages){this.db=db;this.json=json;this.tx=tx;this.messages=messages;}
     private String encode(Object data){try{return json.writeValueAsString(data);}catch(Exception e){throw new IllegalStateException("Cannot encode state",e);}}
@@ -32,15 +37,37 @@ public class RunService {
         tx.executeWithoutResult(s->{
             db.update("update run_command set status='REJECTED', reason='RUN_INTERRUPTED' where status='ACCEPTED'");
             db.update("update simulation_run set status='INTERRUPTED' where status in ('RUNNING','PAUSED')");
-            db.update("insert into scenario_definition(id,version,definition) values (?,1,?::jsonb) on conflict(id) do nothing",SCENARIO,encode(scenario()));
+            for (var definition : scenarios()) {
+                db.update("insert into scenario_definition(id,version,definition) values (?,1,?::jsonb) on conflict(id) do nothing",
+                        definition.get("id"),encode(definition));
+            }
         });
     }
     @PreDestroy void shutdown(){active.values().forEach(r->r.loop.shutdownNow());}
     public Map<String,Object> scenario(){return Map.of("id",SCENARIO,"version",1,"mode","ROUTING_ONLY","name","Central district · routing laboratory","graph",Graph.grid(5),"origin","n00_00","destination","n04_04","junctionEstimator","M1_ZERO_WAIT");}
-    public synchronized Map<String,Object> create(String horizon,long seed){
+    public List<Map<String,Object>> scenarios(){
+        var trafficScenario = new LinkedHashMap<>(scenario());
+        trafficScenario.put("id", TRAFFIC_SCENARIO);
+        trafficScenario.put("mode", "TRAFFIC_SIGNALS");
+        trafficScenario.put("name", "Central district · traffic and signals");
+        trafficScenario.put("junctionEstimator", "BOUNDED_JUNCTION_FORECAST");
+        return List.of(scenario(), trafficScenario);
+    }
+
+    public Map<String,Object> create(String horizon,long seed){
+        return create(horizon, seed, null, false);
+    }
+
+    public synchronized Map<String,Object> create(String horizon,long seed,String scenarioId,Boolean priority){
+        String selected = scenarioId == null ? SCENARIO : scenarioId;
+        var definition = new LinkedHashMap<>(scenarios().stream()
+                .filter(item -> selected.equals(item.get("id"))).findFirst()
+                .orElseThrow(() -> new ApiException(400,"Unknown scenario")));
+        boolean priorityEnabled = TRAFFIC_SCENARIO.equals(selected) && !Boolean.FALSE.equals(priority);
+        definition.put("priorityEnabled", priorityEnabled);
         int h=switch(horizon){case "0"->0;case "2"->2;case "all"->-1;default->throw new ApiException(400,"Horizon must be 0, 2 or all");};
-        UUID id=UUID.randomUUID();Run r=new Run(id,seed,h);
-        db.update("insert into simulation_run(id,scenario_id,scenario_snapshot,seed,horizon,status) values (?,?,?::jsonb,?,?,'PAUSED')",id,SCENARIO,encode(scenario()),seed,horizon);
+        UUID id=UUID.randomUUID();Run r=new Run(id,seed,h,selected,priorityEnabled);
+        db.update("insert into simulation_run(id,scenario_id,scenario_snapshot,seed,horizon,status) values (?,?,?::jsonb,?,?,'PAUSED')",id,selected,encode(definition),seed,horizon);
         r.view=view(r,r.simulation,0,0,true,1);active.put(id,r);r.loop.scheduleWithFixedDelay(()->tick(r),100,100,TimeUnit.MILLISECONDS);return r.view;
     }
     private Run require(UUID id){Run r=active.get(id);if(r!=null)return r;var rows=db.queryForList("select status from simulation_run where id=?",id);if(rows.isEmpty())throw new ApiException(404,"Run not found");throw new ApiException(410,"Live snapshot unavailable: "+rows.getFirst().get("status")+". Create a new run.");}
@@ -65,10 +92,17 @@ public class RunService {
             try{event.put("data",json.readTree(rs.getString(4)));}catch(Exception e){throw new IllegalStateException(e);}return event;},run,after);
     }
     public Map<String,Object> results(UUID id){
-        var rows=db.queryForList("select id::text,status,simulation_time,revision::text,ambulance_result from simulation_run where id=?",id);if(rows.isEmpty())throw new ApiException(404,"Run not found");
+        var rows=db.queryForList("select id::text,status,simulation_time,revision::text,ambulance_result,traffic_result from simulation_run where id=?",id);if(rows.isEmpty())throw new ApiException(404,"Run not found");
         var result=new LinkedHashMap<>(rows.getFirst());Run r=active.get(id);if(r!=null)result.put("ambulance",r.view.get("ambulance"));
         else if(result.get("ambulance_result")!=null)try{result.put("ambulance",json.readTree(result.get("ambulance_result").toString()));}catch(Exception e){throw new IllegalStateException(e);}
-        result.remove("ambulance_result");return result;
+        result.remove("ambulance_result");
+        var trafficResult = result.remove("traffic_result");
+        if (trafficResult != null) try {
+            result.put("traffic", json.readTree(trafficResult.toString()));
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            throw new IllegalStateException("Cannot decode traffic results", e);
+        }
+        return result;
     }
     private String text(JsonNode p,String name){if(!p.path(name).isTextual()||p.path(name).asText().isBlank())throw new IllegalArgumentException(name+" must be a nonempty string");return p.path(name).asText();}
     private void tick(Run r){
@@ -91,11 +125,16 @@ public class RunService {
                 case "PAUSE"->paused=true;
                 case "STEP"->{if(!paused)throw new IllegalArgumentException("Pause before stepping");if(candidate.ambulance().arrivedAt()!=null)throw new IllegalArgumentException("Journey completed");candidate.step();}
                 case "SET_SPEED"->{if(!p.path("speed").isIntegralNumber()||!Set.of(1,5,10,30,60).contains(p.path("speed").asInt()))throw new IllegalArgumentException("Speed must be 1, 5, 10, 30 or 60");speed=p.path("speed").asInt();}
-                case "INCIDENT"->{if(!p.path("reported").isBoolean())throw new IllegalArgumentException("reported must be boolean");candidate.incident(text(p,"edge"),text(p,"effect"),p.path("reported").asBoolean());}
+                case "INCIDENT"->{if(!p.path("reported").isBoolean())throw new IllegalArgumentException("reported must be boolean");candidate.incident(text(p,"edge"),text(p,"effect"),p.path("reported").asBoolean(),
+                            p.has("incidentId") ? text(p,"incidentId") : "operator");}
                 case "REPORT_CLOSURE"->candidate.report(text(p,"edge"),true);
                 case "REPORT_REOPENING"->candidate.report(text(p,"edge"),false);
                 case "RETRY_ROUTE"->candidate.retry();
-                default->throw new IllegalArgumentException("Unsupported M1 command: "+command.type());
+                case "SUSPEND_PRIORITY"->{
+                    if (!p.path("suspended").isBoolean()) throw new IllegalArgumentException("suspended must be boolean");
+                    candidate.suspendPriority(p.path("suspended").booleanValue());
+                }
+                default->throw new IllegalArgumentException("Unsupported command: "+command.type());
             }}else if(advance)candidate.step();
         }catch(IllegalArgumentException e){outcome="REJECTED";rejection=e.getMessage();candidate=r.simulation.copy();paused=r.paused;speed=r.speed;}
         if(candidate.ambulance().arrivedAt()!=null)paused=true;
@@ -110,7 +149,10 @@ public class RunService {
             tx.executeWithoutResult(s->{
                 if(command!=null)db.update("update run_command set status=?,applied_tick=?,boundary_ordinal=?,reason=? where run_id=? and id=?",appliedOutcome,r.simulation.time(),revision,reason,r.id,command.commandId());
                 for(var event:notifications)db.update("insert into run_event(run_id,sequence,tick,type,payload) values (?,?,?,?,?::jsonb)",r.id,Long.parseLong(event.get("sequence").toString()),event.get("time"),event.get("type"),encode(event.get("data")));
-                db.update("update simulation_run set status=?,revision=?,event_sequence=?,simulation_time=?,ambulance_result=?::jsonb where id=?",runStatus,revision,lastEvent,next.time(),encode(next.ambulance()),r.id);
+                var traffic = next.trafficState();
+                String measured = traffic == null ? null : encode(Map.of(
+                        "civilian", traffic.totals(), "ambulanceJunctionWait", next.junctionWait()));
+                db.update("update simulation_run set status=?,revision=?,event_sequence=?,simulation_time=?,ambulance_result=?::jsonb,traffic_result=?::jsonb where id=?",runStatus,revision,lastEvent,next.time(),encode(next.ambulance()),measured,r.id);
             });
         }catch(RuntimeException failure){r.fault=true;return;}
         r.simulation=next;r.paused=paused;r.speed=speed;r.revision=revision;r.eventSequence=lastEvent;
@@ -119,9 +161,17 @@ public class RunService {
         if(System.nanoTime()-r.lastPublish>=200_000_000L)publishState(r);
     }
     private Map<String,Object> view(Run r,RoutingSimulation sim,long revision,long events,boolean paused,int speed){
-        Map<String,Object> view=new LinkedHashMap<>();view.put("schemaVersion",1);view.put("runId",r.id.toString());view.put("scenarioId",SCENARIO);view.put("mode","ROUTING_ONLY");view.put("seed",r.seed);
+        Map<String,Object> view=new LinkedHashMap<>();view.put("schemaVersion",1);view.put("runId",r.id.toString());view.put("scenarioId",r.scenarioId);view.put("mode",TRAFFIC_SCENARIO.equals(r.scenarioId)?"TRAFFIC_SIGNALS":"ROUTING_ONLY");view.put("seed",r.seed);
         view.put("stateRevision",Long.toString(revision));view.put("latestEventSequence",Long.toString(events));view.put("simulationTimeSeconds",sim.time());view.put("paused",paused);view.put("speed",speed);view.put("horizon",sim.horizon()==-1?"all":Integer.toString(sim.horizon()));
-        view.put("runStatus",sim.ambulance().arrivedAt()!=null?"COMPLETED":paused?"PAUSED":"RUNNING");view.put("ambulance",sim.ambulance());view.put("explanation",sim.explanation());view.put("reportedClosures",sim.reported());return Collections.unmodifiableMap(view);
+        view.put("runStatus",sim.ambulance().arrivedAt()!=null?"COMPLETED":paused?"PAUSED":"RUNNING");view.put("ambulance",sim.ambulance());view.put("explanation",sim.explanation());view.put("reportedClosures",sim.reported());
+        var traffic = sim.trafficState();
+        if (traffic != null) {
+            view.put("traffic", traffic);
+            view.put("ambulanceJunctionWait", sim.junctionWait());
+            view.put("priorityEnabled", r.priorityEnabled);
+            view.put("prioritySuspended", sim.prioritySuspended());
+        }
+        return Collections.unmodifiableMap(view);
     }
     private void publishState(Run r){try{messages.convertAndSend("/topic/runs/"+r.id+"/state",snapshot(r.id));r.lastPublish=System.nanoTime();}catch(RuntimeException ignored){/* Next heartbeat or HTTP snapshot repairs delivery. */}}
 }

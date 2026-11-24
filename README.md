@@ -1,6 +1,6 @@
 # GeoPulse
 
-**Fact:** M1 is a routing-only demonstration: one ambulance, a synthetic 5×5 network, current-clock hybrid routing, explainable decisions, and durable command/event history. Signals, background traffic, ambulance priority and multi-ambulance contention belong to later milestones.
+**Fact:** GeoPulse provides two single-ambulance scenarios on a synthetic 5×5 network. The routing-only fixture shows live and historical route costs. The traffic-and-signals fixture adds civilian flow, junction forecasts and optional ambulance signal priority. Both record commands and events in PostgreSQL.
 
 ## Open and edit the project
 
@@ -51,6 +51,15 @@ npm --prefix frontend run dev
 5. Restore a road with reporting enabled to recover. A fully impassable occupied road stops the ambulance in place; restoring it resumes motion. An entry closure does not eject an ambulance already on the road.
 6. Reload the browser to restore the snapshot and ordered events. Select a different horizon only when creating a new run.
 
+## Traffic and signals demonstration
+
+1. Choose **Traffic and signals** under **Scenario for next run**. Leave **Ambulance signal priority** selected for the first run.
+2. Create the run and activate the mission. Expand the selected movement in **Why this turn?** to inspect the forecast waiting time and its source.
+3. Step once to see the station signal grant and partial service. Use **Suspend priority** and **Resume priority** to see how the controller responds at subsequent boundaries.
+4. Play through arrival. Inspect ambulance junction wait, civilian delay, queued population and boundary backlog. Create another run with priority disabled to demonstrate ordinary service on the same fixture.
+
+**Assumption:** The fixture uses 12 vehicle-equivalents per road, 0.6 vehicle-equivalents per second of ordinary discharge, and constant 0.18 vehicle-equivalents per second of demand on the outgoing roads at each corner. A boundary junction exits 30% of civilian traffic on multi-choice approaches, with the remainder split equally across eligible turns. These are synthetic defaults. The historical estimates average the final 120 seconds of a separate 240-second incident-free calibration. The 300-second forecast projects expected queue arrivals and receiving releases with the same service logic. There are no observed Jaipur traffic inputs.
+
 ## Verify
 
 ```bash
@@ -80,10 +89,10 @@ SELECT run_id, sequence, tick, type, payload FROM run_event
 ORDER BY run_id, sequence;
 ```
 
-## M1 boundaries
+## Fixture boundaries
 
-- **Decision:** `JunctionDelayEstimator` is the movement-aware interface. `M1ZeroJunctionDelay` is a deliberate fixture stub, never a fallback for failed forecasts. The simulator accepts an injected estimator; Dijkstra does not need modification for M2's bounded forecast.
-- **Fact:** The historical M1 profile is constant free-flow travel time. Calibrated time-of-day profiles and traffic-driven congestion arrive with the world model; M1 demonstrates the information boundary only.
+- **Decision:** `JunctionDelayEstimator` is the movement-aware interface. `M1ZeroJunctionDelay` is a deliberate fixture stub, never a fallback for failed forecasts. The traffic fixture supplies a bounded forecast through the same interface.
+- **Fact:** The historical M1 profile is constant free-flow travel time. M2 uses a calibrated constant profile for its stationary fixture. Time-of-day demand profiles are separate scenario work.
 - **Fact:** The fixture includes discrete road-entry boundaries. An ambulance enters at a tick boundary and begins progress on the next tick. Consequently the unobstructed 800 m route estimates 80 seconds of traversal but completes in 88 simulation seconds. Actual time starts at activation; these are deliberately separate measurements.
 - **Fact:** Scenario JSON currently describes the single built-in fixture. It is not a general importer. Optional node latitude/longitude fields are supported; default map coordinates are synthetic display coordinates, not real roads.
 - **Decision:** HTTP command acceptance is durable before enqueueing. Each boundary computes an isolated candidate, commits results/events, then exposes it. Publication failure is repaired by HTTP catch-up; database failure stops that run at its last committed state.

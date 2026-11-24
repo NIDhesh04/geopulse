@@ -11,3 +11,5 @@
 **Fact:** Google's Roads API restricts storing or extracting road data for reuse outside its services. The imported OpenStreetMap graph supplies the topology and geometry GeoPulse needs. [Google Roads API policies](https://developers.google.com/maps/documentation/roads/policies)
 
 **Decision:** Label the demo as real Jaipur road geometry with simulated traffic, incidents and signal timing. OpenStreetMap geometry alone does not establish measured demand, current road conditions, or actual controller behavior.
+
+**Decision:** Collapse degree-two pass-through points into the ordered road polyline. Keep topology nodes wherever connectivity, a mapped control, an access point, or a restriction requires one. An unsignalized bend does not create a signal. Map one-way rules to directed edges and turn restrictions to allowed incoming/outgoing movements, including restrictions that span multiple edges. Build each controller's approach list from its actual incoming roads and any station entry.

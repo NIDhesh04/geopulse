@@ -7,10 +7,10 @@ import java.util.*;
 @RestController
 @RequestMapping("/api")
 public class RunController {
-    public record CreateRun(@NotBlank String horizon,long seed){}
+    public record CreateRun(@NotBlank String horizon,long seed,String scenarioId,Boolean priorityEnabled){}
     private final RunService runs;public RunController(RunService runs){this.runs=runs;}
-    @GetMapping("/scenarios") public Object scenarios(){return List.of(runs.scenario());}
-    @PostMapping("/runs") public ResponseEntity<?> create(@Valid @RequestBody CreateRun request){return ResponseEntity.status(201).body(runs.create(request.horizon(),request.seed()));}
+    @GetMapping("/scenarios") public Object scenarios(){return runs.scenarios();}
+    @PostMapping("/runs") public ResponseEntity<?> create(@Valid @RequestBody CreateRun request){return ResponseEntity.status(201).body(runs.create(request.horizon(),request.seed(),request.scenarioId(),request.priorityEnabled()));}
     @GetMapping("/runs/{id}/snapshot") public Object snapshot(@PathVariable UUID id){return runs.snapshot(id);}
     @PostMapping("/runs/{id}/commands") public ResponseEntity<?> command(@PathVariable UUID id,@RequestBody RunService.Command command){return ResponseEntity.accepted().body(runs.accept(id,command));}
     @GetMapping("/runs/{id}/commands/{command}") public Object command(@PathVariable UUID id,@PathVariable UUID command){return runs.command(id,command);}
