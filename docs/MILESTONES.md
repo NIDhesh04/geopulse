@@ -119,3 +119,5 @@
 4. **Decision:** Profile the separate 10×10, 30-ambulance fixture over five seeds. Limit presentation claims to the tested scenarios and simulation assumptions.
 
 **Fact:** [The evaluation design](METRICS_AND_EVALUATION.md) defines the scenario matrix, recovery criterion and presentation rules.
+
+**Fact:** The database-free Java benchmark runner implements all seven scenario schedules and the separate scale fixture. The reporting scripts retain individual missions and aggregate paired seed results. See [execution commands and output definitions](../scenarios/BENCHMARKS.md).

@@ -26,6 +26,7 @@ public final class RoutingSimulation {
     private final List<Event> pending=new ArrayList<>();
     private OperationalReports operationalReports = new OperationalReports();
     private HistoricalProfile historicalProfile;
+    private long benchmarkJunctionForecasts;
     private String ambulanceId = "AMB-001";
     private final Map<String, RoutingSimulation> additionalMissions = new TreeMap<>();
     private boolean fleetEnabled;
@@ -64,21 +65,58 @@ public final class RoutingSimulation {
     }
 
     public static RoutingSimulation fleet(Graph graph, int horizon, boolean priorityEnabled) {
+        return fleet(graph, horizon, priorityEnabled, fixtureOrigins(), TrafficWorld.fixture(graph, true), null);
+    }
+
+    static RoutingSimulation benchmark(Graph graph, Map<String,String> stations, long seed, boolean pulse, HistoricalProfile profile) {
+        var world = TrafficWorld.benchmarkWorld(graph, Set.copyOf(stations.values()), seed, pulse, true);
+        return fleet(graph, 0, false, stations, world, profile);
+    }
+
+    private static RoutingSimulation fleet(Graph graph, int horizon, boolean priorityEnabled, Map<String,String> stations,
+                                           TrafficWorld world, HistoricalProfile profile) {
         var run = new RoutingSimulation(graph, horizon);
-        run.traffic = TrafficWorld.fixture(graph, true);
+        run.traffic = world;
+        run.historicalProfile = profile;
+        run.node = Objects.requireNonNull(stations.get(run.ambulanceId));
         run.priorityEnabled = priorityEnabled;
         run.fleetEnabled = true;
-        fixtureOrigins().forEach((id, origin) -> {
+        stations.forEach((id, origin) -> {
             if (run.ambulanceId.equals(id)) return;
             var mission = new RoutingSimulation(graph, horizon);
             mission.ambulanceId = id;
             mission.node = origin;
             mission.traffic = run.traffic;
+            mission.historicalProfile = profile;
             mission.priorityEnabled = priorityEnabled;
             mission.fleetEnabled = true;
             run.additionalMissions.put(mission.ambulanceId, mission);
         });
         return run;
+    }
+
+    RoutingSimulation forkPolicy(int horizon, boolean priorityEnabled) {
+        if (missions().stream().anyMatch(mission -> mission.activatedAt != null))
+            throw new IllegalStateException("Fork a warmed state before mission activation");
+        return copy(horizon, priorityEnabled);
+    }
+
+    TrafficWorld.Totals benchmarkTotals() { return traffic.totals(); }
+    Map<String,JunctionService.State> benchmarkGrants() { return traffic.grants(); }
+    long benchmarkForecastCount() { return missions().stream().mapToLong(mission -> mission.benchmarkJunctionForecasts).sum(); }
+    int benchmarkFullRoads() { return traffic.fullRoads(); }
+    List<Ambulance> benchmarkFleet() { return missions().stream().map(RoutingSimulation::ambulance).toList(); }
+    List<JunctionService.Request> benchmarkRequests() {
+        return missions().stream().map(mission -> mission.priorityRequest).filter(Objects::nonNull).toList();
+    }
+
+    String benchmarkWaiting(String id) {
+        var mission = mission(id);
+        if (mission.status.equals("STOPPED"))
+            return "ROAD_IMPASSABLE".equals(mission.reason) ? "impassable" : "route_unavailable";
+        if (!mission.status.equals("AT_JUNCTION") || mission.route.isEmpty()) return null;
+        if (!traffic.receivingAvailable(mission.route.getFirst())) return "queue_or_receiving";
+        return traffic.movementGreen(mission.node,mission.incoming) ? "queue_or_receiving" : "signal";
     }
 
     public static Map<String, String> fixtureOrigins() {
@@ -145,12 +183,16 @@ public final class RoutingSimulation {
     }
 
     public RoutingSimulation copy(){
-        var copy = copyMission(traffic == null ? null : traffic.copy());
-        additionalMissions.forEach((id, mission) -> copy.additionalMissions.put(id, mission.copyMission(copy.traffic)));
+        return copy(horizon, priorityEnabled);
+    }
+
+    private RoutingSimulation copy(int horizon, boolean priorityEnabled) {
+        var copy = copyMission(traffic == null ? null : traffic.copy(), horizon, priorityEnabled);
+        additionalMissions.forEach((id, mission) -> copy.additionalMissions.put(id, mission.copyMission(copy.traffic, horizon, priorityEnabled)));
         return copy;
     }
 
-    private RoutingSimulation copyMission(TrafficWorld world){
+    private RoutingSimulation copyMission(TrafficWorld world,int horizon,boolean priorityEnabled){
         var c=new RoutingSimulation(graph,horizon,junctionDelay,router);c.time=time;c.replans=replans;c.reroutes=reroutes;c.activatedAt=activatedAt;c.arrivedAt=arrivedAt;c.initialEta=initialEta;c.estimatedArrival=estimatedArrival;
         c.node=node;c.destination=destination;c.incoming=incoming;c.edge=edge;c.status=status;c.reason=reason;c.progress=progress;c.needsPlan=needsPlan;c.planned=planned;c.route=new ArrayList<>(route);c.explanation=explanation;
         c.traffic = world;
@@ -164,6 +206,7 @@ public final class RoutingSimulation {
         c.junctionArrival = junctionArrival;
         c.priorityRequest = priorityRequest;
         c.historicalProfile = historicalProfile;
+        c.benchmarkJunctionForecasts = benchmarkJunctionForecasts;
         c.operationalReports = operationalReports.copy();
         c.observedDepartureJunction = observedDepartureJunction;
         c.physical.putAll(physical);
@@ -305,6 +348,7 @@ public final class RoutingSimulation {
         var snap = new RoutingSnapshot(graph, time, live, historical, estimator, knownClosures, visible, historicalProfile);
         var result=router.route(graph,node,incoming,destination,snap);
         if(planned)replans++;explanation=new Explanation(Long.toString(replans+1),time,incoming,router.explain(graph,node,incoming,destination,snap,result),snap.liveEdges(),Map.copyOf(snap.roadsForRoute(result.edges(), incoming)));
+        benchmarkJunctionForecasts += snap.cachedJunctionEstimates();
         if(result.reachable()){
             if(planned&&!route.isEmpty()&&!route.equals(result.edges())){reroutes++;emit("REROUTED","Route changed at "+node);}
             if (!route.equals(result.edges()) || !planned || oldStatus.equals("STOPPED")) routeVersion++;

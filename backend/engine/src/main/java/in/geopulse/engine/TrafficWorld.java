@@ -41,6 +41,7 @@ public final class TrafficWorld {
     private final Map<String, Map<String, String>> signalRequests = new TreeMap<>();
     private Profile history;
     private Long corridorSeed;
+    private boolean benchmarkPulse;
     private double arrivalRate = ARRIVAL_RATE;
     private final Map<String, QueuePosition> waitingAmbulances = new LinkedHashMap<>();
     private Map<String, Integer> occupiedByFleet = Map.of();
@@ -78,6 +79,12 @@ public final class TrafficWorld {
     }
 
     private static Network network(Graph graph, boolean fleetStations, String geographicOrigin) {
+        var stations = fleetStations ? Set.of("n00_00", "n00_04", "n04_00") : Set.of("n00_00");
+        if (geographicOrigin != null) stations = Set.of(geographicOrigin);
+        return network(graph, stations, geographicOrigin);
+    }
+
+    private static Network network(Graph graph, Set<String> stations, String geographicOrigin) {
         Map<String, Graph.Edge> roads = new TreeMap<>();
         Map<String, Junction> junctions = new TreeMap<>();
         Map<String, List<Movement>> turns = new TreeMap<>();
@@ -113,8 +120,7 @@ public final class TrafficWorld {
                         .forEach(edge -> local.add(new Movement(road.id(), edge.id())));
             }
             String station = STATION + node.id();
-            if (node.id().equals("n00_00") || node.id().equals(geographicOrigin) || (fleetStations && Set.of("n00_04", "n04_00").contains(node.id()))
-                    || approaches.isEmpty()) {
+            if (stations.contains(node.id()) || approaches.isEmpty()) {
                 approaches.add(station);
                 outgoing.forEach(edge -> local.add(new Movement(station, edge.id())));
             }
@@ -143,6 +149,15 @@ public final class TrafficWorld {
         var world = geographicWorld(graph, origin, seed);
         var baseline = new TrafficWorld(world.network);
         return fixture(world, baseline);
+    }
+
+    static TrafficWorld benchmarkWorld(Graph graph, Set<String> stations, long seed, boolean pulse, boolean forecasts) {
+        var network = network(graph, stations, null);
+        var world = forecasts ? fixture(network) : new TrafficWorld(network);
+        world.arrivalRate = ARRIVAL_RATE * new SplittableRandom(seed).nextDouble(.90, 1.10);
+        world.benchmarkPulse = pulse;
+        if (pulse) world.enableCorridorDemand(seed);
+        return world;
     }
 
     private static TrafficWorld fixture(Network network) {
@@ -180,6 +195,7 @@ public final class TrafficWorld {
         copy.signalRequests.putAll(signalRequests);
         copy.history = history;
         copy.corridorSeed = corridorSeed;
+        copy.benchmarkPulse = benchmarkPulse;
         copy.arrivalRate = arrivalRate;
         copy.waitingAmbulances.putAll(waitingAmbulances);
         copy.occupiedByFleet = occupiedByFleet;
@@ -208,6 +224,29 @@ public final class TrafficWorld {
                     signalRequests.getOrDefault(id, Map.of())));
         });
         return new View(totals(), Collections.unmodifiableMap(views), priority);
+    }
+
+    Map<String, State> grants() {
+        var grants = new TreeMap<String, State>();
+        signals.forEach((junction,state) -> {
+            if (state.grant() != null) grants.put(junction,state);
+        });
+        return grants;
+    }
+
+    int fullRoads() {
+        return (int) network.roads().keySet().stream().filter(id ->
+                civilianOccupancy(id) + occupiedByFleet.getOrDefault(id, 0) >= capacity(id) - EPSILON).count();
+    }
+
+    boolean receivingAvailable(String road) {
+        return capacity(road) - civilianOccupancy(road) - occupiedByFleet.getOrDefault(road, 0) >= 1 - EPSILON;
+    }
+
+    boolean movementGreen(String node, String incoming) {
+        var junction = network.junctions().get(node);
+        var signal = signals.get(node);
+        return signal.phase() == NormalSignal.Phase.GREEN && junction.approaches().get(signal.approach()).equals(incoming);
     }
 
     Map<String, RoadTruth> roadTruth() {
@@ -458,7 +497,7 @@ public final class TrafficWorld {
         crossings.keySet().forEach(waitingAmbulances::remove);
         for (var entry : backlog.entrySet()) {
             double baseRate = corridorSeed != null && entry.getKey().equals(CalibrationRunner.CORRIDOR)
-                    ? CalibrationRunner.demand(tick, corridorSeed) : arrivalRate;
+                    ? CalibrationRunner.demand(benchmarkPulse ? tick - 660 : tick, corridorSeed) : arrivalRate;
             double demandRate = physical.getOrDefault(entry.getKey(), Set.of()).contains("DEMAND_SURGE") ? 2 * baseRate : baseRate;
             arrivals += demandRate;
             double demand = entry.getValue() + demandRate;
@@ -471,8 +510,7 @@ public final class TrafficWorld {
             var next = new ArrayList<Cohort>();
             for (var cohort : travelling.get(id)) {
                 double metres = Math.min(road.length() - cohort.position(), speed.get(id));
-                double seconds = speed.get(id) <= 0 ? 1 : metres / speed.get(id);
-                runningExcess += cohort.count() * Math.max(0, seconds - metres / road.freeSpeed());
+                runningExcess += cohort.count() * Math.max(0, 1 - metres / road.freeSpeed());
                 double position = cohort.position() + metres;
                 if (position + EPSILON >= road.length()) enqueue(id, cohort.count());
                 else next.add(new Cohort(cohort.count(), position));

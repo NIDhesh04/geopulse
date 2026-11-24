@@ -77,4 +77,5 @@ public final class RoutingSnapshot {
                 :junction(incoming,outgoing);
     }
     public long time(){return time;}
+    int cachedJunctionEstimates(){return waits.size();}
 }

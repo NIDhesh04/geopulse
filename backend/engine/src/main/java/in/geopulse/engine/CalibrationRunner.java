@@ -40,6 +40,12 @@ public final class CalibrationRunner {
                 seed -> TrafficWorld.geographicWorld(graph, origin, seed));
     }
 
+    static HistoricalProfile calibrateEvaluation(Graph graph, Set<String> stations, boolean pulse) {
+        var seeds = List.of(-1201L, -1202L, -1203L);
+        return sample(seeds, 60, BenchmarkSuite.END / 60,
+                seed -> TrafficWorld.benchmarkWorld(graph, stations, seed, pulse, false));
+    }
+
     private static HistoricalProfile sample(List<Long> orderedSeeds, int interval, int buckets,
                                              java.util.function.LongFunction<TrafficWorld> worldFactory) {
         var roads = new TreeMap<String, double[]>();
