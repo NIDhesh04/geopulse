@@ -6,6 +6,7 @@ public final class RoutingSnapshot {
     private final Set<String> liveEdges;private final Map<String,Estimate> roads=new TreeMap<>();
     private final Map<Movement,Estimate> waits=new HashMap<>();
     private final HistoricalProfile profile;
+    private final List<String> turnContext;
     public RoutingSnapshot(Graph graph,String origin,int horizon,long time,RoadWeightProvider live,RoadWeightProvider historical,JunctionDelayEstimator delays,Set<String> reportedClosures){
         this(graph, time, live, historical, delays, reportedClosures, liveEdges(graph, origin, horizon));
     }
@@ -17,7 +18,14 @@ public final class RoutingSnapshot {
 
     RoutingSnapshot(Graph graph,long time,RoadWeightProvider live,RoadWeightProvider historical,
                     JunctionDelayEstimator delays,Set<String> reportedClosures,Set<String> liveEdges, HistoricalProfile profile){
+        this(graph,time,live,historical,delays,reportedClosures,liveEdges,profile,null);
+    }
+
+    RoutingSnapshot(Graph graph,long time,RoadWeightProvider live,RoadWeightProvider historical,
+                    JunctionDelayEstimator delays,Set<String> reportedClosures,Set<String> liveEdges,
+                    HistoricalProfile profile,List<String> turnContext){
         this.profile=profile;
+        this.turnContext=turnContext==null?null:List.copyOf(turnContext);
         this.graph=graph;this.time=time;this.delays=delays;this.liveEdges=liveEdges;
         for(var e:graph.edges()){
             Estimate value;
@@ -31,6 +39,10 @@ public final class RoutingSnapshot {
             }else value=profile==null?safe(historical.estimate(e,time)):profile.road(e.id(),time);
             roads.put(e.id(),value);
         }
+    }
+
+    List<String> turnContext(String incoming) {
+        return turnContext==null?graph.turnRestrictions().advance(List.of(),incoming):turnContext;
     }
 
     static Set<String> liveEdges(Graph graph, String origin, int horizon) {

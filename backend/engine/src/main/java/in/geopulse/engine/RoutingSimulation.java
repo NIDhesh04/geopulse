@@ -20,6 +20,7 @@ public final class RoutingSimulation {
     private String node="n00_00",destination="n04_04",incoming="station-entry",edge,status="IDLE",reason;
     private double progress;private boolean needsPlan,planned;
     private List<String> route=new ArrayList<>();private Explanation explanation;
+    private List<String> turnContext=List.of();
     private final Map<String,Set<String>> physical=new TreeMap<>();
     private final Map<String,Map<String,String>> incidents = new TreeMap<>();
     private final Map<String,Set<String>> reportedIncidents = new TreeMap<>();private final Set<String> reported=new TreeSet<>();
@@ -209,6 +210,7 @@ public final class RoutingSimulation {
         c.benchmarkJunctionForecasts = benchmarkJunctionForecasts;
         c.operationalReports = operationalReports.copy();
         c.observedDepartureJunction = observedDepartureJunction;
+        c.turnContext = turnContext;
         c.physical.putAll(physical);
         c.incidents.putAll(incidents);
         c.reportedIncidents.putAll(reportedIncidents);c.reported.addAll(reported);c.pending.addAll(pending);return c;
@@ -345,7 +347,7 @@ public final class RoutingSimulation {
             historical = (road,t) -> Estimate.available(road.length() / traffic.historicalSpeed(road), "HISTORICAL");
             estimator = traffic.estimator(time, visible, Map.copyOf(physical), knownClosures, ambulanceRoad(), ambulanceId);
         }
-        var snap = new RoutingSnapshot(graph, time, live, historical, estimator, knownClosures, visible, historicalProfile);
+        var snap = new RoutingSnapshot(graph,time,live,historical,estimator,knownClosures,visible,historicalProfile,turnContext);
         var result=router.route(graph,node,incoming,destination,snap);
         if(planned)replans++;explanation=new Explanation(Long.toString(replans+1),time,incoming,router.explain(graph,node,incoming,destination,snap,result),snap.liveEdges(),Map.copyOf(snap.roadsForRoute(result.edges(), incoming)));
         benchmarkJunctionForecasts += snap.cachedJunctionEstimates();
@@ -372,7 +374,8 @@ public final class RoutingSimulation {
             if("ROAD_IMPASSABLE".equals(reason))emit("ROAD_RECOVERED",edge);
             status="MOVING";reason=null;progress=Math.min(road.length(),progress+v);time++;
             if(progress>=road.length()){
-                node=road.to();incoming=edge;edge=null;progress=0;if(!route.isEmpty())route.removeFirst();
+                node=road.to();incoming=edge;turnContext=graph.turnRestrictions().advance(turnContext,edge);
+                edge=null;progress=0;if(!route.isEmpty())route.removeFirst();
                 if(node.equals(destination))arrive();else{status="AT_JUNCTION";needsPlan=true;emit("JUNCTION_REACHED",node);}
             }return;
         }
@@ -472,6 +475,7 @@ public final class RoutingSimulation {
             junctionArrival = time;
             node = road.to();
             incoming = edge;
+            turnContext = graph.turnRestrictions().advance(turnContext, edge);
             edge = null;
             progress = 0;
             route.removeFirst();
