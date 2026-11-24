@@ -13,8 +13,9 @@ type Props = {
  closures:string[]; signals?:Record<string,Signal>; truth?:SimulationTruth;
  locate:number; follow:boolean; onDrag:()=>void; onEdge:(id:string)=>void;
  onAmbulance:(id:string)=>void; onJunction:(id:string)=>void;
+ showNavigationControls?:boolean;
 };
-export function NetworkMap({scenario,fleet,selected,explanation,mode,closures,signals,truth,locate,follow,onDrag,onEdge,onAmbulance,onJunction}:Props){
+export function NetworkMap({scenario,fleet,selected,explanation,mode,closures,signals,truth,locate,follow,onDrag,onEdge,onAmbulance,onJunction,showNavigationControls=true}:Props){
  const container=useRef<HTMLDivElement>(null),map=useRef<maplibregl.Map|null>(null),selectedRef=useRef(selected);
  const drag=useRef(onDrag),edgeAction=useRef(onEdge),select=useRef(onAmbulance),junctionAction=useRef(onJunction);
  drag.current=onDrag;edgeAction.current=onEdge;select.current=onAmbulance;selectedRef.current=selected;junctionAction.current=onJunction;
@@ -33,7 +34,8 @@ export function NetworkMap({scenario,fleet,selected,explanation,mode,closures,si
   try{instance=new maplibregl.Map({container:container.current!,style:{version:8,sources:{},layers:[{id:'background',type:'background',paint:{'background-color':'#0d1722'}}]},center:[75.782,26.918],zoom:16.7,attributionControl:false});}catch(e){setFailure(String(e));return;}
   instance.on('error',e=>setFailure(e.error.message));
   instance.on('idle',()=>{if(container.current&&instance.getLayer('roads-base'))container.current.dataset.roadCount=String(instance.queryRenderedFeatures({layers:['roads-base']}).length);});
-  map.current=instance;instance.addControl(new maplibregl.NavigationControl({showCompass:false}),'bottom-right');
+  map.current=instance;
+  if(showNavigationControls)instance.addControl(new maplibregl.NavigationControl({showCompass:false}),'bottom-right');
   instance.on('dragstart',()=>drag.current());
   instance.on('load',()=>{
    const nodeMap=new Map(scenario.graph.nodes.map(n=>[n.id,n]));
@@ -64,7 +66,7 @@ export function NetworkMap({scenario,fleet,selected,explanation,mode,closures,si
    instance.fitBounds([coord({x:-80,y:480}),coord({x:480,y:-80})],{padding:70,duration:0});setReady(true);
   });
   return()=>{setReady(false);instance.remove();map.current=null;};
- },[scenario,mapAttempt]);
+ },[scenario,mapAttempt,showNavigationControls]);
  const previous=useRef<Ambulance|undefined>(undefined);
  const lastLocate=useRef(0);
  useEffect(()=>{

@@ -118,6 +118,7 @@ export function App() {
           <div><span className="point hospital"/><span><small>DESTINATION</small>{selected.activatedAt===null?scenario?.destination:selected.destination}</span></div></div>
           <button className="primary full" disabled={pending || selected.status!=='IDLE' || !departure || !scenario} onClick={()=>
             act('ACTIVATE',{ambulanceId:id,origin:departure,destination:scenario?.destination})}>Activate mission</button>
+          {state && <a className="secondary full driver-link" href={`/driver?run=${encodeURIComponent(state.runId)}&ambulance=${encodeURIComponent(selected.id)}`}>Open Driver Navigation</a>}
         </>}
       </aside>
 

@@ -1,6 +1,6 @@
 # GeoPulse agent rules
 
-- **Decision:** This is a design-led project. Read docs/PRD.md, docs/DECISIONS.md, docs/OPEN_QUESTIONS.md, and the approved milestone before changing application code. M1 is verified. The user authorized starting M2 after M1 verification; implement through M2 only. User instructions can explicitly change phase gates.
+- **Decision:** This is a design-led project. Read docs/PRD.md, docs/DECISIONS.md, docs/OPEN_QUESTIONS.md, and the approved milestone before changing application code. M1 through M3 are verified. User instructions can explicitly change phase gates.
 - **Decision:** Work one approved milestone at a time. Write meaningful engine tests first, verify working steps, and commit them during the authorized build phase. Do not deploy or force-push without user authorization.
 - **Decision:** Keep backend/engine pure Java: no Spring, persistence, transport DTOs, or wall-clock/network dependencies. Application owns command serialization, transactions, adapters, and publication; frontend displays server-authoritative state.
 - **Decision:** Use PostgreSQL through Compose and Flyway, never substitute H2. Keep credentials out of source. Active world state stays in memory; unfinished runs become INTERRUPTED after restart.
