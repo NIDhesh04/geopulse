@@ -8,6 +8,7 @@ const descriptions:Record<string,{label:string;description:string;incidents:stri
   ROUTING_ONLY:{label:'Routing only',description:'Compare live and historical routing on an empty network.',incidents:'On-demand road closures'},
   TRAFFIC_SIGNALS:{label:'Traffic and signals',description:'Follow one ambulance through civilian queues and signal priority.',incidents:'On-demand closures, slowdowns, and demand changes'},
   FLEET_TRAFFIC:{label:'Ten ambulance conflict',description:'Coordinate ten ambulances competing for signal priority.',incidents:'Hidden incidents and operator-reviewed reports'},
+  PREDICTABLE_CONGESTION:{label:'Predictable corridor congestion',description:'Use historical travel times to anticipate a demand surge beyond the live window.',incidents:'Scheduled civilian demand surge'},
 };
 
 export function Landing() {

@@ -25,7 +25,7 @@
 ## Non-goals and deferred work
 
 - **Decision:** No real signal hardware, real traffic data requirement, paid/Google Maps services, civilian app, individual civilian driver physics, Pygame, or unqualified real-world accuracy claims.
-- **Decision:** Defer backtracking, arrival-time/time-dependent routing variants, trained ML, greedy/blended variants, distributed zone control/handoffs, authenticated role accounts, and replay scrubber unless explicitly reintroduced.
+- **Decision:** Use arrival-time routing for M4's calibrated historical profiles. Defer backtracking, trained ML, greedy/blended variants, distributed zone control/handoffs, authenticated role accounts, and replay scrubber unless explicitly reintroduced.
 - **Decision:** Do not add patient contacts, first aid, triage, hospital optimization, or other Emergency108 patient-side features.
 
 ## Success and review

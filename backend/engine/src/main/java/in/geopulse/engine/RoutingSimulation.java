@@ -25,6 +25,7 @@ public final class RoutingSimulation {
     private final Map<String,Set<String>> reportedIncidents = new TreeMap<>();private final Set<String> reported=new TreeSet<>();
     private final List<Event> pending=new ArrayList<>();
     private OperationalReports operationalReports = new OperationalReports();
+    private HistoricalProfile historicalProfile;
     private String ambulanceId = "AMB-001";
     private final Map<String, RoutingSimulation> additionalMissions = new TreeMap<>();
     private boolean fleetEnabled;
@@ -40,6 +41,14 @@ public final class RoutingSimulation {
         var simulation = new RoutingSimulation(graph, horizon);
         simulation.traffic = TrafficWorld.fixture(graph);
         simulation.priorityEnabled = priorityEnabled;
+        return simulation;
+    }
+
+    public static RoutingSimulation predictableCongestion(int horizon, boolean priorityEnabled, long seed,
+                                                          HistoricalProfile profile) {
+        var simulation = traffic(Graph.grid(5), horizon, priorityEnabled);
+        simulation.historicalProfile = Objects.requireNonNull(profile);
+        simulation.traffic.enableCorridorDemand(seed);
         return simulation;
     }
 
@@ -143,6 +152,7 @@ public final class RoutingSimulation {
         c.junctionWait = junctionWait;
         c.junctionArrival = junctionArrival;
         c.priorityRequest = priorityRequest;
+        c.historicalProfile = historicalProfile;
         c.operationalReports = operationalReports.copy();
         c.observedDepartureJunction = observedDepartureJunction;
         c.physical.putAll(physical);
@@ -281,9 +291,9 @@ public final class RoutingSimulation {
             historical = (road,t) -> Estimate.available(road.length() / traffic.historicalSpeed(road), "HISTORICAL");
             estimator = traffic.estimator(time, visible, Map.copyOf(physical), knownClosures, ambulanceRoad(), ambulanceId);
         }
-        var snap = new RoutingSnapshot(graph, time, live, historical, estimator, knownClosures, visible);
+        var snap = new RoutingSnapshot(graph, time, live, historical, estimator, knownClosures, visible, historicalProfile);
         var result=router.route(graph,node,incoming,destination,snap);
-        if(planned)replans++;explanation=new Explanation(Long.toString(replans+1),time,incoming,router.explain(graph,node,incoming,destination,snap,result),snap.liveEdges(),Map.copyOf(snap.roads()));
+        if(planned)replans++;explanation=new Explanation(Long.toString(replans+1),time,incoming,router.explain(graph,node,incoming,destination,snap,result),snap.liveEdges(),Map.copyOf(snap.roadsForRoute(result.edges(), incoming)));
         if(result.reachable()){
             if(planned&&!route.isEmpty()&&!route.equals(result.edges())){reroutes++;emit("REROUTED","Route changed at "+node);}
             if (!route.equals(result.edges()) || !planned || oldStatus.equals("STOPPED")) routeVersion++;

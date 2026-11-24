@@ -1,5 +1,6 @@
 package in.geopulse.application;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import in.geopulse.engine.CalibrationRunner;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +14,25 @@ import static org.junit.jupiter.api.Assertions.*;
 @Testcontainers
 @SpringBootTest
 class RunServiceTest {
+    @Test void predictableCongestionRunUsesTheReproduciblePackagedProfile() throws Exception {
+        assertEquals(CalibrationRunner.calibrate(CalibrationRunner.CALIBRATION_SEEDS), RunService.readCongestionProfile());
+        var created = runs.create("2", CalibrationRunner.DEMO_SEED, CalibrationRunner.SCENARIO, false);
+        var run = UUID.fromString(created.get("runId").toString());
+        assertEquals("PREDICTABLE_CONGESTION", created.get("mode"));
+        assertEquals("APPLIED", command(run, UUID.randomUUID(), "ACTIVATE",
+                Map.of("origin", "n00_00", "destination", "n00_04")).get("status"));
+        var mission = runs.mission(run, "AMB-001");
+        assertFalse(mission.ambulance().route().contains(CalibrationRunner.CORRIDOR));
+        var selectedHistoricalRoad = mission.ambulance().route().stream()
+                .filter(road -> !mission.explanation().liveEdges().contains(road)).findFirst().orElseThrow();
+        var estimate = mission.explanation().roads().get(selectedHistoricalRoad);
+        assertEquals("HISTORICAL", estimate.source());
+        assertTrue(estimate.reason().startsWith("Historical interval 20–") ||
+                estimate.reason().startsWith("Historical interval 40–"));
+        assertEquals(CalibrationRunner.CALIBRATION_SEEDS.toString(), jdbc.queryForObject(
+                "select scenario_snapshot #>> '{historicalProfile,calibrationSeeds}' from simulation_run where id=?",
+                String.class, run));
+    }
     @Test void fleetCommandsPublishSeparateOperationalRoutingAndTruthViews() throws Exception {
         var run = UUID.fromString(runs.create("2", 108, "fleet-conflict-5x5", true).get("runId").toString());
         assertEquals(10, ((List<?>) runs.snapshot(run).get("fleet")).size());

@@ -13,5 +13,15 @@
 <dependency><groupId>org.testcontainers</groupId><artifactId>postgresql</artifactId><scope>test</scope></dependency>
 <dependency><groupId>org.testcontainers</groupId><artifactId>junit-jupiter</artifactId><scope>test</scope></dependency>
 </dependencies>
-<build><plugins><plugin><groupId>org.springframework.boot</groupId><artifactId>spring-boot-maven-plugin</artifactId></plugin></plugins></build>
+<build>
+<resources>
+<resource><directory>src/main/resources</directory></resource>
+<resource>
+<directory>${project.basedir}/../../scenarios</directory>
+<targetPath>scenarios</targetPath>
+<includes><include>predictable-congestion-5x5.profile.tsv</include></includes>
+</resource>
+</resources>
+<plugins><plugin><groupId>org.springframework.boot</groupId><artifactId>spring-boot-maven-plugin</artifactId></plugin></plugins>
+</build>
 </project>

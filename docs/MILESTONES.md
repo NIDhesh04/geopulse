@@ -1,6 +1,6 @@
-# Milestones — M4 in progress
+# Milestones — M4 verified
 
-**Fact:** Prepared on 2026-11-23 after consolidation of Topics 1–10 and the design risk review. M1 through M3 have been verified. M4–M6 remain proposals.
+**Fact:** Prepared on 2026-11-23 after consolidation of Topics 1–10 and the design risk review. M1 through M4 have been verified. M5 and M6 remain planned.
 
 ## Delivery approach
 
@@ -12,7 +12,7 @@
 | **Decision: M1 approved** | One ambulance follows explainable hybrid routes on a synthetic map | Scaffold builds; real PostgreSQL/Flyway; deterministic routing; HTTP/STOMP controls and event history; no-signal fixture explicitly identified | Background flow, production junction forecasts, priority, multi-ambulance contention, polished driver screen |
 | **Decision: M2 authorized** | Ordinary traffic queues and signals affect a single ambulance | Conservation/storage/credits; signal timings and clearance; reported versus physical incidents; bounded forecasts; actual delays | Multi-ambulance conflict workflow and full benchmark suite |
 | **Decision: M3 authorized** | Multiple ambulances share junctions correctly | 10-ambulance contention, deterministic ordering, active-grant commitment, suspension and recovery; fleet/driver state isolation | 30-ambulance performance claim and external integration |
-| **Assumption: M4** | Complete polished control-room/driver product | Approved information modes, inspectors, report review, ETA states, responsive/keyboard behavior, local synthetic map, concise landing | Real operational deployment, individual civilian physics, auth expansion |
+| **Fact: M4 verified** | Polished control-room/driver product and calibrated routing fixture | Responsive and keyboard checks, scenario picker, reproducible historical profiles, projected historical estimates in the route inspector | Real operational deployment, individual civilian physics, auth expansion |
 | **Assumption: M5** | Reproducible comparison report and scale results | Paired schedules/warm starts, seven scenarios, completion-aware delays, exact recovery, seed summaries, 30-ambulance profiling | Claims about CoSiCoSt superiority or real-world accuracy |
 | **Assumption: M6** | Test Emergency108 hospital-leg handoff | Inspect real code; mapping/dedup/reassignment tests; pending police authorization; read-only simulated status | Real GPS ingestion/map matching, production completion writes, pickup-leg integration |
 
@@ -107,4 +107,15 @@
 
 **Assumption (planned milestone):** Polish the control room and driver experience, including responsive and keyboard behavior, inspector and report review details, and the concise landing experience. Calibrate time-indexed historical profiles against scenario demand with predictable bottlenecks, then freeze them before M5 evaluation.
 
-**Fact:** M4 Part 1 adds the landing page at `/welcome`, scenario selection, and responsive control room drawers. Keyboard selection exposes the same junction and road inspectors as map selection. Drawer dismissal restores focus. Incoming events append without moving keyboard focus or the current reading position. Historical profile calibration is M4 Part 2.
+**Fact:** M4 Part 1 adds the landing page at `/welcome`, scenario selection, and responsive control room drawers. Keyboard selection exposes the same junction and road inspectors as map selection. Drawer dismissal restores focus. Incoming events append without moving keyboard focus or the current reading position.
+
+**Fact:** M4 Part 2 adds the [predictable corridor congestion fixture](../scenarios/PREDICTABLE_CONGESTION.md). Historical-only and Hybrid both anticipate the distant congestion at activation. The application bundles the frozen profile and records its provenance with each run. The route inspector displays the projected interval on selected historical roads.
+
+## M5 — strategy evaluation and scale
+
+1. **Decision:** Prepare the seven core fixtures with paired demand, incident and mission schedules. Freeze historical profiles on the benchmark clock from independent incident-free calibration runs. Clone the 600-second warm state across configurations.
+2. **Decision:** Run Historical-only, Hybrid and All-live with priority enabled and disabled over 20 seeds per core fixture, plus a matched ordinary-traffic-only reference per seed. Measure across 1,800 seconds of evaluation and 600 seconds of follow-up.
+3. **Decision:** Report completion and unfinished missions, matched journey-time differences, civilian delay components, signed priority cost and queue recovery. Summarize seed-level medians and interquartile ranges.
+4. **Decision:** Profile the separate 10×10, 30-ambulance fixture over five seeds. Limit presentation claims to the tested scenarios and simulation assumptions.
+
+**Fact:** [The evaluation design](METRICS_AND_EVALUATION.md) defines the scenario matrix, recovery criterion and presentation rules.

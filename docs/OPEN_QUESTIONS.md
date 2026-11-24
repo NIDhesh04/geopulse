@@ -4,17 +4,10 @@
 
 ## Deferred routing extensions
 
-### Arrival-time predictions
+### Arrival-time forecasts beyond historical profiles
 
-- **Decision:** Deferred beyond the baseline. Baseline predictions use the current simulation clock.
-- **Assumption (unresolved):** A future variant will estimate edge-entry times along candidate paths and query forecasts for those times. Define this during variant design; do not silently introduce it now.
-- **Fact:** Accepting `(edge, time)` supports future forecast queries but does not by itself make the baseline search time-dependent.
-
-### Time-dependent shortest-path search
-
-- **Decision:** Study later rather than use time-dependent Dijkstra in the baseline.
-- **Assumption (unresolved):** Algorithm selection will depend on FIFO behavior (whether later entry can yield earlier exit), permitted waiting, and signal-delay behavior. Resolve before implementing this variant.
-- **Assumption (unresolved):** Future signal interventions and multi-ambulance reservations may influence forecasts. Resolve with their respective designs.
+- **Fact:** M4 implements time-dependent Dijkstra for frozen historical road and movement profiles with FIFO costs. Existing current-clock fixtures keep their baseline provider.
+- **Assumption (unresolved):** Future signal interventions and multi-ambulance reservations may influence projected live forecasts. Resolve with their respective designs.
 
 ### Backtracking
 

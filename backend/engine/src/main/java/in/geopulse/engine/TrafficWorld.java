@@ -40,6 +40,7 @@ public final class TrafficWorld {
     private final Map<String, State> signals = new TreeMap<>();
     private final Map<String, Map<String, String>> signalRequests = new TreeMap<>();
     private Profile history;
+    private Long corridorSeed;
     private final Map<String, QueuePosition> waitingAmbulances = new LinkedHashMap<>();
     private Map<String, Integer> occupiedByFleet = Map.of();
     private Map<String, Integer> movingByFleet = Map.of();
@@ -50,6 +51,18 @@ public final class TrafficWorld {
 
     public TrafficWorld(Graph graph) {
         this(network(graph, false));
+    }
+
+    static TrafficWorld calibrationWorld(Graph graph, long seed) {
+        var world = new TrafficWorld(graph);
+        world.enableCorridorDemand(seed);
+        return world;
+    }
+
+    void enableCorridorDemand(long seed) {
+        network.graph().edge(CalibrationRunner.CORRIDOR);
+        corridorSeed = seed;
+        backlog.putIfAbsent(CalibrationRunner.CORRIDOR, 0.0);
     }
 
     private TrafficWorld(Network network) {
@@ -138,6 +151,7 @@ public final class TrafficWorld {
         copy.signals.putAll(signals);
         copy.signalRequests.putAll(signalRequests);
         copy.history = history;
+        copy.corridorSeed = corridorSeed;
         copy.waitingAmbulances.putAll(waitingAmbulances);
         copy.occupiedByFleet = occupiedByFleet;
         copy.movingByFleet = movingByFleet;
@@ -410,7 +424,9 @@ public final class TrafficWorld {
         }
         crossings.keySet().forEach(waitingAmbulances::remove);
         for (var entry : backlog.entrySet()) {
-            double demandRate = physical.getOrDefault(entry.getKey(), Set.of()).contains("DEMAND_SURGE") ? 2 * ARRIVAL_RATE : ARRIVAL_RATE;
+            double baseRate = corridorSeed != null && entry.getKey().equals(CalibrationRunner.CORRIDOR)
+                    ? CalibrationRunner.demand(tick, corridorSeed) : ARRIVAL_RATE;
+            double demandRate = physical.getOrDefault(entry.getKey(), Set.of()).contains("DEMAND_SURGE") ? 2 * baseRate : baseRate;
             arrivals += demandRate;
             double demand = entry.getValue() + demandRate;
             double entered = Math.min(demand, Math.max(0,
@@ -434,6 +450,28 @@ public final class TrafficWorld {
         });
         priority = statuses.getOrDefault("AMB-001", "NONE");
         return new FleetCrossing(Map.copyOf(crossings), Map.copyOf(statuses));
+    }
+
+    void sampleHistorical(java.util.function.ObjDoubleConsumer<String> roadSample,
+                          java.util.function.ObjDoubleConsumer<Movement> movementSample) {
+        var occupancies = new TreeMap<String, Double>();
+        for (var edge : network.roads().values()) {
+            roadSample.accept(edge.id(), edge.length() / fleetSpeed(edge, Map.of()));
+            occupancies.put(edge.id(), civilianOccupancy(edge.id()));
+        }
+        network.junctions().forEach((id, junction) -> {
+            var state = signals.get(id);
+            for (var movement : junction.movements()) {
+                if (movement.outgoing().equals(EXIT)) continue;
+                double queued = queues.getOrDefault(movement, 0.0);
+                boolean green = state.phase() == NormalSignal.Phase.GREEN
+                        && junction.approaches().get(state.approach()).equals(movement.incoming());
+                double receivingShortfall = Math.max(0, occupancies.get(movement.outgoing()) - (STORAGE - 1));
+                // Summarize the observed queue, clearance, and receiving space as
+                // a delay estimate. The live estimator still runs a bounded forecast.
+                movementSample.accept(movement, (1 + queued + receivingShortfall) / DISCHARGE + (green ? 0 : 5));
+            }
+        });
     }
 
     private void enqueue(String road, double count) {

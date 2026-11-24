@@ -10,6 +10,7 @@ import {isDrawer, useWorkspaceDrawers, type Drawer} from './workspaceDrawers';
 
 const scenarioLabels: Record<string,string> = {
   ROUTING_ONLY:'Routing only', TRAFFIC_SIGNALS:'Traffic and signals', FLEET_TRAFFIC:'Ten ambulance conflict',
+  PREDICTABLE_CONGESTION:'Predictable corridor congestion',
 };
 
 export function App() {
@@ -217,7 +218,9 @@ export function App() {
             <summary><span>{scenario?.graph.edges.find(edge=>edge.id===candidate.edge)?.to ?? candidate.edge}<small>{readable(candidate.road.source)}</small></span>
               <span className="candidate-cost">{candidate.pathSeconds!==null?`${candidate.pathSeconds.toFixed(1)}s`:readable(candidate.outcome)}</span></summary>
             <div className="candidate-breakdown"><p>Road travel {candidate.road.seconds?.toFixed(1)??'—'}s · Junction wait {candidate.junction.seconds?.toFixed(1)??'—'}s</p>
-              <p>{candidate.road.reason ?? candidate.reason ?? readable(candidate.junction.source)}</p></div>
+              {candidate.road.reason&&<p>Road estimate · {candidate.road.reason}</p>}
+              <p>Junction estimate · {candidate.junction.reason ?? readable(candidate.junction.source)}</p>
+              {candidate.reason&&candidate.reason!==candidate.road.reason&&candidate.reason!==candidate.junction.reason&&<p>{candidate.reason}</p>}</div>
           </details>)}
         </section>}
         <RoadControls mode={mode} scenario={scenario} state={state} truth={truth} events={run.events} road={road} setRoad={setRoad} pending={pending} act={act}/>
