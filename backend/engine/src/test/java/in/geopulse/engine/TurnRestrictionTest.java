@@ -59,6 +59,17 @@ class TurnRestrictionTest {
         assertEquals(List.of("ab","bc","ce","ed"),simulation.ambulance().route());
     }
 
+    @Test void aShorterRestrictedPrefixDoesNotPruneALegalWayToTheSameIncomingRoad() {
+        var base=network(new TurnRestrictions(List.of(List.of("ab","bc","cd")),List.of()));
+        var roads=new ArrayList<>(base.edges());
+        roads.add(new Graph.Edge("af","a","f",1,1));
+        var graph=new Graph(base.nodes(),roads,base.turnRestrictions());
+        var simulation=new RoutingSimulation(graph,0);
+        simulation.incident("ce","ENTRY_CLOSED",true);
+        simulation.activate("a","d");
+        assertEquals(List.of("af","fb","bc","cd"),simulation.ambulance().route());
+    }
+
     @Test void rejectsNoncontiguousRestrictions() {
         assertThrows(IllegalArgumentException.class,()->network(
                 new TurnRestrictions(List.of(List.of("ab","ed")),List.of())));

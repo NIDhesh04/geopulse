@@ -35,9 +35,14 @@ java -jar backend/application/target/application-0.1.0-SNAPSHOT.jar --calibrate-
 
 **Fact:** The offline audit generated 2,097 nodes, 4,955 directed links, and 12 mapped signal nodes. It mapped all eight included restrictions, including one via-way restriction. The route reaches a mapped service road roughly 71 m from the SMS Hospital map pin after 3,688 m of driving. The pin and service-road check do not establish a valid ambulance gate or actual controller timing.
 
-**Decision:** Keep the curated SMS fixture in the application until hospital entry is verified and both the Java routing and civilian flow models enforce imported restrictions. The offline validator keeps the required road history to enforce via-way restrictions. The map uses local OSM node IDs to preserve grade-separated crossings.
+**Fact:** The Java router and aggregate civilian simulator now keep the relevant part of a vehicle's recent road sequence to enforce via-way restrictions. Java Dijkstra and the offline auditor agreed on the same 49 directed links and 3,688 m route on the frozen extract using free-flow weights. Civilian queue tests verify legal turns and conservation. The map uses local OSM node IDs to preserve grade-separated crossings.
+
+**Decision:** Keep the curated SMS fixture in the application while the hospital entrance is unverified and the larger audited graph lacks its own live traffic scenario and calibration. The free-flow check establishes topology and restriction handling.
 
 ```sh
 python3 scenarios/import_osm_corridor.py scenarios/jaipur-driving-2026-11-24.osm.gz --date 2026-11-24 > /tmp/jaipur-driving-audit.json
+python3 scenarios/import_osm_corridor.py scenarios/jaipur-driving-2026-11-24.osm.gz --date 2026-11-24 --engine-graph > /tmp/jaipur-engine-graph.json
+./backend/mvnw -f backend/pom.xml -DskipTests package
+java -jar backend/application/target/application-0.1.0-SNAPSHOT.jar --check-jaipur-import /tmp/jaipur-engine-graph.json 316929009 10579711493
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scenarios -p test_import_osm_corridor.py
 ```
