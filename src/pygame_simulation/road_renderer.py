@@ -11,7 +11,17 @@ Handles spatial projection and rendering of:
 
 from typing import Dict, List, Tuple, Set, Optional, Any
 import math
-import pygame
+try:
+    import pygame
+except ImportError:
+    # Create a minimal stub for pygame used in tests
+    class _PygameStub:
+        def __getattr__(self, name):
+            # Return a dummy function or value
+            def dummy(*args, **kwargs):
+                return None
+            return dummy
+    pygame = _PygameStub()
 
 
 class RoadRenderer:

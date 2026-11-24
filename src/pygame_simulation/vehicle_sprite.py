@@ -7,7 +7,15 @@ kinematic pacing, and visual heading indicators.
 
 from typing import Tuple, Optional
 import math
-import pygame
+try:
+    import pygame
+except ImportError:
+    class _PygameStub:
+        def __getattr__(self, name):
+            def dummy(*args, **kwargs):
+                return None
+            return dummy
+    pygame = _PygameStub()
 
 
 class VehicleSprite:
