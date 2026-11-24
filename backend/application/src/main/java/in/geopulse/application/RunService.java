@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.*;
 import in.geopulse.engine.*;
 import jakarta.annotation.*;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -25,11 +26,15 @@ public class RunService {
     private final HistoricalProfile congestionProfile = readCongestionProfile();
     private final HistoricalProfile jaipurProfile = JaipurScenario.profile();
     private final Map<String,Object> jaipurScenario;
+    private final Emergency108Handoffs emergency108;
+    @Value("${geopulse.emergency108.test-enabled:false}")
+    private boolean emergency108TestEnabled;
     private final JdbcTemplate db;private final ObjectMapper json;private final TransactionTemplate tx;private final SimpMessagingTemplate messages;
     private final ConcurrentMap<UUID,Run> active=new ConcurrentHashMap<>();
     private static final class Run {
         final UUID id;final long seed;final String scenarioId;final boolean priorityEnabled;final ScheduledExecutorService loop;
         RoutingSimulation simulation;long revision,eventSequence;boolean paused=true;int speed=1;
+        List<Emergency108Handoffs.Pending> pendingEmergency108=List.of();
         volatile boolean fault;
         volatile Published published;
         long lastTick=System.nanoTime(),lastPublish;double credit;
@@ -49,6 +54,7 @@ public class RunService {
                              Map<String, Set<String>> physicalEffects, Map<String, TrafficWorld.RoadTruth> roadTruth) {}
     public RunService(JdbcTemplate db,ObjectMapper json,TransactionTemplate tx,SimpMessagingTemplate messages){
         this.db=db;this.json=json;this.tx=tx;this.messages=messages;
+        emergency108 = new Emergency108Handoffs(db);
         var definition = JaipurScenario.read(json);
         definition.put("version", 2);
         definition.put("demoSeed", CalibrationRunner.DEMO_SEED);
@@ -139,11 +145,24 @@ public class RunService {
                 "physicalEffects", published.physicalEffects(), "roads", published.roadTruth());
     }
     public synchronized Map<String,Object> accept(UUID runId,Command command){
+        if (command!=null && Emergency108Handoffs.internalCommand(command.type()))
+            throw new ApiException(400,"Use the dedicated Emergency108 test endpoint");
+        return acceptCommand(runId,command);
+    }
+    synchronized Map<String,Object> acceptEmergency108(UUID runId,Command command) {
+        if (command==null || !Emergency108Handoffs.internalCommand(command.type()))
+            throw new ApiException(400,"Unknown Emergency108 handoff command");
+        return acceptCommand(runId,command);
+    }
+    private Map<String,Object> acceptCommand(UUID runId,Command command) {
         if(command==null||command.commandId()==null||command.type()==null||command.payload()==null||!command.payload().isObject())throw new ApiException(400,"commandId, type and object payload are required");
-        var existing=db.queryForList("select type,payload from run_command where run_id=? and id=?",runId,command.commandId());
+        var existing=db.queryForList("select type,payload = ?::jsonb as same_payload from run_command where run_id=? and id=?",
+                encode(command.payload()),runId,command.commandId());
         if(!existing.isEmpty()){
-            try{var old=existing.getFirst();if(!old.get("type").equals(command.type())||!json.readTree(old.get("payload").toString()).equals(command.payload()))throw new ApiException(409,"Command ID already has different content");}
-            catch(com.fasterxml.jackson.core.JsonProcessingException e){throw new IllegalStateException(e);}return command(runId,command.commandId());
+            var old=existing.getFirst();
+            if(!old.get("type").equals(command.type())||!Boolean.TRUE.equals(old.get("same_payload")))
+                throw new ApiException(409,"Command ID already has different content");
+            return command(runId,command.commandId());
         }
         Run r=require(runId);if(r.fault)throw new ApiException(503,"Run stopped after persistence failure");
         tx.executeWithoutResult(s->{long sequence=db.queryForObject("update simulation_run set acceptance_sequence=acceptance_sequence+1 where id=? returning acceptance_sequence",Long.class,runId);
@@ -151,6 +170,48 @@ public class RunService {
         r.loop.execute(()->apply(r,command,false));return command(runId,command.commandId());
     }
     public Map<String,Object> command(UUID run,UUID command){var rows=db.queryForList("select id::text as command_id,type,status,applied_tick,boundary_ordinal::text,reason,acceptance_sequence::text from run_command where run_id=? and id=?",run,command);if(rows.isEmpty())throw new ApiException(404,"Command not found");return rows.getFirst();}
+    Map<String,Object> emergency108Status(UUID run,long assignment) {
+        return tx.execute(transaction -> {
+            // The command boundary updates this row last. Hold a shared lock while
+            // reading the handoff and fleet so both come from the same commit.
+            var result = db.queryForList("""
+                    select status,simulation_time,traffic_result::text from simulation_run where id=? for share
+                    """,run);
+            if (result.isEmpty()) throw new ApiException(404,"Run not found");
+            var row=result.getFirst();
+            var handoff=emergency108.find(run,assignment);
+            if (handoff==null) throw new ApiException(404,"Assignment handoff does not exist in this run");
+            JsonNode mission=json.getNodeFactory().missingNode();
+            if (Emergency108Handoffs.activated(handoff) && row.get("traffic_result")!=null) {
+                try {
+                    for (JsonNode a : json.readTree(row.get("traffic_result").toString()).path("fleet")) {
+                        if (handoff.ambulanceId().equals(a.path("id").asText())) { mission=a; break; }
+                    }
+                } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+                    throw new IllegalStateException("Cannot read persisted handoff status",e);
+                }
+            }
+            Run activeRun=active.get(run);
+            String runStatus=activeRun!=null&&activeRun.fault?"PERSISTENCE_FAULT":row.get("status").toString();
+            var view=new LinkedHashMap<String,Object>();
+            view.put("simulated",true);
+            view.put("runId",run);
+            view.put("assignmentRef",handoff.assignmentRef());
+            view.put("emergencyRef",handoff.emergencyRef());
+            view.put("journeyLeg",handoff.journeyLeg());
+            view.put("ambulanceId",handoff.ambulanceId());
+            view.put("status",Emergency108Handoffs.status(handoff,mission,runStatus));
+            view.put("simulationTimeSeconds",row.get("simulation_time"));
+            view.put("submissionCommandId",handoff.submissionCommand());
+            view.put("authorizationCommandId",handoff.authorizationCommand());
+            view.put("replacedBy",handoff.replacedBy());
+            view.put("journeyStatus",mission.path("status").asText(null));
+            view.put("estimatedArrival",mission.path("estimatedArrival").isNumber()&&!Set.of("INTERRUPTED","PERSISTENCE_FAULT").contains(runStatus)
+                    ? mission.get("estimatedArrival").doubleValue():null);
+            view.put("stopReason",mission.path("reason").asText(null));
+            return view;
+        });
+    }
     public List<Map<String,Object>> events(UUID run,long after){
         if(after<0)throw new ApiException(400,"Event cursor cannot be negative");
         return db.query("select sequence,tick,type,payload from run_event where run_id=? and sequence>? order by sequence limit 200",(rs,n)->{
@@ -187,9 +248,17 @@ public class RunService {
     private void apply(Run r,Command command,boolean advance){
         if(r.fault)return;
         RoutingSimulation candidate=r.simulation.copy();boolean paused=r.paused;int speed=r.speed;String outcome="APPLIED",rejection=null;
+        Runnable handoffWrite=null;
         try{
             if(command!=null){JsonNode p=command.payload();switch(command.type()){
-                case "ACTIVATE"->candidate.activate(ambulanceId(p),text(p,"origin"),text(p,"destination"));
+                case "ACTIVATE"->{
+                    String ambulance=ambulanceId(p);
+                    if (FLEET_SCENARIO.equals(r.scenarioId) && emergency108.reserved(r.id,ambulance))
+                        throw new IllegalArgumentException("Use Emergency108 authorization for this pending mission");
+                    candidate.activate(ambulance,text(p,"origin"),text(p,"destination"));
+                }
+                case Emergency108Handoffs.SUBMIT, Emergency108Handoffs.AUTHORIZE ->
+                    handoffWrite=emergency108.prepare(r.id,r.scenarioId,r.priorityEnabled,candidate,command);
                 case "PLAY"->{if(candidate.completed())throw new IllegalArgumentException("Journey completed; create a new run");paused=false;}
                 case "PAUSE"->paused=true;
                 case "STEP"->{if(!paused)throw new IllegalArgumentException("Pause before stepping");if(candidate.completed())throw new IllegalArgumentException("Journey completed");candidate.step();}
@@ -218,18 +287,25 @@ public class RunService {
                 default->throw new IllegalArgumentException("Unsupported command: "+command.type());
             }}else if(advance)candidate.step();
         }catch(IllegalArgumentException e){outcome="REJECTED";rejection=e.getMessage();candidate=r.simulation.copy();paused=r.paused;speed=r.speed;}
+        catch(org.springframework.dao.DataAccessException failure){r.fault=true;return;}
         if(candidate.completed())paused=true;
         List<RoutingSimulation.Event> emitted=new ArrayList<>(candidate.drainEvents());
         boolean privateIncident = command != null && FLEET_SCENARIO.equals(r.scenarioId) && command.type().equals("INCIDENT");
         if (privateIncident) emitted.removeIf(event -> event.type().equals("PHYSICAL_INCIDENT"));
         if(command!=null && !privateIncident)emitted.add(new RoutingSimulation.Event(candidate.time(),"COMMAND_"+outcome,command.type()+": "+(rejection==null?"applied":rejection)));
         final RoutingSimulation next=candidate;final String appliedOutcome=outcome,reason=rejection;
+        final Runnable committedHandoff=handoffWrite;
         final long revision=r.revision+1,lastEvent=r.eventSequence+emitted.size();
         String runStatus=candidate.completed()?"COMPLETED":paused?"PAUSED":"RUNNING";
         List<Map<String,Object>> notifications=new ArrayList<>();long seq=r.eventSequence;
         for(var event:emitted){Map<String,Object> data=new LinkedHashMap<>();data.put("message",event.type().equals("PHYSICAL_INCIDENT")?"Physical scenario changed":event.message());if(command!=null)data.put("commandId",command.commandId().toString());notifications.add(Map.of("sequence",Long.toString(++seq),"time",event.time(),"type",event.type(),"data",data));}
         try{
-            tx.executeWithoutResult(s->{
+            r.pendingEmergency108=tx.execute(s->{
+                // Serialize coherent handoff status reads with handoff and run writes.
+                if(committedHandoff!=null) {
+                    db.queryForObject("select id from simulation_run where id=? for update",UUID.class,r.id);
+                    committedHandoff.run();
+                }
                 if(command!=null)db.update("update run_command set status=?,applied_tick=?,boundary_ordinal=?,reason=? where run_id=? and id=?",appliedOutcome,r.simulation.time(),revision,reason,r.id,command.commandId());
                 for(var event:notifications)db.update("insert into run_event(run_id,sequence,tick,type,payload) values (?,?,?,?,?::jsonb)",r.id,Long.parseLong(event.get("sequence").toString()),event.get("time"),event.get("type"),encode(event.get("data")));
                 var traffic = next.trafficState();
@@ -246,6 +322,7 @@ public class RunService {
                 }
                 String measured = measurements.isEmpty() ? null : encode(measurements);
                 db.update("update simulation_run set status=?,revision=?,event_sequence=?,simulation_time=?,ambulance_result=?::jsonb,traffic_result=?::jsonb where id=?",runStatus,revision,lastEvent,next.time(),encode(next.ambulance()),measured,r.id);
+                return committedHandoff!=null&&emergency108TestEnabled?emergency108.pending(r.id):r.pendingEmergency108;
             });
         }catch(RuntimeException failure){r.fault=true;return;}
         r.simulation=next;r.paused=paused;r.speed=speed;r.revision=revision;r.eventSequence=lastEvent;
@@ -267,6 +344,7 @@ public class RunService {
         view.put("runStatus",sim.completed()?"COMPLETED":paused?"PAUSED":"RUNNING");view.put("ambulance",sim.ambulance());view.put("explanation",fleetScenario?null:sim.explanation());view.put("reportedClosures",sim.reported());
         var fleet = sim.fleetView();
         view.put("fleet", fleet.values().stream().map(RoutingSimulation.MissionView::ambulance).toList());
+        if (fleetScenario && emergency108TestEnabled) view.put("pendingEmergency108",r.pendingEmergency108);
         view.put("reports",sim.operationalReports().reports());
         view.put("acknowledgements",sim.operationalReports().acknowledgements());
         var traffic = sim.trafficState();

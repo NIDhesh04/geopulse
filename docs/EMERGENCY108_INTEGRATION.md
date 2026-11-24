@@ -1,6 +1,6 @@
 # Emergency108 integration — approved Topic 10
 
-**Fact:** Consolidated on 2026-11-23 from the supplied Emergency108 description and explicit Topic 10 approval. The source code, deployed behavior, exact payloads, and assignment identifiers have not been independently inspected.
+**Fact:** The test adapter was checked against Emergency108 revision `3dd116a5a59ab32716682be20077c03777522c69`. The driver pickup transaction records the destination hospital on the existing assignment and sets the emergency to `TO_HOSPITAL`. The generated assignment row ID is the stable `assignmentRef`. Reassignment creates a different row. The pickup response contains the hospital details, and the existing assignment events carry emergency and ambulance IDs. A live producer would need to send the full handoff after the pickup transaction commits. [Pickup transaction](https://github.com/anupamkushwaha85/emergency-dispatch-system/blob/3dd116a5a59ab32716682be20077c03777522c69/src/main/java/com/emergency/emergency108/controller/DriverController.java#L246-L324) · [Assignment identity](https://github.com/anupamkushwaha85/emergency-dispatch-system/blob/3dd116a5a59ab32716682be20077c03777522c69/src/main/java/com/emergency/emergency108/entity/EmergencyAssignment.java#L12-L63)
 
 ## Ownership
 
@@ -31,3 +31,30 @@
 
 - **Decision:** Test one mapped hospital-leg handoff; pending authorization; duplicate delivery; changed assignment; missing mapping; unsupported leg; stale/interrupted run; and read-only status after simulated arrival.
 - **Decision:** Verify no simulated location/completion writes reach Emergency108, no engine dependency is added, and both projects' independent lifecycle rules remain intact.
+
+## Local M6 walkthrough
+
+**Fact:** The endpoint is opt-in and the normal backend still binds to loopback. For the test preview start the application with `--geopulse.emergency108.test-enabled=true`. Select **Ten ambulance conflict**, create a run, and choose **Replay sample pickup**. **Authorize hospital leg** applies the queued command and starts the mission clock. Use Play to advance the simulator.
+
+**Decision:** The local fixture maps external ambulance IDs 301 and 302 to AMB-001 and AMB-008, and external hospital ID 501 to `n04_04`. These are test identifiers. The upstream backend and deployed services are outside the local replay.
+
+**Fact:** Test clients may submit a normalized pickup using `POST /api/test-integrations/emergency108/runs/{runId}/handoffs`.
+
+```json
+{
+  "commandId": "baa74299-612a-465c-88e0-e56935f39f02",
+  "handoff": {
+    "assignmentRef": 7001,
+    "emergencyRef": 410,
+    "ambulanceRef": 301,
+    "destinationRef": 501,
+    "journeyLeg": "TO_HOSPITAL",
+    "emergencyStatus": "TO_HOSPITAL",
+    "assignmentStatus": "ACCEPTED"
+  }
+}
+```
+
+**Fact:** Poll the existing command endpoint until its outcome is final. Fetch the read-only simulated handoff state at `GET …/handoffs/7001`. The police action uses `POST …/handoffs/7001/authorize` with a fresh `commandId`. Keep the same command ID for a transport retry. Replaying a previously accepted assignment with a different command ID still preserves the original mission.
+
+**Decision:** A newer source assignment can supersede a pending assignment or an authorized one with a different available simulated ambulance. If the previous ambulance is already active, it retains its physical state and its priority is suspended. A replacement must still be separately authorized. After restart an unfinished run is reported as interrupted and requires a new simulation run.

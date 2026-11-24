@@ -27,10 +27,12 @@ export function useRun(initialRunId?:string|null){
   const timer=setInterval(()=>{if(Date.now()-lastSeen>5000)setConnected(false);},500);
   return()=>{alive=false;clearInterval(timer);window.removeEventListener('offline',disconnected);void client.deactivate();};
  },[runId]);
- async function send(type:string,payload:Record<string,unknown>={}){
+ async function send(type:string,payload:Record<string,unknown>={},handoffAction?:string){
   if(!runId)throw new Error('Create a run first');const target=runId;setPending(type);setError('');
   try{
-   const commandId=crypto.randomUUID();let result=await api<{status:string;reason?:string}>(`/runs/${target}/commands`,{commandId,type,payload});
+   const commandId=crypto.randomUUID();
+   const endpoint=handoffAction?`/test-integrations/emergency108/runs/${target}/handoffs/${handoffAction}`:`/runs/${target}/commands`;
+   let result=await api<{status:string;reason?:string}>(endpoint,handoffAction?{commandId}:{commandId,type,payload});
    for(let count=0;result.status==='ACCEPTED'&&count<100;count++){await new Promise(r=>setTimeout(r,100));result=await api(`/runs/${target}/commands/${commandId}`);}
    if(result.status==='ACCEPTED')throw new Error('Command remains pending; reconnect to inspect its outcome');
    if(result.status==='REJECTED')throw new Error(result.reason??'Command rejected');

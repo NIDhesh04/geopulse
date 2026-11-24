@@ -12,8 +12,101 @@ import org.testcontainers.junit.jupiter.*;
 import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 @Testcontainers
-@SpringBootTest
+@SpringBootTest(properties="geopulse.emergency108.test-enabled=true")
 class RunServiceTest {
+    @Test void emergency108HandoffSurvivesRetriesAndRequiresExplicitAuthorization() throws Exception {
+        var run = UUID.fromString(runs.create("2",108,"fleet-conflict-5x5",true).get("runId").toString());
+        var original = hospitalLeg(7001,301);
+        var transport = UUID.randomUUID();
+        assertEquals("APPLIED", integrationCommand(run,transport,"EMERGENCY108_HANDOFF",original).get("status"));
+        var pending = runs.emergency108Status(run,7001);
+        assertEquals("PENDING_AUTHORIZATION",pending.get("status"));
+        assertNull(runs.mission(run,"AMB-001").ambulance().activatedAt());
+        assertEquals("APPLIED",integrationCommand(run,transport,"EMERGENCY108_HANDOFF",original).get("status"));
+        assertEquals("APPLIED",integrationCommand(run,UUID.randomUUID(),"EMERGENCY108_HANDOFF",original).get("status"));
+        assertEquals("REJECTED",command(run,UUID.randomUUID(),"ACTIVATE",
+                Map.of("ambulanceId","AMB-001","origin","n00_00","destination","n04_04")).get("status"));
+        assertEquals("APPLIED",integrationCommand(run,UUID.randomUUID(),"EMERGENCY108_AUTHORIZE",
+                Map.of("assignmentRef",7001)).get("status"));
+        assertEquals("ACTIVE",runs.emergency108Status(run,7001).get("status"));
+        assertEquals(0L,runs.mission(run,"AMB-001").ambulance().activatedAt());
+        assertEquals("APPLIED",integrationCommand(run,UUID.randomUUID(),"EMERGENCY108_AUTHORIZE",
+                Map.of("assignmentRef",7001)).get("status"));
+        for(int tick=0;tick<30&&runs.mission(run,"AMB-001").ambulance().edge()==null;tick++)
+            assertEquals("APPLIED",command(run,UUID.randomUUID(),"STEP",Map.of()).get("status"));
+        var occupiedRoad=runs.mission(run,"AMB-001").ambulance().edge();
+        assertNotNull(occupiedRoad);
+        assertEquals("APPLIED",integrationCommand(run,UUID.randomUUID(),"EMERGENCY108_HANDOFF",hospitalLeg(7002,302)).get("status"));
+        assertEquals("SUPERSEDED",runs.emergency108Status(run,7001).get("status"));
+        assertEquals("PENDING_AUTHORIZATION",runs.emergency108Status(run,7002).get("status"));
+        assertTrue(runs.mission(run,"AMB-001").prioritySuspended());
+        assertEquals(occupiedRoad,runs.mission(run,"AMB-001").ambulance().edge());
+        assertNotNull(runs.mission(run,"AMB-001").ambulance().activatedAt());
+        assertNull(runs.mission(run,"AMB-008").ambulance().activatedAt());
+        assertEquals("REJECTED",integrationCommand(run,UUID.randomUUID(),"EMERGENCY108_AUTHORIZE",
+                Map.of("assignmentRef",7001)).get("status"));
+        assertEquals(2,jdbc.queryForObject("select count(*) from emergency108_handoff where run_id=?",Integer.class,run));
+    }
+
+    @Test void emergency108ReportsArrivalWithoutAnExternalCompletionAndReadsInterruptedRuns() throws Exception {
+        var run=UUID.fromString(runs.create("2",108,"fleet-conflict-5x5",true).get("runId").toString());
+        assertEquals("APPLIED",integrationCommand(run,UUID.randomUUID(),"EMERGENCY108_HANDOFF",hospitalLeg(7020,301)).get("status"));
+        assertEquals("APPLIED",integrationCommand(run,UUID.randomUUID(),"EMERGENCY108_AUTHORIZE",
+                Map.of("assignmentRef",7020)).get("status"));
+        command(run,UUID.randomUUID(),"SET_SPEED",Map.of("speed",60));
+        command(run,UUID.randomUUID(),"PLAY",Map.of());
+        for(int i=0;i<300&&runs.mission(run,"AMB-001").ambulance().arrivedAt()==null;i++)Thread.sleep(40);
+        command(run,UUID.randomUUID(),"PAUSE",Map.of());
+        var status=runs.emergency108Status(run,7020);
+        assertEquals("ARRIVED",status.get("status"));
+        assertEquals(Boolean.TRUE,status.get("simulated"));
+        assertEquals("ARRIVED",status.get("journeyStatus"));
+        assertEquals("AUTHORIZED",jdbc.queryForObject("select status from emergency108_handoff where run_id=?",String.class,run));
+        long eventCount=runs.events(run,0).size();
+        assertEquals(status,runs.emergency108Status(run,7020));
+        assertEquals(eventCount,runs.events(run,0).size());
+
+        var independent=new RunService(jdbc,json,tx,org.mockito.Mockito.mock(org.springframework.messaging.simp.SimpMessagingTemplate.class));
+        var restarted=new RunService(jdbc,json,tx,org.mockito.Mockito.mock(org.springframework.messaging.simp.SimpMessagingTemplate.class));
+        try {
+            var stale=UUID.fromString(independent.create("2",108,"fleet-conflict-5x5",true).get("runId").toString());
+            var command=UUID.randomUUID();
+            independent.acceptEmergency108(stale,new RunService.Command(command,"EMERGENCY108_HANDOFF",json.valueToTree(hospitalLeg(7030,302))));
+            for(int i=0;i<100&&independent.command(stale,command).get("status").equals("ACCEPTED");i++)Thread.sleep(20);
+            assertEquals("PENDING_AUTHORIZATION",independent.emergency108Status(stale,7030).get("status"));
+            independent.shutdown();
+            restarted.startup();
+            assertEquals("INTERRUPTED",restarted.emergency108Status(stale,7030).get("status"));
+            var rejected=assertThrows(RunService.ApiException.class,()->restarted.acceptEmergency108(stale,
+                    new RunService.Command(UUID.randomUUID(),"EMERGENCY108_AUTHORIZE",json.valueToTree(Map.of("assignmentRef",7030)))));
+            assertEquals(410,rejected.status);
+        } finally {
+            independent.shutdown();
+            restarted.shutdown();
+        }
+    }
+
+    @Test void emergency108RejectsUnknownMappingsPickupAndOlderAssignments() throws Exception {
+        var run = UUID.fromString(runs.create("0",108,"fleet-conflict-5x5",false).get("runId").toString());
+        var pickup = new HashMap<>(hospitalLeg(7010,301));
+        pickup.put("journeyLeg","PICKUP");
+        assertEquals("REJECTED",integrationCommand(run,UUID.randomUUID(),"EMERGENCY108_HANDOFF",pickup).get("status"));
+        assertEquals("REJECTED",integrationCommand(run,UUID.randomUUID(),"EMERGENCY108_HANDOFF",hospitalLeg(7010,999)).get("status"));
+        assertEquals("APPLIED",integrationCommand(run,UUID.randomUUID(),"EMERGENCY108_HANDOFF",hospitalLeg(7012,302)).get("status"));
+        assertEquals("REJECTED",integrationCommand(run,UUID.randomUUID(),"EMERGENCY108_HANDOFF",hospitalLeg(7011,301)).get("status"));
+        assertThrows(RunService.ApiException.class,()->runs.accept(run,new RunService.Command(UUID.randomUUID(),
+                "EMERGENCY108_AUTHORIZE",json.valueToTree(Map.of("assignmentRef",7012)))));
+    }
+
+    private Map<String,Object> hospitalLeg(long assignment,long ambulance) {
+        return Map.of("assignmentRef",assignment,"emergencyRef",410,"ambulanceRef",ambulance,"destinationRef",501,
+                "journeyLeg","TO_HOSPITAL","emergencyStatus","TO_HOSPITAL","assignmentStatus","ACCEPTED");
+    }
+
+    private Map<String,Object> integrationCommand(UUID run,UUID id,String type,Map<String,?> payload) throws Exception {
+        runs.acceptEmergency108(run,new RunService.Command(id,type,json.valueToTree(payload)));
+        return awaitCommand(run,id);
+    }
     @Test void jaipurCompletesInEveryInformationModeUsingItsPackagedProfile() {
         var definition = JaipurScenario.read(json);
         var graph = (in.geopulse.engine.Graph) definition.get("graph");
@@ -115,6 +208,9 @@ class RunServiceTest {
     @Autowired RunService runs; @Autowired ObjectMapper json; @Autowired JdbcTemplate jdbc;
     Map<String,Object> command(UUID run,UUID id,String type,Map<String,Object> payload)throws Exception{
         runs.accept(run,new RunService.Command(id,type,json.valueToTree(payload)));
+        return awaitCommand(run,id);
+    }
+    private Map<String,Object> awaitCommand(UUID run,UUID id) throws Exception {
         for (int i=0;i<100;i++) {
             var result=runs.command(run,id);
             if (!result.get("status").equals("ACCEPTED")

@@ -13,6 +13,7 @@ export type RoadTruth = {occupancy:number;queued:number;capacity:number};
 export type SimulationTruth = {stateRevision:string;simulationTimeSeconds:number;physicalEffects:Record<string,string[]>;roads:Record<string,RoadTruth>};
 export type OperationalReport = {id:string;ambulanceId:string;road:string;closure:boolean;submittedAt:number;status:string;reviewedAt:number|null};
 export type Snapshot = {
+ pendingEmergency108?:{assignmentRef:string;emergencyRef:string;ambulanceId:string;origin:string;destination:string}[];
  scenarioId?:string;
  traffic?:{
    priority:string;

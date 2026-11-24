@@ -65,6 +65,7 @@ export function App() {
   const departure = (id ? scenario?.departureByAmbulance?.[id] : undefined) ?? scenario?.origin;
   const elapsed = state?.simulationTimeSeconds ?? 0;
   const pending = Boolean(run.pending);
+  const testHandoffs = state?.pendingEmergency108;
   const prioritySuspended = mission?.data?.prioritySuspended ?? (id === 'AMB-001' && state?.prioritySuspended);
   const priorityState = prioritySuspended ? 'suspended' : state?.priorityEnabled
     ? readable(mission?.data?.priority ?? (id === 'AMB-001' ? traffic?.priority : undefined) ?? 'NONE') : 'disabled';
@@ -117,6 +118,20 @@ export function App() {
         </select>
         <button className="secondary full" disabled={pending || !scenarios.length} onClick={create}>{state?'New run':'Create run'}</button>
 
+        {testHandoffs&&<section className="scenario-tools" aria-labelledby="emergency108-heading">
+          <h3 id="emergency108-heading">Emergency108 test handoff</h3>
+          {testHandoffs.length===0&&<button className="secondary full" disabled={pending||!run.connected}
+            onClick={()=>void run.send('Replay pickup',{},'replay-example').catch(()=>{})}>Replay sample pickup</button>}
+          {testHandoffs.map(handoff=><div key={handoff.assignmentRef} className="handoff-review">
+            <strong>{handoff.ambulanceId} · Assignment {handoff.assignmentRef}</strong>
+            <p>Awaiting police authorization</p>
+            <button className="primary full" disabled={pending||!run.connected}
+              onClick={()=>void run.send('Authorize hospital leg',{},`${encodeURIComponent(handoff.assignmentRef)}/authorize`).catch(()=>{})}>
+              Authorize hospital leg
+            </button>
+          </div>)}
+        </section>}
+
         <div className="section-label">FLEET <span>{fleet.length} {fleet.length===1?'ambulance':'ambulances'}</span></div>
         <label className="field-label" htmlFor="fleet-search">Search fleet</label>
         <input id="fleet-search" type="search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Ambulance ID"/>
@@ -137,7 +152,8 @@ export function App() {
           <div><span className="point hospital"/><span><small>DESTINATION</small>{selected.activatedAt===null
             ? scenario?.nodeNames?.[scenario.destination]??scenario?.destination
             : scenario?.nodeNames?.[selected.destination]??selected.destination}</span></div></div>
-          <button className="primary full" disabled={pending || selected.status!=='IDLE' || !departure || !scenario} onClick={()=>
+          <button className="primary full" disabled={pending || selected.status!=='IDLE' || !departure || !scenario
+            || testHandoffs?.some(handoff=>handoff.ambulanceId===id)} onClick={()=>
             act('ACTIVATE',{ambulanceId:id,origin:departure,destination:scenario?.destination})}>Activate mission</button>
           {state && <a className="secondary full driver-link" href={`/driver?run=${encodeURIComponent(state.runId)}&ambulance=${encodeURIComponent(selected.id)}`}>Open Driver Navigation</a>}
         </>}
