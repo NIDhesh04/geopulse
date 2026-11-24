@@ -44,10 +44,12 @@ public final class RoutingSimulation {
         return simulation;
     }
 
-    public static RoutingSimulation geographicTraffic(Graph graph, int horizon, boolean priorityEnabled, String origin) {
+    public static RoutingSimulation geographicTraffic(Graph graph, int horizon, boolean priorityEnabled, String origin,
+                                                      long seed, HistoricalProfile profile) {
         graph.node(origin);
         var simulation = new RoutingSimulation(graph, horizon);
-        simulation.traffic = TrafficWorld.geographicFixture(graph, origin);
+        simulation.traffic = TrafficWorld.geographicFixture(graph, origin, seed);
+        simulation.historicalProfile = Objects.requireNonNull(profile);
         simulation.priorityEnabled = priorityEnabled;
         simulation.node = origin;
         return simulation;

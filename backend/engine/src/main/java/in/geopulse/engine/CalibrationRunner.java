@@ -11,6 +11,7 @@ public final class CalibrationRunner {
     public static final String CORRIDOR = "n00_02_n00_03";
     public static final long DEMO_SEED = 108;
     public static final List<Long> CALIBRATION_SEEDS = List.of(-1001L, -1002L, -1003L);
+    public static final List<Long> GEOGRAPHIC_CALIBRATION_SEEDS = List.of(-1101L, -1102L, -1103L);
     public static final List<Long> CORE_BENCHMARK_SEEDS = LongStream.range(1000, 1020).boxed().toList();
     public static final List<Long> SCALE_BENCHMARK_SEEDS = LongStream.range(2000, 2005).boxed().toList();
     public static final int BUCKET_SECONDS = 20;
@@ -30,21 +31,32 @@ public final class CalibrationRunner {
             throw new IllegalArgumentException("Use distinct reserved calibration seeds");
         }
         var orderedSeeds = seeds.stream().sorted(Comparator.reverseOrder()).toList();
+        return sample(orderedSeeds, BUCKET_SECONDS, BUCKETS,
+                seed -> TrafficWorld.calibrationWorld(Graph.grid(5), seed));
+    }
+
+    public static HistoricalProfile calibrateGeographic(Graph graph, String origin) {
+        return sample(GEOGRAPHIC_CALIBRATION_SEEDS, 60, 30,
+                seed -> TrafficWorld.geographicWorld(graph, origin, seed));
+    }
+
+    private static HistoricalProfile sample(List<Long> orderedSeeds, int interval, int buckets,
+                                             java.util.function.LongFunction<TrafficWorld> worldFactory) {
         var roads = new TreeMap<String, double[]>();
         var junctions = new TreeMap<Movement, double[]>();
-        int samplesPerBucket = seeds.size() * BUCKET_SECONDS;
+        int samplesPerBucket = orderedSeeds.size() * interval;
         for (long seed : orderedSeeds) {
-            var world = TrafficWorld.calibrationWorld(Graph.grid(5), seed);
-            for (int tick = 0; tick < BUCKET_SECONDS * BUCKETS; tick++) {
+            var world = worldFactory.apply(seed);
+            for (int tick = 0; tick < interval * buckets; tick++) {
                 // No ambulances, operational reports, physical incidents or future live inputs.
                 world.step(tick, Map.of(), null, false, null, null);
-                int bucket = tick / BUCKET_SECONDS;
+                int bucket = tick / interval;
                 world.sampleHistorical(
-                        (edge, seconds) -> roads.computeIfAbsent(edge, ignored -> new double[BUCKETS])[bucket] += seconds,
-                        (movement, seconds) -> junctions.computeIfAbsent(movement, ignored -> new double[BUCKETS])[bucket] += seconds);
+                        (edge, seconds) -> roads.computeIfAbsent(edge, ignored -> new double[buckets])[bucket] += seconds,
+                        (movement, seconds) -> junctions.computeIfAbsent(movement, ignored -> new double[buckets])[bucket] += seconds);
             }
         }
-        return new HistoricalProfile(BUCKET_SECONDS, BUCKETS, orderedSeeds,
+        return new HistoricalProfile(interval, buckets, orderedSeeds,
                 average(roads, samplesPerBucket), average(junctions, samplesPerBucket));
     }
 

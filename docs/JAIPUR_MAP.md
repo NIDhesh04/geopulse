@@ -4,6 +4,17 @@
 
 **Fact:** The Control Room, scenario preview, and Driver Navigation use those same local road shapes. The All Streets layer colors visible Jaipur driving streets from OpenFreeMap, including neighborhood and service roads, and samples animated dots for readability. This citywide traffic visualization is synthetic and separate from the backend corridor model. Simulation Truth shows the engine’s occupancy and queues alongside it. Local corridor roads and routing remain available if the OpenFreeMap context cannot load (© OpenMapTiles, © OpenStreetMap contributors).
 
+**Decision:** Model Jaipur road storage at 12 vehicle-equivalents per 100 metres of link length, with a 12-unit minimum. This is a synthetic density assumption for longer links. The 5×5 fixtures retain their existing storage rule.
+
+**Fact:** The bundled Jaipur historical profile covers 1,800 seconds in 60-second intervals. It was generated from incident-free simulations using seeds `-1101` through `-1103`, independently of demo and benchmark seeds. At the default demo seed, the Chandpole–SMS mission completed in all six routing and priority configurations in 478 simulated seconds. This run showed no arrival-time difference between configurations.
+
+**Decision:** Regenerate the profile from the repository root.
+
+```sh
+./backend/mvnw -f backend/pom.xml -DskipTests package
+java -jar backend/application/target/application-0.1.0-SNAPSHOT.jar --calibrate-jaipur > scenarios/jaipur-sms-corridor.profile.tsv
+```
+
 **Decision:** Use a bounded Jaipur road network from a dated OpenStreetMap extract for the first geographic demo. Keep the synthetic grid as the reference fixture for checking routing, queues and signal timing. Introduce Jaipur once those mechanics are integrated on the grid.
 
 **Fact:** OpenStreetMap provides road data under the ODbL. A downloaded extract can be processed offline without an API key. Display © OpenStreetMap contributors on the map and preserve the source date, attribution and license with any distributed data. [OpenStreetMap copyright and attribution](https://www.openstreetmap.org/copyright)

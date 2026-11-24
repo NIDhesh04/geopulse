@@ -17,7 +17,7 @@ public final class TrafficWorld {
     private record Cohort(double count, double position) {}
     private record Junction(List<String> approaches, List<Movement> movements, JunctionService service) {}
     private record Network(Graph graph, Map<String, Graph.Edge> roads, Map<String, Junction> junctions,
-                           Map<String, List<Movement>> turns, Set<String> entries) {}
+                           Map<String, List<Movement>> turns, Set<String> entries, boolean geographic) {}
     private record Profile(Map<String, Double> speed, Map<String, Double> occupancy,
                            Map<Movement, Double> queues, Map<Movement, Double> arrivals, Map<String, Double> releases) {}
     public record Totals(double arrivals, double travelling, double queued, double exited,
@@ -41,6 +41,7 @@ public final class TrafficWorld {
     private final Map<String, Map<String, String>> signalRequests = new TreeMap<>();
     private Profile history;
     private Long corridorSeed;
+    private double arrivalRate = ARRIVAL_RATE;
     private final Map<String, QueuePosition> waitingAmbulances = new LinkedHashMap<>();
     private Map<String, Integer> occupiedByFleet = Map.of();
     private Map<String, Integer> movingByFleet = Map.of();
@@ -120,7 +121,7 @@ public final class TrafficWorld {
             junctions.put(node.id(), new Junction(List.copyOf(approaches), List.copyOf(local),
                     new JunctionService(approaches)));
         }
-        return new Network(graph, roads, junctions, turns, entries);
+        return new Network(graph, roads, junctions, turns, entries, geographicOrigin != null);
     }
 
     /** Calibration uses a separate incident-free run. The live run starts empty. */
@@ -132,13 +133,23 @@ public final class TrafficWorld {
         return fixture(network(graph, fleetStations));
     }
 
-    static TrafficWorld geographicFixture(Graph graph, String origin) {
-        return fixture(network(graph, false, origin));
+    static TrafficWorld geographicWorld(Graph graph, String origin, long seed) {
+        var world = new TrafficWorld(network(graph, false, origin));
+        world.arrivalRate = ARRIVAL_RATE * new SplittableRandom(seed).nextDouble(.9, 1.1);
+        return world;
+    }
+
+    static TrafficWorld geographicFixture(Graph graph, String origin, long seed) {
+        var world = geographicWorld(graph, origin, seed);
+        var baseline = new TrafficWorld(world.network);
+        return fixture(world, baseline);
     }
 
     private static TrafficWorld fixture(Network network) {
-        var world = new TrafficWorld(network);
-        var baseline = new TrafficWorld(world.network);
+        return fixture(new TrafficWorld(network), new TrafficWorld(network));
+    }
+
+    private static TrafficWorld fixture(TrafficWorld world, TrafficWorld baseline) {
         Map<String, Double> speeds = new TreeMap<>();
         Map<String, Double> populations = new TreeMap<>();
         Map<Movement, Double> waiting = new TreeMap<>();
@@ -147,7 +158,7 @@ public final class TrafficWorld {
         for (int tick = 0; tick < 240; tick++) {
             baseline.step(tick, Map.of(), null, false, null, null);
             if (tick < 120) continue;
-            for (var edge : network.graph().edges()) {
+            for (var edge : world.network.roads().values()) {
                 speeds.merge(edge.id(), baseline.speed(edge, Map.of(), null, false) / 120, Double::sum);
                 populations.merge(edge.id(), baseline.civilianOccupancy(edge.id()) / 120, Double::sum);
             }
@@ -169,6 +180,7 @@ public final class TrafficWorld {
         copy.signalRequests.putAll(signalRequests);
         copy.history = history;
         copy.corridorSeed = corridorSeed;
+        copy.arrivalRate = arrivalRate;
         copy.waitingAmbulances.putAll(waitingAmbulances);
         copy.occupiedByFleet = occupiedByFleet;
         copy.movingByFleet = movingByFleet;
@@ -204,13 +216,17 @@ public final class TrafficWorld {
             double queued = network.turns().get(id).stream().mapToDouble(m -> queues.getOrDefault(m, 0.0)).sum();
             int fleet = occupiedByFleet.getOrDefault(id, 0);
             truth.put(id, new RoadTruth(runningPopulation(id) + queued + fleet,
-                    queued + fleet - movingByFleet.getOrDefault(id, 0), STORAGE));
+                    queued + fleet - movingByFleet.getOrDefault(id, 0), capacity(id)));
         });
         return Collections.unmodifiableMap(truth);
     }
 
     private static double sum(Map<?, Double> values) {
         return values.values().stream().mapToDouble(Double::doubleValue).sum();
+    }
+
+    private double capacity(String road) {
+        return network.geographic() ? Math.max(STORAGE, network.roads().get(road).length() * STORAGE / 100) : STORAGE;
     }
 
     private double runningPopulation(String road) {
@@ -234,7 +250,7 @@ public final class TrafficWorld {
         Set<String> effects = physical.getOrDefault(road.id(), Set.of());
         if (effects.contains("IMPASSABLE")) return 0;
         double running = runningPopulation(road.id()) + movingAmbulances;
-        double free = road.freeSpeed() * Math.max(0.2, 1 - 0.8 * Math.min(1, running / STORAGE));
+        double free = road.freeSpeed() * Math.max(0.2, 1 - 0.8 * Math.min(1, running / capacity(road.id())));
         return effects.contains("SLOW") ? Math.min(2, free) : free;
     }
 
@@ -330,7 +346,7 @@ public final class TrafficWorld {
                 if (visible) used += occupiedByFleet.getOrDefault(road.id(), 0);
                 else if (road.id().equals(ambulanceRoad)) used++;
                 boolean blocked = reported.contains(road.id()) || (visible && closed(physical.get(road.id())));
-                room.put(road.id(), blocked ? 0 : Math.max(0, STORAGE - used));
+                room.put(road.id(), blocked ? 0 : Math.max(0, capacity(road.id()) - used));
                 if (!blocked) release.put(road.id(), Math.min(history.releases().getOrDefault(road.id(), 0.0),
                         rate(visible ? physical.get(road.id()) : null)));
             }
@@ -391,7 +407,7 @@ public final class TrafficWorld {
         Map<String, Double> speed = new TreeMap<>();
         network.roads().forEach((id, road) -> {
             double occupied = civilianOccupancy(id) + occupiedByFleet.getOrDefault(id, 0);
-            room.put(id, closed(physical.get(id)) ? 0 : Math.max(0, STORAGE - occupied));
+            room.put(id, closed(physical.get(id)) ? 0 : Math.max(0, capacity(id) - occupied));
             speed.put(id, fleetSpeed(road, physical));
         });
         Map<String, Double> receivingUsed = new TreeMap<>();
@@ -442,7 +458,7 @@ public final class TrafficWorld {
         crossings.keySet().forEach(waitingAmbulances::remove);
         for (var entry : backlog.entrySet()) {
             double baseRate = corridorSeed != null && entry.getKey().equals(CalibrationRunner.CORRIDOR)
-                    ? CalibrationRunner.demand(tick, corridorSeed) : ARRIVAL_RATE;
+                    ? CalibrationRunner.demand(tick, corridorSeed) : arrivalRate;
             double demandRate = physical.getOrDefault(entry.getKey(), Set.of()).contains("DEMAND_SURGE") ? 2 * baseRate : baseRate;
             arrivals += demandRate;
             double demand = entry.getValue() + demandRate;
@@ -483,7 +499,7 @@ public final class TrafficWorld {
                 double queued = queues.getOrDefault(movement, 0.0);
                 boolean green = state.phase() == NormalSignal.Phase.GREEN
                         && junction.approaches().get(state.approach()).equals(movement.incoming());
-                double receivingShortfall = Math.max(0, occupancies.get(movement.outgoing()) - (STORAGE - 1));
+                double receivingShortfall = Math.max(0, occupancies.get(movement.outgoing()) - (capacity(movement.outgoing()) - 1));
                 // Summarize the observed queue, clearance, and receiving space as
                 // a delay estimate. The live estimator still runs a bounded forecast.
                 movementSample.accept(movement, (1 + queued + receivingShortfall) / DISCHARGE + (green ? 0 : 5));

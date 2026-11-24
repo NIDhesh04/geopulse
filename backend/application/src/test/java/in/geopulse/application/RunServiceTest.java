@@ -14,6 +14,27 @@ import static org.junit.jupiter.api.Assertions.*;
 @Testcontainers
 @SpringBootTest
 class RunServiceTest {
+    @Test void jaipurCompletesInEveryInformationModeUsingItsPackagedProfile() {
+        var definition = JaipurScenario.read(json);
+        var graph = (in.geopulse.engine.Graph) definition.get("graph");
+        var origin = (String) definition.get("origin");
+        var destination = (String) definition.get("destination");
+        var profile = JaipurScenario.profile();
+        assertEquals(CalibrationRunner.calibrateGeographic(graph, origin), profile);
+        for (int horizon : List.of(0, 2, -1)) {
+            var sim = in.geopulse.engine.RoutingSimulation.geographicTraffic(
+                    graph, horizon, true, origin, CalibrationRunner.DEMO_SEED, profile);
+            sim.activate(origin, destination);
+            assertFalse(sim.ambulance().route().isEmpty(), "horizon " + horizon);
+            if (horizon == 0) {
+                var firstRoad = sim.explanation().roads().get(sim.ambulance().route().getFirst());
+                assertEquals("HISTORICAL", firstRoad.source());
+                assertTrue(firstRoad.reason().startsWith("Historical interval"));
+            }
+            for (int tick = 0; tick < 1800 && !sim.completed(); tick++) sim.step();
+            assertEquals("ARRIVED", sim.ambulance().status(), "horizon " + horizon);
+        }
+    }
     @Test void jaipurMissionRoutesOverThePublishedGeometry() throws Exception {
         String scenarioId = "jaipur-sms-corridor";
         var definition = runs.scenarios().stream().filter(s -> scenarioId.equals(s.get("id"))).findFirst().orElseThrow();

@@ -21,9 +21,9 @@ public class RunService {
     private static final String SCENARIO="routing-only-5x5";
     private static final String TRAFFIC_SCENARIO = "traffic-signals-5x5";
     private static final String FLEET_SCENARIO = "fleet-conflict-5x5";
-    private static final String JAIPUR_SCENARIO = "jaipur-sms-corridor";
     private static final String PROFILE_RESOURCE = "/scenarios/" + CalibrationRunner.SCENARIO + ".profile.tsv";
     private final HistoricalProfile congestionProfile = readCongestionProfile();
+    private final HistoricalProfile jaipurProfile = JaipurScenario.profile();
     private final Map<String,Object> jaipurScenario;
     private final JdbcTemplate db;private final ObjectMapper json;private final TransactionTemplate tx;private final SimpMessagingTemplate messages;
     private final ConcurrentMap<UUID,Run> active=new ConcurrentHashMap<>();
@@ -39,8 +39,8 @@ public class RunService {
                 case FLEET_SCENARIO -> RoutingSimulation.fleet(Graph.grid(5), horizon, priorityEnabled);
                 case TRAFFIC_SCENARIO -> RoutingSimulation.traffic(Graph.grid(5), horizon, priorityEnabled);
                 case CalibrationRunner.SCENARIO -> RoutingSimulation.predictableCongestion(horizon, priorityEnabled, seed, profile);
-                case JAIPUR_SCENARIO -> RoutingSimulation.geographicTraffic((Graph) definition.get("graph"),
-                        horizon, priorityEnabled, (String) definition.get("origin"));
+                case JaipurScenario.ID -> RoutingSimulation.geographicTraffic((Graph) definition.get("graph"),
+                        horizon, priorityEnabled, (String) definition.get("origin"), seed, profile);
                 default -> new RoutingSimulation(Graph.grid(5), horizon);
             };
             loop=Executors.newSingleThreadScheduledExecutor(r->{Thread t=new Thread(r,"run-"+id);t.setDaemon(true);return t;});}
@@ -49,23 +49,27 @@ public class RunService {
                              Map<String, Set<String>> physicalEffects, Map<String, TrafficWorld.RoadTruth> roadTruth) {}
     public RunService(JdbcTemplate db,ObjectMapper json,TransactionTemplate tx,SimpMessagingTemplate messages){
         this.db=db;this.json=json;this.tx=tx;this.messages=messages;
-        try (var resource = RunService.class.getResourceAsStream("/scenarios/" + JAIPUR_SCENARIO + ".json")) {
-            if (resource == null) throw new IllegalStateException("Missing Jaipur corridor scenario");
-            var definition = json.readValue(resource, new com.fasterxml.jackson.core.type.TypeReference<Map<String,Object>>() {});
-            definition.put("graph", json.convertValue(definition.get("graph"), Graph.class));
-            jaipurScenario = Map.copyOf(definition);
-        } catch (IOException e) {
-            throw new IllegalStateException("Invalid Jaipur corridor scenario", e);
-        }
+        var definition = JaipurScenario.read(json);
+        definition.put("version", 2);
+        definition.put("demoSeed", CalibrationRunner.DEMO_SEED);
+        definition.put("historicalProfile", profileMetadata(JaipurScenario.PROFILE, jaipurProfile));
+        jaipurScenario = Map.copyOf(definition);
     }
     static HistoricalProfile readCongestionProfile() {
-        var resource = RunService.class.getResourceAsStream(PROFILE_RESOURCE);
-        if (resource == null) throw new IllegalStateException("Missing profile: " + PROFILE_RESOURCE);
+        return readProfile(PROFILE_RESOURCE);
+    }
+    static HistoricalProfile readProfile(String path) {
+        var resource = RunService.class.getResourceAsStream(path);
+        if (resource == null) throw new IllegalStateException("Missing profile: " + path);
         try (var reader = new BufferedReader(new InputStreamReader(resource, StandardCharsets.UTF_8))) {
             return HistoricalProfile.read(reader);
         } catch (IOException | IllegalArgumentException e) {
-            throw new IllegalStateException("Invalid profile: " + PROFILE_RESOURCE, e);
+            throw new IllegalStateException("Invalid profile: " + path, e);
         }
+    }
+    private static Map<String,Object> profileMetadata(String resource, HistoricalProfile profile) {
+        return Map.of("resource", resource, "formatVersion", 1, "bucketSeconds", profile.bucketSeconds(),
+                "buckets", profile.buckets(), "calibrationSeeds", profile.seeds());
     }
     private String encode(Object data){try{return json.writeValueAsString(data);}catch(Exception e){throw new IllegalStateException("Cannot encode state",e);}}
     @PostConstruct void startup(){
@@ -73,8 +77,11 @@ public class RunService {
             db.update("update run_command set status='REJECTED', reason='RUN_INTERRUPTED' where status='ACCEPTED'");
             db.update("update simulation_run set status='INTERRUPTED' where status in ('RUNNING','PAUSED')");
             for (var definition : scenarios()) {
-                db.update("insert into scenario_definition(id,version,definition) values (?,1,?::jsonb) on conflict(id) do nothing",
-                        definition.get("id"),encode(definition));
+                db.update("""
+                        insert into scenario_definition(id,version,definition) values (?,?,?::jsonb)
+                        on conflict(id) do update set version=excluded.version, definition=excluded.definition
+                        where scenario_definition.version < excluded.version
+                        """, definition.get("id"),definition.get("version"),encode(definition));
             }
         });
     }
@@ -97,9 +104,7 @@ public class RunService {
         congestionScenario.put("name", "Central district · predictable corridor congestion");
         congestionScenario.put("destination", "n00_04");
         congestionScenario.put("demoSeed", CalibrationRunner.DEMO_SEED);
-        congestionScenario.put("historicalProfile", Map.of("resource", PROFILE_RESOURCE, "formatVersion", 1,
-                "bucketSeconds", congestionProfile.bucketSeconds(), "buckets", congestionProfile.buckets(),
-                "calibrationSeeds", congestionProfile.seeds()));
+        congestionScenario.put("historicalProfile", profileMetadata(PROFILE_RESOURCE, congestionProfile));
         return List.of(scenario(), trafficScenario, fleetScenario, congestionScenario, jaipurScenario);
     }
 
@@ -115,7 +120,8 @@ public class RunService {
         boolean priorityEnabled = !SCENARIO.equals(selected) && !Boolean.FALSE.equals(priority);
         definition.put("priorityEnabled", priorityEnabled);
         int h=switch(horizon){case "0"->0;case "2"->2;case "all"->-1;default->throw new ApiException(400,"Horizon must be 0, 2 or all");};
-        UUID id=UUID.randomUUID();Run r=new Run(id,seed,h,selected,priorityEnabled,congestionProfile,definition);
+        HistoricalProfile profile = JaipurScenario.ID.equals(selected) ? jaipurProfile : congestionProfile;
+        UUID id=UUID.randomUUID();Run r=new Run(id,seed,h,selected,priorityEnabled,profile,definition);
         db.update("insert into simulation_run(id,scenario_id,scenario_snapshot,seed,horizon,status) values (?,?,?::jsonb,?,?,'PAUSED')",id,selected,encode(definition),seed,horizon);
         r.published=publishable(r,r.simulation,0,0,true,1);active.put(id,r);r.loop.scheduleWithFixedDelay(()->tick(r),100,100,TimeUnit.MILLISECONDS);return r.published.operational();
     }
@@ -253,7 +259,7 @@ public class RunService {
             case FLEET_SCENARIO -> "FLEET_TRAFFIC";
             case TRAFFIC_SCENARIO -> "TRAFFIC_SIGNALS";
             case CalibrationRunner.SCENARIO -> "PREDICTABLE_CONGESTION";
-            case JAIPUR_SCENARIO -> "JAIPUR_CORRIDOR";
+            case JaipurScenario.ID -> "JAIPUR_CORRIDOR";
             default -> "ROUTING_ONLY";
         };
         Map<String,Object> view=new LinkedHashMap<>();view.put("schemaVersion",1);view.put("runId",r.id.toString());view.put("scenarioId",r.scenarioId);view.put("mode",mode);view.put("seed",r.seed);
