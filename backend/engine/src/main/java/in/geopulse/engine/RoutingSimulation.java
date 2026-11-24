@@ -24,6 +24,7 @@ public final class RoutingSimulation {
     private final Map<String,Map<String,String>> incidents = new TreeMap<>();
     private final Map<String,Set<String>> reportedIncidents = new TreeMap<>();private final Set<String> reported=new TreeSet<>();
     private final List<Event> pending=new ArrayList<>();
+    private OperationalReports operationalReports = new OperationalReports();
     public RoutingSimulation(Graph graph,int horizon){this(graph,horizon,new M1ZeroJunctionDelay());}
     public RoutingSimulation(Graph graph,int horizon,JunctionDelayEstimator junctionDelay){
         this(graph, horizon, junctionDelay, new DijkstraRouter());
@@ -63,6 +64,7 @@ public final class RoutingSimulation {
         c.junctionWait = junctionWait;
         c.junctionArrival = junctionArrival;
         c.priorityRequest = priorityRequest;
+        c.operationalReports = operationalReports.copy();
         c.observedDepartureJunction = observedDepartureJunction;
         c.physical.putAll(physical);
         c.incidents.putAll(incidents);
@@ -74,7 +76,27 @@ public final class RoutingSimulation {
     public Set<String> reported(){
         var known = new TreeSet<>(reported);
         known.addAll(reportedIncidents.keySet());
+        known.addAll(operationalReports.confirmedClosures());
         return Collections.unmodifiableSet(known);
+    }
+    public OperationalReports operationalReports() { return operationalReports; }
+
+    public void submitObstruction(String id, String ambulanceId, String road, boolean closure) {
+        graph.edge(road);
+        if (!"AMB-001".equals(ambulanceId)) throw new IllegalArgumentException("Unknown ambulance");
+        operationalReports.submit(id, ambulanceId, road, closure, time);
+        emit("REPORT_SUBMITTED", id + " awaiting operator review");
+    }
+
+    public void reviewObstruction(String id, boolean confirmed) {
+        operationalReports.review(id, confirmed, time);
+        emit("REPORT_REVIEWED", id + (confirmed ? " confirmed" : " rejected"));
+        if (edge == null && activatedAt != null && arrivedAt == null) plan();
+    }
+
+    public void acknowledgeAlert(String id) {
+        operationalReports.acknowledge(id, time);
+        emit("ALERT_ACKNOWLEDGED", id);
     }
     public List<Event> drainEvents(){var events=List.copyOf(pending);pending.clear();return events;}
     private void emit(String type,String message){pending.add(new Event(time,type,message));}

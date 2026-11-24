@@ -130,6 +130,15 @@ public class RunService {
                 case "REPORT_CLOSURE"->candidate.report(text(p,"edge"),true);
                 case "REPORT_REOPENING"->candidate.report(text(p,"edge"),false);
                 case "RETRY_ROUTE"->candidate.retry();
+                case "SUBMIT_OBSTRUCTION"->{
+                    if (!p.path("closure").isBoolean()) throw new IllegalArgumentException("closure must be boolean");
+                    candidate.submitObstruction(text(p,"reportId"),text(p,"ambulanceId"),text(p,"edge"),p.path("closure").booleanValue());
+                }
+                case "REVIEW_OBSTRUCTION"->{
+                    if (!p.path("confirmed").isBoolean()) throw new IllegalArgumentException("confirmed must be boolean");
+                    candidate.reviewObstruction(text(p,"reportId"),p.path("confirmed").booleanValue());
+                }
+                case "ACKNOWLEDGE_ALERT"->candidate.acknowledgeAlert(text(p,"alertId"));
                 case "SUSPEND_PRIORITY"->{
                     if (!p.path("suspended").isBoolean()) throw new IllegalArgumentException("suspended must be boolean");
                     candidate.suspendPriority(p.path("suspended").booleanValue());
@@ -164,6 +173,8 @@ public class RunService {
         Map<String,Object> view=new LinkedHashMap<>();view.put("schemaVersion",1);view.put("runId",r.id.toString());view.put("scenarioId",r.scenarioId);view.put("mode",TRAFFIC_SCENARIO.equals(r.scenarioId)?"TRAFFIC_SIGNALS":"ROUTING_ONLY");view.put("seed",r.seed);
         view.put("stateRevision",Long.toString(revision));view.put("latestEventSequence",Long.toString(events));view.put("simulationTimeSeconds",sim.time());view.put("paused",paused);view.put("speed",speed);view.put("horizon",sim.horizon()==-1?"all":Integer.toString(sim.horizon()));
         view.put("runStatus",sim.ambulance().arrivedAt()!=null?"COMPLETED":paused?"PAUSED":"RUNNING");view.put("ambulance",sim.ambulance());view.put("explanation",sim.explanation());view.put("reportedClosures",sim.reported());
+        view.put("reports",sim.operationalReports().reports());
+        view.put("acknowledgements",sim.operationalReports().acknowledgements());
         var traffic = sim.trafficState();
         if (traffic != null) {
             view.put("traffic", traffic);
