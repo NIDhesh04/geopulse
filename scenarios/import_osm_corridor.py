@@ -222,6 +222,7 @@ def main():
     parser.add_argument("--date", required=True, help="Date on which the extract was captured")
     parser.add_argument("--origin", nargs=2, type=float, default=(75.806233,26.925469), metavar=("LNG","LAT"))
     parser.add_argument("--destination", nargs=2, type=float, default=(75.8161049,26.9060159), metavar=("LNG","LAT"))
+    parser.add_argument("--engine-graph", action="store_true", help="Write the Java engine graph instead of the full audit")
     args = parser.parse_args()
     source = args.extract.read_bytes()
     source = gzip.decompress(source) if args.extract.suffix==".gz" else source
@@ -230,6 +231,22 @@ def main():
     outgoing, forbidden, only, omitted, audit = turn_rules(links, restrictions)
     route = shortest_path(origin, destination, outgoing, forbidden, only, omitted)
     nodes = sorted({node for link in links.values() if link.id not in omitted for node in (link.start, link.end)})
+    if args.engine_graph:
+        lng, lat=coordinates[origin]
+        graph={
+            "nodes":[{"id":node,"x":(coordinates[node][0]-lng)*111195*math.cos(math.radians(lat)),
+                      "y":(lat-coordinates[node][1])*111195, "lat":coordinates[node][1],"lng":coordinates[node][0]}
+                     for node in nodes],
+            "edges":[{"id": link.id, "from":link.start,"to":link.end,"length":link.length,"freeSpeed":link.speed}
+                     for link in links.values() if link.id not in omitted],
+            "turnRestrictions":{
+                "forbidden":[path for path in sorted(forbidden) if not omitted.intersection(path)],
+                "only":[{"after":prefix,"allowed":sorted(edges-omitted)} for prefix,edges in sorted(only.items())
+                        if not omitted.intersection(prefix)],
+            },
+        }
+        print(json.dumps(graph,ensure_ascii=False,sort_keys=True))
+        return
     result = {
         "dataSource": {"name": "OpenStreetMap contributors", "license": "ODbL-1.0",
                        "captureDate": args.date, "sha256": hashlib.sha256(source).hexdigest()},

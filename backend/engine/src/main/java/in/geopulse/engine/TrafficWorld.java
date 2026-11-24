@@ -588,7 +588,8 @@ public final class TrafficWorld {
             }
             if(batch.count()>moved)batches.addFirst(new TurnBatch(batch.count()-moved,batch.context()));
         }
-        if(batches.isEmpty())turnBatches.remove(movement);
+        if(remaining>EPSILON)throw new IllegalStateException("Turn batches do not cover movement discharge");
+        if(!queues.containsKey(movement))turnBatches.remove(movement);
     }
 
     private static void addArrival(Map<String,Map<List<String>,Double>> arrivals,String road,List<String> context,double count) {

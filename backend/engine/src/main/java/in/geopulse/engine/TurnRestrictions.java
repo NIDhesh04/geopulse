@@ -10,7 +10,7 @@ public record TurnRestrictions(List<List<String>> forbidden, List<Only> only) {
         public Only {
             after=List.copyOf(after);
             allowed=List.copyOf(allowed);
-            if(after.isEmpty()||allowed.isEmpty())throw new IllegalArgumentException("Invalid required turn");
+            if(after.isEmpty())throw new IllegalArgumentException("Invalid required turn");
         }
     }
 

@@ -19,13 +19,36 @@ class TurnRestrictionTest {
         var restricted=new RoutingSimulation(graph,0);
         restricted.activate("a","d");
         assertEquals(List.of("ab","bc","ce","ed"),restricted.ambulance().route());
-        while (!restricted.ambulance().node().equals("c")) restricted.step();
+        for(int tick=0;tick<20&&!restricted.ambulance().node().equals("c");tick++) restricted.step();
+        assertEquals("c",restricted.ambulance().node());
         restricted.step();
         assertEquals("ce",restricted.ambulance().edge());
         assertEquals("TURN_RESTRICTED",restricted.explanation().candidates().getFirst().outcome());
         var other=new RoutingSimulation(graph,0);
         other.activate("f","d");
         assertEquals(List.of("fb","bc","cd"),other.ambulance().route());
+    }
+
+    @Test void civilianThroughputCannotTakeForbiddenTurnAndStillConservesTraffic() {
+        var restricted=TrafficWorld.geographicWorld(
+                network(new TurnRestrictions(List.of(List.of("ab","bc","cd")),List.of())),"a",108);
+        var ordinary=TrafficWorld.geographicWorld(network(TurnRestrictions.NONE),"a",108);
+        var physical=Map.of("fb",Set.of("ENTRY_CLOSED"));
+        boolean unrestrictedUsedLink=false,restrictedUsedAlternative=false;
+        for(int tick=0;tick<220;tick++) {
+            restricted.step(tick,physical,null,false,null,null);
+            ordinary.step(tick,physical,null,false,null,null);
+            var truth=restricted.roadTruth();
+            assertEquals(0,truth.get("cd").occupancy(),1e-9);
+            restrictedUsedAlternative|=truth.get("ce").occupancy()>0;
+            unrestrictedUsedLink|=ordinary.roadTruth().get("cd").occupancy()>0;
+            var totals=restricted.totals();
+            assertEquals(totals.arrivals(),totals.travelling()+totals.queued()+totals.boundaryBacklog()+totals.exited(),1e-7);
+            truth.values().forEach(road->assertTrue(road.occupancy()<=road.capacity()+1e-7));
+            if(tick==110)restricted=restricted.copy();
+        }
+        assertTrue(restrictedUsedAlternative);
+        assertTrue(unrestrictedUsedLink);
     }
 
     @Test void onlyTurnConstrainsTheEntireViaWayPrefix() {
