@@ -17,8 +17,10 @@ test('Jaipur map and driver voice use a server-authoritative mission',async({pag
   const tilt=page.getByRole('button',{name:'3D view'});
   const allStreets=page.getByRole('button',{name:'All Streets'});
   await expect(allStreets).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('.city-traffic-canvas')).toHaveCount(1);
   await allStreets.click();
   await expect(allStreets).toHaveAttribute('aria-pressed','false');
+  await expect(page.locator('.city-traffic-canvas')).toHaveCount(0);
   await page.getByRole('button',{name:'Corridor',exact:true}).click();
   await page.getByRole('button',{name:'City',exact:true}).click();
   await allStreets.click();

@@ -1,4 +1,4 @@
-import type {Feature, FeatureCollection, LineString, Point} from 'geojson';
+import type {FeatureCollection, LineString} from 'geojson';
 import type {LayerSpecification, MapGeoJSONFeature, Map as CityMap, GeoJSONSource} from 'maplibre-gl';
 import type {Coordinate} from './types';
 
@@ -9,8 +9,8 @@ const large=new Set(['motorway','trunk','primary','secondary']);
 export const emptyFeatures:FeatureCollection={type:'FeatureCollection',features:[]};
 const roadLayer='city-streets';
 const streetSource='city-traffic';
-const dotSource='city-vehicles';
 const colors={free:'#253e56',moderate:'#ec870b',heavy:'#f03e31'};
+const dotColors=['#25c6ff','#ffb52b','#ff623a'];
 
 export type CityStreet={
   id:string;name:string;kind:string;tier:number;points:Coordinate[];distance:number[];phase:number;load:number;oneWay:number;
@@ -60,28 +60,52 @@ export function streetLines(streets:CityStreet[]):FeatureCollection<LineString> 
   }))};
 }
 
-export function streetVehicles(streets:CityStreet[],seconds:number):FeatureCollection<Point> {
-  const features:Feature<Point>[]=[];
-  // Every visible street is colored. Sample moving dots across road classes to bound animation work.
+export function prepareStreetVehicles(streets:CityStreet[]) {
+  // Sample moving dots independently of the entire colored network.
   const stride=Math.max(1,Math.ceil(streets.length/1400));
+  const vehicles=[];
   for(let index=0;index<streets.length;index+=stride){
     const road=streets[index];
     const length=road.distance.at(-1)!;
     const count=Math.min(road.tier+2,Math.max(1,Math.round(length/150)));
-    for(let i=0;i<count;i++){
-      const progress=(road.phase+i/count+seconds*(4+road.tier*3)*(1-road.load*.58)/length)%1;
-      const metres=(road.oneWay<0||road.oneWay===0&&i%2===1?1-progress:progress)*length;
-      let segment=0;
-      while(segment<road.distance.length-2&&road.distance[segment+1]<metres)segment++;
-      const span=road.distance[segment+1]-road.distance[segment];
-      const proportion=span?(metres-road.distance[segment])/span:0;
-      const [a,b]=[road.points[segment],road.points[segment+1]];
-      const coordinate:Coordinate=[a[0]+(b[0]-a[0])*proportion,a[1]+(b[1]-a[1])*proportion];
-      features.push({type:'Feature',properties:{color:road.load>=.7?'#ff623a':road.load>=.48?'#ffb52b':'#25c6ff',
-        radius:1.45+road.tier*.5},geometry:{type:'Point',coordinates:coordinate}});
-    }
+    vehicles.push({road,length,count,cyclesPerSecond:(4+road.tier*3)*(1-road.load*.58)/length,
+      color:road.load>=.70?2:road.load>=.48?1:0});
   }
-  return {type:'FeatureCollection',features};
+  return vehicles;
+}
+
+export function sampleStreetVehicles(
+  flow:ReturnType<typeof prepareStreetVehicles>[number],
+  points:readonly {x:number;y:number}[],seconds:number,draw:(x:number,y:number)=>void,
+) {
+  const {road,length,count,cyclesPerSecond}=flow;
+  for(let i=0;i<count;i++){
+    const progress=(road.phase+i/count+seconds*cyclesPerSecond)%1;
+    const metres=(road.oneWay<0||road.oneWay===0&&i%2===1?1-progress:progress)*length;
+    let segment=0;
+    while(segment<road.distance.length-2&&road.distance[segment+1]<metres)segment++;
+    const span=road.distance[segment+1]-road.distance[segment];
+    const proportion=span?(metres-road.distance[segment])/span:0;
+    const a=points[segment],b=points[segment+1];
+    draw(a.x+(b.x-a.x)*proportion,a.y+(b.y-a.y)*proportion);
+  }
+}
+
+function vehicleSprite(color:string,tier:number) {
+  const sprite=document.createElement('canvas');
+  sprite.width=24;
+  sprite.height=24;
+  const brush=sprite.getContext('2d')!;
+  const glow=brush.createRadialGradient(12,12,1,12,12,10);
+  glow.addColorStop(0,color);
+  glow.addColorStop(1,color+'00');
+  brush.fillStyle=glow;
+  brush.fillRect(0,0,24,24);
+  brush.fillStyle=color;
+  brush.beginPath();
+  brush.arc(12,12,2.9+tier,0,2*Math.PI);
+  brush.fill();
+  return sprite;
 }
 
 const layers:LayerSpecification[]=[
@@ -92,53 +116,90 @@ const layers:LayerSpecification[]=[
   {id:'city-traffic-lines',type:'line',source:streetSource,layout:{'line-cap':'round','line-join':'round'},
     paint:{'line-color':['step',['get','load'],colors.free,.48,colors.moderate,.70,colors.heavy],
       'line-width':['match',['get','tier'],2,3.8,1,2.35,1.15], 'line-opacity':.94}},
-  {id:'city-vehicles-glow',type:'circle',source:dotSource,
-    paint:{'circle-color':['get','color'],'circle-radius':['+',['get','radius'],2.6],'circle-blur':.85,'circle-opacity':.7}},
-  {id:'city-vehicles-dot',type:'circle',source:dotSource,
-    paint:{'circle-color':['get','color'],'circle-radius':['get','radius'],'circle-opacity':.97}},
 ];
 
 export function addCityTraffic(map:CityMap) {
   map.addSource(streetSource,{type:'geojson',data:emptyFeatures});
-  map.addSource(dotSource,{type:'geojson',data:emptyFeatures});
   for(const layer of layers)map.addLayer(layer,'route-glow');
 }
 
 export function runCityTraffic(map:CityMap,reduced:boolean,onCount:(count:number)=>void) {
   const lines=map.getSource<GeoJSONSource>(streetSource)!;
-  const dots=map.getSource<GeoJSONSource>(dotSource)!;
-  let streets:CityStreet[]=[];
+  const canvas=document.createElement('canvas');
+  canvas.className='city-traffic-canvas';
+  canvas.setAttribute('aria-hidden','true');
+  const brush=canvas.getContext('2d');
+  map.getCanvasContainer().append(canvas);
+  const sprites=brush?dotColors.map(color=>[0,1,2].map(tier=>vehicleSprite(color,tier))):[];
+  let vehicles:ReturnType<typeof prepareStreetVehicles>=[];
+  let projected:ReturnType<CityMap['project']>[][]=[];
+  let projectionDirty=true;
+  let width=0,height=0;
+  let frame=0;
   let pending=0;
   let signature='';
+  const paint=(now:number)=>{
+    frame=0;
+    if(!brush)return;
+    if(projectionDirty){
+      projected=vehicles.map(({road})=>road.points.map(point=>map.project(point)));
+      projectionDirty=false;
+    }
+    brush.clearRect(0,0,width,height);
+    const seconds=reduced?0:now/1000;
+    vehicles.forEach((flow,index)=>{
+      const sprite=sprites[flow.color][flow.road.tier];
+      sampleStreetVehicles(flow,projected[index],seconds,(x,y)=>{
+        if(x>=-6&&x<=width+6&&y>=-6&&y<=height+6)brush.drawImage(sprite,x-6,y-6,12,12);
+      });
+    });
+    if(!reduced&&vehicles.length)frame=requestAnimationFrame(paint);
+  };
+  const redraw=()=>{
+    projectionDirty=true;
+    if(!frame&&brush)frame=requestAnimationFrame(paint);
+  };
+  const resize=()=>{
+    const surface=map.getCanvas();
+    width=surface.clientWidth;
+    height=surface.clientHeight;
+    const scale=Math.min(devicePixelRatio,1.5);
+    canvas.width=Math.round(width*scale);
+    canvas.height=Math.round(height*scale);
+    brush?.setTransform(scale,0,0,scale,0,0);
+    redraw();
+  };
   const refresh=()=>{
     pending=0;
     const next=visibleStreets(map.queryRenderedFeatures({layers:[roadLayer]}));
     const key=next.map(road=>road.id).sort().join('|');
     if(key===signature)return;
     signature=key;
-    streets=next;
-    lines.setData(streetLines(streets));
-    dots.setData(streetVehicles(streets,reduced?0:performance.now()/1000));
-    onCount(streets.length);
+    lines.setData(streetLines(next));
+    vehicles=prepareStreetVehicles(next);
+    redraw();
+    onCount(next.length);
   };
-  const schedule=()=>{if(!pending)pending=window.setTimeout(refresh,120);};
+  const schedule=()=>{
+    window.clearTimeout(pending);
+    if(!map.isMoving())pending=window.setTimeout(refresh,160);
+  };
   const sourceChanged=(event:{sourceId?:string})=>{if(event.sourceId==='jaipur-context')schedule();};
+  map.on('move',redraw);
+  map.on('resize',resize);
   map.on('moveend',schedule);
   map.on('sourcedata',sourceChanged);
+  resize();
   schedule();
-  const frame=reduced?0:window.setInterval(()=>{
-    if(streets.length&&document.visibilityState==='visible')dots.setData(streetVehicles(streets,performance.now()/1000));
-  },90);
   return ()=>{
     window.clearTimeout(pending);
-    window.clearInterval(frame);
+    cancelAnimationFrame(frame);
+    map.off('move',redraw);
+    map.off('resize',resize);
     map.off('moveend',schedule);
     map.off('sourcedata',sourceChanged);
-    // React may tear down the whole map before cleaning up this effect.
-    if(map.getSource(streetSource)===lines){
-      lines.setData(emptyFeatures);
-      dots.setData(emptyFeatures);
-    }
+    canvas.remove();
+    if(map.getSource(streetSource)===lines)lines.setData(emptyFeatures);
     onCount(0);
   };
 }

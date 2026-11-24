@@ -1,6 +1,6 @@
 import {expect,it} from 'vitest';
 import type {Geometry} from 'geojson';
-import {streetLines,streetVehicles,visibleStreets} from './jaipurTraffic';
+import {prepareStreetVehicles,sampleStreetVehicles,streetLines,visibleStreets} from './jaipurTraffic';
 
 it('includes major roads, little service lanes and each part of a multi-line street',()=>{
   const single=(coordinates:number[][],kind:string)=>({
@@ -14,7 +14,13 @@ it('includes major roads, little service lanes and each part of a multi-line str
   },single([[77.2,28.6],[77.22,28.6]],'primary')]);
   expect(streets.map(road=>road.kind)).toEqual(['motorway','service','minor','minor']);
   expect(streetLines(streets).features).toHaveLength(4);
-  const before=streetVehicles(streets,0);
-  expect(before.features.length).toBeGreaterThanOrEqual(4);
-  expect(streetVehicles(streets,1)).not.toEqual(before);
+  const traffic=prepareStreetVehicles(streets);
+  const samples=(time:number)=>traffic.flatMap(flow=>{
+    const points:number[][]=[];
+    const screen=flow.road.points.map(([x,y])=>({x,y}));
+    sampleStreetVehicles(flow,screen,time,(x,y)=>points.push([x,y]));
+    return points;
+  });
+  expect(samples(0).length).toBeGreaterThanOrEqual(4);
+  expect(samples(1/60)).not.toEqual(samples(0));
 });
