@@ -1,6 +1,7 @@
 package in.geopulse.engine;
 import java.util.*;
-public record Graph(List<Node> nodes, List<Edge> edges) {
+public record Graph(List<Node> nodes, List<Edge> edges, TurnRestrictions turnRestrictions) {
+    public Graph(List<Node> nodes,List<Edge> edges) { this(nodes,edges,TurnRestrictions.NONE); }
     public record Node(String id,double x,double y,Double lat,Double lng) {
         public Node(String id,double x,double y){this(id,x,y,null,null);}
         public Node {if(id==null||id.isBlank()||!Double.isFinite(x)||!Double.isFinite(y))throw new IllegalArgumentException("Invalid junction");
@@ -13,7 +14,10 @@ public record Graph(List<Node> nodes, List<Edge> edges) {
         nodes=nodes.stream().sorted(Comparator.comparing(Node::id)).toList();
         edges=edges.stream().sorted(Comparator.comparing(Edge::id)).toList();
         Set<String> ids=new HashSet<>();for(Node n:nodes)if(!ids.add(n.id()))throw new IllegalArgumentException("Duplicate node");
-        Set<String> eids=new HashSet<>();for(Edge e:edges)if(!eids.add(e.id())||!ids.contains(e.from())||!ids.contains(e.to()))throw new IllegalArgumentException("Invalid graph edge");
+        Map<String,Edge> byId=new HashMap<>();
+        for(Edge e:edges)if(byId.put(e.id(),e)!=null||!ids.contains(e.from())||!ids.contains(e.to()))throw new IllegalArgumentException("Invalid graph edge");
+        turnRestrictions=turnRestrictions==null?TurnRestrictions.NONE:turnRestrictions;
+        turnRestrictions.validate(byId);
     }
     public Node node(String id){return nodes.stream().filter(n->n.id().equals(id)).findFirst().orElseThrow(()->new IllegalArgumentException("Unknown junction: "+id));}
     public Edge edge(String id){return edges.stream().filter(e->e.id().equals(id)).findFirst().orElseThrow(()->new IllegalArgumentException("Unknown road: "+id));}
