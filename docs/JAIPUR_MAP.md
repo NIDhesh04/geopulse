@@ -28,3 +28,16 @@ java -jar backend/application/target/application-0.1.0-SNAPSHOT.jar --calibrate-
 **Decision:** Label the demo as real Jaipur road geometry with simulated traffic, incidents and signal timing. OpenStreetMap geometry alone does not establish measured demand, current road conditions, or actual controller behavior.
 
 **Decision:** Collapse degree-two pass-through points into the ordered road polyline. Keep topology nodes wherever connectivity, a mapped control, an access point, or a restriction requires one. An unsignalized bend does not create a signal. Map one-way rules to directed edges and turn restrictions to allowed incoming/outgoing movements, including restrictions that span multiple edges. Build each controller's approach list from its actual incoming roads and any station entry.
+
+## Dated OpenStreetMap import audit
+
+**Fact:** The [filtered driving extract](../scenarios/jaipur-driving-2026-11-24.osm.gz) was captured on 2026-11-24 from a bounded OSM map request and the full membership of turn relation 21181208. The retained data is under ODbL 1.0 and attributed to OpenStreetMap contributors. [OSM attribution and license](https://www.openstreetmap.org/copyright) · [Bounded map request](https://api.openstreetmap.org/api/0.6/map?bbox=75.800,26.898,75.830,26.929) · [Turn relation membership](https://api.openstreetmap.org/api/0.6/relation/21181208/full)
+
+**Fact:** The offline audit generated 2,097 nodes, 4,955 directed links, and 12 mapped signal nodes. It mapped all eight included restrictions, including one via-way restriction. The route reaches a mapped service road roughly 71 m from the SMS Hospital map pin after 3,688 m of driving. The pin and service-road check do not establish a valid ambulance gate or actual controller timing.
+
+**Decision:** Keep the curated SMS fixture in the application until hospital entry is verified and both the Java routing and civilian flow models enforce imported restrictions. The offline validator keeps the required road history to enforce via-way restrictions. The map uses local OSM node IDs to preserve grade-separated crossings.
+
+```sh
+python3 scenarios/import_osm_corridor.py scenarios/jaipur-driving-2026-11-24.osm.gz --date 2026-11-24 > /tmp/jaipur-driving-audit.json
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scenarios -p test_import_osm_corridor.py
+```

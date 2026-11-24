@@ -1,6 +1,6 @@
-# Milestones — M4 verified
+# Milestones — M5 verified
 
-**Fact:** Prepared on 2026-11-23 after consolidation of Topics 1–10 and the design risk review. M1 through M4 have been verified. M5 and M6 remain planned.
+**Fact:** Prepared on 2026-11-23 after consolidation of Topics 1–10 and the design risk review. M1 through M5 have been verified. M6 remains planned.
 
 ## Delivery approach
 
@@ -13,7 +13,7 @@
 | **Decision: M2 authorized** | Ordinary traffic queues and signals affect a single ambulance | Conservation/storage/credits; signal timings and clearance; reported versus physical incidents; bounded forecasts; actual delays | Multi-ambulance conflict workflow and full benchmark suite |
 | **Decision: M3 authorized** | Multiple ambulances share junctions correctly | 10-ambulance contention, deterministic ordering, active-grant commitment, suspension and recovery; fleet/driver state isolation | 30-ambulance performance claim and external integration |
 | **Fact: M4 verified** | Polished control-room/driver product and calibrated routing fixture | Responsive and keyboard checks, scenario picker, reproducible historical profiles, projected historical estimates in the route inspector | Real operational deployment, individual civilian physics, auth expansion |
-| **Assumption: M5** | Reproducible comparison report and scale results | Paired schedules/warm starts, seven scenarios, completion-aware delays, exact recovery, seed summaries, 30-ambulance profiling | Claims about CoSiCoSt superiority or real-world accuracy |
+| **Fact: M5 verified** | Reproducible comparison report and scale results | 980 core/reference runs, 35 scale/reference runs, paired completion-aware delay and recovery results | Claims about CoSiCoSt superiority or real-world accuracy |
 | **Assumption: M6** | Test Emergency108 hospital-leg handoff | Inspect real code; mapping/dedup/reassignment tests; pending police authorization; read-only simulated status | Real GPS ingestion/map matching, production completion writes, pickup-leg integration |
 
 ## M1 — scaffold and first routing slice
@@ -121,3 +121,5 @@
 **Fact:** [The evaluation design](METRICS_AND_EVALUATION.md) defines the scenario matrix, recovery criterion and presentation rules.
 
 **Fact:** The database-free Java benchmark runner implements all seven scenario schedules and the separate scale fixture. The reporting scripts retain individual missions and aggregate paired seed results. See [execution commands and output definitions](../scenarios/BENCHMARKS.md).
+
+**Fact:** The [M5 results](M5_RESULTS.md) record all 1,015 runs at engine revision `32147e0`. The [compressed TSV](../scenarios/m5-32147e0.tsv.gz) contains the run and mission records used for the report.
