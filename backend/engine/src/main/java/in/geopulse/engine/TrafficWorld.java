@@ -14,7 +14,8 @@ public final class TrafficWorld {
     private static final String STATION = "station-entry:";
     private static final double EPSILON = 1e-9;
 
-    private record Cohort(double count, double position) {}
+    private record Cohort(double count, double position, List<String> turnContext) {}
+    private record TurnBatch(double count,List<String> context) {}
     private record Junction(List<String> approaches, List<Movement> movements, JunctionService service) {}
     private record Network(Graph graph, Map<String, Graph.Edge> roads, Map<String, Junction> junctions,
                            Map<String, List<Movement>> turns, Set<String> entries, boolean geographic) {}
@@ -36,6 +37,7 @@ public final class TrafficWorld {
     private final Network network;
     private final Map<String, List<Cohort>> travelling = new TreeMap<>();
     private final Map<Movement, Double> queues = new TreeMap<>();
+    private final Map<Movement, Deque<TurnBatch>> turnBatches = new TreeMap<>();
     private final Map<String, Double> backlog = new TreeMap<>();
     private final Map<String, State> signals = new TreeMap<>();
     private final Map<String, Map<String, String>> signalRequests = new TreeMap<>();
@@ -113,7 +115,8 @@ public final class TrafficWorld {
                 boolean boundary = geographicOrigin == null
                         ? node.x() == minX || node.x() == maxX || node.y() == minY || node.y() == maxY
                         : true; // A curated corridor omits local side streets where civilian traffic can leave.
-                if (boundary || choices.isEmpty()) distribution.add(new Movement(road.id(), EXIT));
+                if (boundary || choices.isEmpty() || !graph.turnRestrictions().empty())
+                    distribution.add(new Movement(road.id(), EXIT));
                 turns.put(road.id(), List.copyOf(distribution));
                 local.addAll(distribution);
                 outgoing.stream().filter(edge -> edge.to().equals(road.from()))
@@ -190,6 +193,7 @@ public final class TrafficWorld {
         var copy = new TrafficWorld(network);
         copy.travelling.putAll(travelling);
         copy.queues.putAll(queues);
+        turnBatches.forEach((movement,batches)->copy.turnBatches.put(movement,new ArrayDeque<>(batches)));
         copy.backlog.putAll(backlog);
         copy.signals.putAll(signals);
         copy.signalRequests.putAll(signalRequests);
@@ -451,6 +455,8 @@ public final class TrafficWorld {
         });
         Map<String, Double> receivingUsed = new TreeMap<>();
         Map<String, Double> arrivalsOnRoads = new TreeMap<>();
+        var restrictions=network.graph().turnRestrictions();
+        Map<String, Map<List<String>,Double>> restrictedArrivals=new TreeMap<>();
         Map<String, Movement> crossings = new TreeMap<>();
         Map<String, String> statuses = new TreeMap<>();
         signalRequests.clear();
@@ -487,10 +493,11 @@ public final class TrafficWorld {
                 });
                 waitingAmbulances.replaceAll((id, position) -> position.movement().equals(movement)
                         ? new QueuePosition(movement, Math.max(0, position.civiliansAhead() - count)) : position);
+                if (!restrictions.empty()) transferWithTurnContext(movement,count,restrictedArrivals);
                 if (movement.outgoing().equals(EXIT)) exited += count;
                 else {
                     receivingUsed.merge(movement.outgoing(), count, Double::sum);
-                    arrivalsOnRoads.merge(movement.outgoing(), count, Double::sum);
+                    if (restrictions.empty()) arrivalsOnRoads.merge(movement.outgoing(), count, Double::sum);
                 }
             });
         }
@@ -504,7 +511,8 @@ public final class TrafficWorld {
             double entered = Math.min(demand, Math.max(0,
                     room.get(entry.getKey()) - receivingUsed.getOrDefault(entry.getKey(), 0.0)));
             entry.setValue(demand - entered);
-            arrivalsOnRoads.merge(entry.getKey(), entered, Double::sum);
+            if (restrictions.empty()) arrivalsOnRoads.merge(entry.getKey(), entered, Double::sum);
+            else if(entered>0) addArrival(restrictedArrivals,entry.getKey(),restrictions.advance(List.of(),entry.getKey()),entered);
         }
         network.roads().forEach((id, road) -> {
             var next = new ArrayList<Cohort>();
@@ -512,11 +520,12 @@ public final class TrafficWorld {
                 double metres = Math.min(road.length() - cohort.position(), speed.get(id));
                 runningExcess += cohort.count() * Math.max(0, 1 - metres / road.freeSpeed());
                 double position = cohort.position() + metres;
-                if (position + EPSILON >= road.length()) enqueue(id, cohort.count());
-                else next.add(new Cohort(cohort.count(), position));
+                if (position + EPSILON >= road.length()) enqueue(id,cohort.count(),cohort.turnContext());
+                else next.add(new Cohort(cohort.count(),position,cohort.turnContext()));
             }
             double newlyEntered = arrivalsOnRoads.getOrDefault(id, 0.0);
-            if (newlyEntered > 0) next.add(new Cohort(newlyEntered, 0));
+            if (newlyEntered > 0) next.add(new Cohort(newlyEntered,0,List.of()));
+            restrictedArrivals.getOrDefault(id,Map.of()).forEach((context,count)->next.add(new Cohort(count,0,context)));
             travelling.put(id, List.copyOf(next));
         });
         priority = statuses.getOrDefault("AMB-001", "NONE");
@@ -545,19 +554,44 @@ public final class TrafficWorld {
         });
     }
 
-    private void enqueue(String road, double count) {
+    private void enqueue(String road,double count,List<String> context) {
         var movements = network.turns().get(road);
+        var restrictions=network.graph().turnRestrictions();
+        if (!restrictions.empty()) movements=movements.stream()
+                .filter(movement->EXIT.equals(movement.outgoing())||restrictions.permits(context,movement.outgoing())).toList();
         if (movements.size() == 1) {
-            addToQueue(movements.getFirst(), count);
+            addToQueue(movements.getFirst(),count,context);
             return;
         }
         boolean hasExit = movements.getLast().outgoing().equals(EXIT);
         double turnShare = hasExit ? (1 - EXIT_SHARE) / (movements.size() - 1) : 1.0 / movements.size();
         movements.forEach(movement -> addToQueue(movement,
-                count * (movement.outgoing().equals(EXIT) ? EXIT_SHARE : turnShare)));
+                count * (movement.outgoing().equals(EXIT) ? EXIT_SHARE : turnShare),context));
     }
-    private void addToQueue(Movement movement, double count) {
+    private void addToQueue(Movement movement,double count,List<String> context) {
         queues.merge(movement, count, Double::sum);
         queueArrivals.merge(movement, count, Double::sum);
+        if(!network.graph().turnRestrictions().empty())
+            turnBatches.computeIfAbsent(movement,ignored->new ArrayDeque<>()).addLast(new TurnBatch(count,context));
+    }
+
+    private void transferWithTurnContext(Movement movement,double count,Map<String,Map<List<String>,Double>> arrivals) {
+        var batches=turnBatches.get(movement);
+        double remaining=count;
+        while(remaining>0&&!batches.isEmpty()){
+            var batch=batches.removeFirst();
+            double moved=Math.min(remaining,batch.count());
+            remaining-=moved;
+            if(!movement.outgoing().equals(EXIT)) {
+                var context=network.graph().turnRestrictions().advance(batch.context(),movement.outgoing());
+                addArrival(arrivals,movement.outgoing(),context,moved);
+            }
+            if(batch.count()>moved)batches.addFirst(new TurnBatch(batch.count()-moved,batch.context()));
+        }
+        if(batches.isEmpty())turnBatches.remove(movement);
+    }
+
+    private static void addArrival(Map<String,Map<List<String>,Double>> arrivals,String road,List<String> context,double count) {
+        arrivals.computeIfAbsent(road,ignored->new LinkedHashMap<>()).merge(context,count,Double::sum);
     }
 }
