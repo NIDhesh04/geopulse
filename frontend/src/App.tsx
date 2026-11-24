@@ -11,6 +11,7 @@ import {isDrawer, useWorkspaceDrawers, type Drawer} from './workspaceDrawers';
 const scenarioLabels: Record<string,string> = {
   ROUTING_ONLY:'Routing only', TRAFFIC_SIGNALS:'Traffic and signals', FLEET_TRAFFIC:'Ten ambulance conflict',
   PREDICTABLE_CONGESTION:'Predictable corridor congestion',
+  JAIPUR_CORRIDOR:'Jaipur · SMS Hospital corridor',
 };
 
 export function App() {
@@ -88,7 +89,7 @@ export function App() {
     <header className="topbar">
       <a className="brand" href="/welcome"><span className="brand-mark" aria-hidden="true">G</span>GeoPulse</a>
       <div className="workspace-title"><strong>Police Control Room</strong></div>
-      <div className="top-status"><span className="tag">SYNTHETIC NETWORK</span>
+      <div className="top-status"><span className="tag">{scenario?.edgeGeometry?'JAIPUR · SIMULATION':'SYNTHETIC NETWORK'}</span>
         <span className={run.connected?'connection':'connection offline'}><i/>{run.connected?'Connected':state?'Connection stale':'Not connected'}</span>
       </div>
     </header>
@@ -132,8 +133,10 @@ export function App() {
           {fleet.length>0 && !filteredFleet.length && <p className="scope-note">No ambulances match these filters.</p>}
         </div>
         {selected && <>
-          <div className="mission-details"><div><span className="point"/><span><small>DEPARTURE</small>{departure}</span></div>
-          <div><span className="point hospital"/><span><small>DESTINATION</small>{selected.activatedAt===null?scenario?.destination:selected.destination}</span></div></div>
+          <div className="mission-details"><div><span className="point"/><span><small>DEPARTURE</small>{departure&&scenario?.nodeNames?.[departure]||departure}</span></div>
+          <div><span className="point hospital"/><span><small>DESTINATION</small>{selected.activatedAt===null
+            ? scenario?.nodeNames?.[scenario.destination]??scenario?.destination
+            : scenario?.nodeNames?.[selected.destination]??selected.destination}</span></div></div>
           <button className="primary full" disabled={pending || selected.status!=='IDLE' || !departure || !scenario} onClick={()=>
             act('ACTIVATE',{ambulanceId:id,origin:departure,destination:scenario?.destination})}>Activate mission</button>
           {state && <a className="secondary full driver-link" href={`/driver?run=${encodeURIComponent(state.runId)}&ambulance=${encodeURIComponent(selected.id)}`}>Open Driver Navigation</a>}
@@ -181,7 +184,7 @@ export function App() {
         <label className="field-label" htmlFor="inspect-junction">Inspect junction</label>
         <select id="inspect-junction" value={inspectedJunction??''} onChange={event=>setInspectedJunction(event.target.value||undefined)}>
           <option value="">Selected ambulance’s next junction</option>
-          {scenario?.graph.nodes.map(node=><option key={node.id} value={node.id}>{node.id}</option>)}
+          {scenario?.graph.nodes.map(node=><option key={node.id} value={node.id}>{scenario.nodeNames?.[node.id]??node.id}</option>)}
         </select>
         {selected && <>
           <div className="metrics"><div><span>ETA remaining</span><strong>{eta}</strong></div>
@@ -194,7 +197,7 @@ export function App() {
               onClick={()=>act('SUSPEND_PRIORITY',{ambulanceId:id,suspended:!prioritySuspended})}>{prioritySuspended?'Resume priority':'Suspend priority'}</button>}
           </div>}
         </>}
-        {signal && <section className="inspector-section"><h3>Junction {junction}</h3>
+        {signal && <section className="inspector-section"><h3>Junction {junction&&scenario?.nodeNames?.[junction]||junction}</h3>
           <p>{readable(signal.phase)}{signal.recoveryGreen?' · Recovery green':''}
             {signal.startedAt!==undefined && signal.startedAt>=0 && ` · Since ${clock(signal.startedAt)}`}</p>
           {signal.permissions.includes(1)&&<p>Green approach {signal.approaches[signal.permissions.indexOf(1)]}</p>}
@@ -204,18 +207,18 @@ export function App() {
             : <ul>{Object.entries(signal.requests??{}).filter(([,status])=>status!=='GRANTED').map(([vehicle,status])=>
               <li key={vehicle}>{vehicle} · {readable(status)}</li>)}</ul>}
         </section>}
-        {junction&&!signal&&<section className="inspector-section"><h3>Junction {junction}</h3><p>No signal observations available.</p></section>}
+        {junction&&!signal&&<section className="inspector-section"><h3>Junction {scenario?.nodeNames?.[junction]??junction}</h3><p>No signal observations available.</p></section>}
         {mode==='routing' && <section className="inspector-section"><h3>Why this turn?</h3>
           <p>{explanation?`Decision ${explanation.routingRevision} at ${clock(explanation.time)} · ${state?.horizon==='all'?'All live':`${state?.horizon}-hop window`}`:'Awaiting a routing decision'}</p>
           <label className="field-label" htmlFor="route-road">Inspect road estimate</label>
           <select id="route-road" value={road} onChange={event=>setRoad(event.target.value)}>
-            {scenario?.graph.edges.map(edge=><option key={edge.id} value={edge.id}>{edge.from} → {edge.to}</option>)}
+            {scenario?.graph.edges.map(edge=><option key={edge.id} value={edge.id}>{scenario.roadNames?.[edge.id]??edge.from} → {scenario.nodeNames?.[edge.to]??edge.to}</option>)}
           </select>
           {explanation?.roads[road]&&<p>{readable(explanation.roads[road].source)} · {readable(explanation.roads[road].status)}
             {explanation.roads[road].seconds!==null&&` · ${explanation.roads[road].seconds?.toFixed(1)}s`}
             {explanation.roads[road].reason&&` · ${explanation.roads[road].reason}`}</p>}
           {explanation?.candidates.map(candidate=><details className={`candidate ${candidate.outcome==='SELECTED'?'winner':''}`} key={candidate.edge}>
-            <summary><span>{scenario?.graph.edges.find(edge=>edge.id===candidate.edge)?.to ?? candidate.edge}<small>{readable(candidate.road.source)}</small></span>
+            <summary><span>{scenario?.roadNames?.[candidate.edge]??scenario?.graph.edges.find(edge=>edge.id===candidate.edge)?.to??candidate.edge}<small>{readable(candidate.road.source)}</small></span>
               <span className="candidate-cost">{candidate.pathSeconds!==null?`${candidate.pathSeconds.toFixed(1)}s`:readable(candidate.outcome)}</span></summary>
             <div className="candidate-breakdown"><p>Road travel {candidate.road.seconds?.toFixed(1)??'—'}s · Junction wait {candidate.junction.seconds?.toFixed(1)??'—'}s</p>
               {candidate.road.reason&&<p>Road estimate · {candidate.road.reason}</p>}

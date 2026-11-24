@@ -23,6 +23,8 @@ export function DriverNavigation() {
   const [follow,setFollow] = useState(true);
   const [locate,setLocate] = useState(0);
   const [reportOpen,setReportOpen] = useState(false);
+  const [voice,setVoice] = useState(false);
+  const lastSpoken = useRef('');
   const [road,setRoad] = useState('');
   const [roadEdited,setRoadEdited] = useState(false);
   const [reportId,setReportId] = useState<string>();
@@ -52,6 +54,27 @@ export function DriverNavigation() {
   const explanation = mission?.explanation;
   const guidance = routeGuidance(selected,scenario,explanation?.incoming);
   const currentRoad = guidance.current?.id;
+  const nextRoadName=guidance.next?scenario?.roadNames?.[guidance.next.id]:undefined;
+  const voiceAvailable='speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+  const maneuver=nextRoadName?`${guidance.turn} onto ${nextRoadName}`:guidance.turn;
+  const voiceCue=selected?.activatedAt!=null
+    ? `${selected.reroutes}:${guidance.junction}:${guidance.next?.id}:${maneuver}` : '';
+  useEffect(()=>{
+    if(!voiceAvailable)return;
+    if(!voice||!run.connected){
+      if(lastSpoken.current)window.speechSynthesis.cancel();
+      lastSpoken.current='';
+      return;
+    }
+    if(voiceCue&&voiceCue!==lastSpoken.current){
+      lastSpoken.current=voiceCue;
+      window.speechSynthesis.cancel();
+      const cue=new SpeechSynthesisUtterance(maneuver);
+      cue.lang='en-IN';
+      window.speechSynthesis.speak(cue);
+    }
+  },[voiceAvailable,voice,run.connected,voiceCue,maneuver]);
+  useEffect(()=>()=>{if(lastSpoken.current)window.speechSynthesis.cancel();},[]);
   useEffect(() => {
     if (reportOpen && !roadEdited && !road && currentRoad) setRoad(currentRoad);
   },[reportOpen,roadEdited,road,currentRoad]);
@@ -95,18 +118,20 @@ export function DriverNavigation() {
     {(loadError||run.error||projection?.error) && <p className="driver-alert" role="alert">{loadError||run.error||projection?.error}</p>}
     <section className="driver-turn" aria-label="Next maneuver">
       <div><span className="eyebrow">Next maneuver</span><h2>{guidance.turn}</h2>
-      <p>{guidance.next?`${guidance.next.from} → ${guidance.next.to}`:guidance.junction??'Route guidance will appear here'}</p></div>
+      <p>{nextRoadName??(guidance.next?`${guidance.next.from} → ${guidance.next.to}`:guidance.junction??'Route guidance will appear here')}</p></div>
       {guidance.stepDistance!==undefined&&<strong>{Math.ceil(guidance.stepDistance)} m</strong>}
     </section>
     <div className="driver-layout">
       <section className="driver-map panel">
         <div className="driver-map-toolbar"><span>{follow?'Following ambulance':'Map position unlocked'}</span>
+          {voiceAvailable&&<button className="secondary driver-voice" aria-pressed={voice}
+            onClick={()=>setVoice(current=>!current)}>Voice {voice?'on':'off'}</button>}
           {!follow&&<button className="secondary" onClick={()=>{setFollow(true);setLocate(n=>n+1);}}>Recenter</button>}
         </div>
         <div className="driver-map-canvas">
           {scenario&&selected?<NetworkMap scenario={scenario} fleet={[selected]} selected={selected} explanation={explanation}
             mode="routing" closures={state?.reportedClosures??[]} signals={state?.traffic?.signals} follow={follow} locate={locate}
-            showNavigationControls={false}
+            showNavigationControls={false} navigation
             onDrag={()=>setFollow(false)} onEdge={()=>{}} onAmbulance={()=>{}} onJunction={()=>{}}/>
             : <p className="map-empty">Waiting for mission map</p>}
         </div>
@@ -122,7 +147,7 @@ export function DriverNavigation() {
           </dl>
           {eta.reason&&<p>{eta.reason}</p>}
           {eta.measured&&<p>Measured journey time <strong>{eta.measured}</strong></p>}
-          {selected&&<p>Destination {selected.destination}</p>}
+          {selected&&<p>Destination {scenario?.nodeNames?.[selected.destination]??selected.destination}</p>}
         </section>
         <section className="panel driver-card" aria-label="Next junction">
           <h2>Next junction {guidance.junction??''}</h2><p>{signalStatus}</p>

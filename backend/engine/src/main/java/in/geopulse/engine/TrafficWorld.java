@@ -73,6 +73,10 @@ public final class TrafficWorld {
     }
 
     private static Network network(Graph graph, boolean fleetStations) {
+        return network(graph, fleetStations, null);
+    }
+
+    private static Network network(Graph graph, boolean fleetStations, String geographicOrigin) {
         Map<String, Graph.Edge> roads = new TreeMap<>();
         Map<String, Junction> junctions = new TreeMap<>();
         Map<String, List<Movement>> turns = new TreeMap<>();
@@ -84,7 +88,10 @@ public final class TrafficWorld {
         double maxY = graph.nodes().stream().mapToDouble(Graph.Node::y).max().orElse(0);
         for (var node : graph.nodes()) {
             var outgoing = graph.outgoing(node.id());
-            if ((node.x() == minX || node.x() == maxX) && (node.y() == minY || node.y() == maxY)) {
+            boolean hasIncoming = graph.edges().stream().anyMatch(edge -> edge.to().equals(node.id()));
+            if (geographicOrigin == null
+                    ? (node.x() == minX || node.x() == maxX) && (node.y() == minY || node.y() == maxY)
+                    : geographicOrigin.equals(node.id()) || !hasIncoming) {
                 outgoing.forEach(edge -> entries.add(edge.id()));
             }
             var approaches = new ArrayList<String>();
@@ -95,7 +102,9 @@ public final class TrafficWorld {
                 var choices = outgoing.stream().filter(edge -> !edge.to().equals(road.from()))
                         .map(edge -> new Movement(road.id(), edge.id())).toList();
                 var distribution = new ArrayList<>(choices);
-                boolean boundary = node.x() == minX || node.x() == maxX || node.y() == minY || node.y() == maxY;
+                boolean boundary = geographicOrigin == null
+                        ? node.x() == minX || node.x() == maxX || node.y() == minY || node.y() == maxY
+                        : true; // A curated corridor omits local side streets where civilian traffic can leave.
                 if (boundary || choices.isEmpty()) distribution.add(new Movement(road.id(), EXIT));
                 turns.put(road.id(), List.copyOf(distribution));
                 local.addAll(distribution);
@@ -103,7 +112,7 @@ public final class TrafficWorld {
                         .forEach(edge -> local.add(new Movement(road.id(), edge.id())));
             }
             String station = STATION + node.id();
-            if (node.id().equals("n00_00") || (fleetStations && Set.of("n00_04", "n04_00").contains(node.id()))
+            if (node.id().equals("n00_00") || node.id().equals(geographicOrigin) || (fleetStations && Set.of("n00_04", "n04_00").contains(node.id()))
                     || approaches.isEmpty()) {
                 approaches.add(station);
                 outgoing.forEach(edge -> local.add(new Movement(station, edge.id())));
@@ -120,7 +129,15 @@ public final class TrafficWorld {
     }
 
     static TrafficWorld fixture(Graph graph, boolean fleetStations) {
-        var world = new TrafficWorld(network(graph, fleetStations));
+        return fixture(network(graph, fleetStations));
+    }
+
+    static TrafficWorld geographicFixture(Graph graph, String origin) {
+        return fixture(network(graph, false, origin));
+    }
+
+    private static TrafficWorld fixture(Network network) {
+        var world = new TrafficWorld(network);
         var baseline = new TrafficWorld(world.network);
         Map<String, Double> speeds = new TreeMap<>();
         Map<String, Double> populations = new TreeMap<>();
@@ -130,7 +147,7 @@ public final class TrafficWorld {
         for (int tick = 0; tick < 240; tick++) {
             baseline.step(tick, Map.of(), null, false, null, null);
             if (tick < 120) continue;
-            for (var edge : graph.edges()) {
+            for (var edge : network.graph().edges()) {
                 speeds.merge(edge.id(), baseline.speed(edge, Map.of(), null, false) / 120, Double::sum);
                 populations.merge(edge.id(), baseline.civilianOccupancy(edge.id()) / 120, Double::sum);
             }

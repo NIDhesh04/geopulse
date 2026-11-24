@@ -9,6 +9,7 @@ const descriptions:Record<string,{label:string;description:string;incidents:stri
   TRAFFIC_SIGNALS:{label:'Traffic and signals',description:'Follow one ambulance through civilian queues and signal priority.',incidents:'On-demand closures, slowdowns, and demand changes'},
   FLEET_TRAFFIC:{label:'Ten ambulance conflict',description:'Coordinate ten ambulances competing for signal priority.',incidents:'Hidden incidents and operator-reviewed reports'},
   PREDICTABLE_CONGESTION:{label:'Predictable corridor congestion',description:'Use historical travel times to anticipate a demand surge beyond the live window.',incidents:'Scheduled civilian demand surge'},
+  JAIPUR_CORRIDOR:{label:'Jaipur · SMS Hospital corridor',description:'Follow an ambulance from Chandpole through Jaipur to SMS Hospital.',incidents:'Jaipur streets · Simulated traffic and signals'},
 };
 
 export function Landing() {
@@ -21,7 +22,7 @@ export function Landing() {
     api<Scenario[]>('/scenarios').then(items=>{
       if(!active)return;
       setScenarios(items);
-      setChoice(items.find(item=>item.mode==='FLEET_TRAFFIC')?.id??items[0]?.id??'');
+      setChoice(items.find(item=>item.mode==='JAIPUR_CORRIDOR')?.id??items[0]?.id??'');
     }).catch(failure=>{if(active)setError(String(failure));});
     return ()=>{active=false;};
   },[]);
@@ -37,7 +38,7 @@ export function Landing() {
       <section className="landing-intro">
         <div>
           <h1>Simulate ambulance routing and signal priority</h1>
-          <p>Choose a synthetic network to explore traffic queues, route changes, and obstruction review from the control room or the driver’s seat.</p>
+          <p>Run an ambulance mission on Jaipur’s streets or test a repeatable scenario. Watch how signals, queues, and road closures change the route.</p>
           <div className="landing-actions">
             <a className="primary landing-link" href={choice?`/?scenario=${encodeURIComponent(choice)}&setup=1`:'/'}>Open Police Control Room</a>
             {driverHref&&<a className="secondary landing-link" href={driverHref}>Open Driver Navigation</a>}
@@ -58,7 +59,7 @@ export function Landing() {
           return <label className="panel scenario-option" key={item.id}>
             <span><input type="radio" name="landing-scenario" value={item.id} checked={choice===item.id}
               onChange={()=>setChoice(item.id)}/> <strong>{details?.label??item.name}</strong></span>
-            <span className="mode-tag">Synthetic scenario</span>
+            <span className="mode-tag">{item.edgeGeometry?'Jaipur map':'Synthetic scenario'}</span>
             <span>{details?.description??item.name}</span>
             <span className="scenario-meta">{item.graph.nodes.length} junctions · {item.graph.edges.length} roads · {Object.keys(item.departureByAmbulance??{}).length||1} ambulance{item.departureByAmbulance?'s':''}</span>
             {details&&<span className="scenario-meta">{details.incidents}</span>}

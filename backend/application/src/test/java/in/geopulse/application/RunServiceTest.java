@@ -14,6 +14,35 @@ import static org.junit.jupiter.api.Assertions.*;
 @Testcontainers
 @SpringBootTest
 class RunServiceTest {
+    @Test void jaipurMissionRoutesOverThePublishedGeometry() throws Exception {
+        String scenarioId = "jaipur-sms-corridor";
+        var definition = runs.scenarios().stream().filter(s -> scenarioId.equals(s.get("id"))).findFirst().orElseThrow();
+        var graph = (in.geopulse.engine.Graph) definition.get("graph");
+        var geometry = json.valueToTree(definition.get("edgeGeometry"));
+        for (var road : graph.edges()) {
+            var shape = geometry.path(road.id());
+            assertTrue(shape.size() >= 2);
+            assertEquals(graph.node(road.from()).lng(), shape.get(0).get(0).asDouble());
+            assertEquals(graph.node(road.to()).lat(), shape.get(shape.size()-1).get(1).asDouble());
+        }
+        var created = runs.create("2", 108, scenarioId, true);
+        var id = UUID.fromString(created.get("runId").toString());
+        assertEquals("JAIPUR_CORRIDOR", created.get("mode"));
+        String origin = (String) definition.get("origin");
+        String destination = (String) definition.get("destination");
+        var activation = command(id, UUID.randomUUID(), "ACTIVATE", Map.of("origin",origin,"destination",destination));
+        assertEquals("APPLIED", activation.get("status"), activation.toString());
+        var mission = runs.mission(id, "AMB-001").ambulance();
+        assertFalse(mission.route().isEmpty());
+        assertEquals(origin, graph.edge(mission.route().getFirst()).from());
+        assertEquals(destination, graph.edge(mission.route().getLast()).to());
+        for (int tick = 0; tick < 30 && mission.edge() == null; tick++) {
+            assertEquals("APPLIED", command(id, UUID.randomUUID(), "STEP", Map.of()).get("status"));
+            mission = runs.mission(id, "AMB-001").ambulance();
+        }
+        assertNotNull(mission.edge());
+        assertTrue(geometry.has(mission.edge()));
+    }
     @Test void predictableCongestionRunUsesTheReproduciblePackagedProfile() throws Exception {
         assertEquals(CalibrationRunner.calibrate(CalibrationRunner.CALIBRATION_SEEDS), RunService.readCongestionProfile());
         var created = runs.create("2", CalibrationRunner.DEMO_SEED, CalibrationRunner.SCENARIO, false);
@@ -65,7 +94,13 @@ class RunServiceTest {
     @Autowired RunService runs; @Autowired ObjectMapper json; @Autowired JdbcTemplate jdbc;
     Map<String,Object> command(UUID run,UUID id,String type,Map<String,Object> payload)throws Exception{
         runs.accept(run,new RunService.Command(id,type,json.valueToTree(payload)));
-        for(int i=0;i<100;i++){var result=runs.command(run,id);if(!result.get("status").equals("ACCEPTED"))return result;Thread.sleep(20);}
+        for (int i=0;i<100;i++) {
+            var result=runs.command(run,id);
+            if (!result.get("status").equals("ACCEPTED")
+                    && Long.parseLong(runs.snapshot(run).get("stateRevision").toString())
+                    >= Long.parseLong(result.get("boundary_ordinal").toString())) return result;
+            Thread.sleep(20);
+        }
         fail("command never completed");return Map.of();
     }
     @Test void migrationJsonbCommandsAndStepping()throws Exception{

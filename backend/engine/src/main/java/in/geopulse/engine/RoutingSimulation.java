@@ -44,6 +44,15 @@ public final class RoutingSimulation {
         return simulation;
     }
 
+    public static RoutingSimulation geographicTraffic(Graph graph, int horizon, boolean priorityEnabled, String origin) {
+        graph.node(origin);
+        var simulation = new RoutingSimulation(graph, horizon);
+        simulation.traffic = TrafficWorld.geographicFixture(graph, origin);
+        simulation.priorityEnabled = priorityEnabled;
+        simulation.node = origin;
+        return simulation;
+    }
+
     public static RoutingSimulation predictableCongestion(int horizon, boolean priorityEnabled, long seed,
                                                           HistoricalProfile profile) {
         var simulation = traffic(Graph.grid(5), horizon, priorityEnabled);
@@ -207,7 +216,7 @@ public final class RoutingSimulation {
     public void activate(String from,String to){
         if(!status.equals("IDLE"))throw new IllegalArgumentException("This scenario supports one mission per run; create a new run to restart");
         graph.node(from);graph.node(to);
-        if (traffic != null && !from.equals(fleetEnabled ? fixtureOrigins().get(ambulanceId) : "n00_00"))
+        if (traffic != null && !from.equals(node))
             throw new IllegalArgumentException("Use the configured station entry");
         node=from;destination=to;incoming="station-entry:"+from;activatedAt=time;junctionArrival=time;status="AT_JUNCTION";emit("MISSION_ACTIVATED",ambulanceId+" activated");
         if(from.equals(to)){initialEta=0.0;arrive();return;}plan();

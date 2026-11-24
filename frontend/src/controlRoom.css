@@ -47,6 +47,18 @@
 .landing-preview {margin:0;min-width:0}
 .landing-preview figcaption {padding:12px 16px;border-bottom:1px solid var(--border)}
 .landing-preview>div {height:clamp(280px,38vw,440px);position:relative}
+.map-canvas {position:absolute;inset:0}
+.geo-map-label {position:absolute;left:10px;bottom:8px;display:grid;gap:1px;max-width:calc(100% - 64px);
+  padding:4px 8px;border:1px solid #2f4558;border-radius:6px;background:#091421ed;color:#d9eafa;
+  font-size:11px;line-height:1.35}
+.geo-map-label small,.geo-map-label a {color:#afc6d7;font-size:10px}
+.map-wrap:has(.geographic-map) .map-legend {bottom:64px}
+.map-tilt {position:absolute;right:10px;top:10px;background:#101d2be8}
+.landing-preview:has(.geographic-map) {border-color:#45758e;box-shadow:0 22px 70px #0309139c}
+.landing-preview:has(.geographic-map) figcaption {background:#102433;color:#d6ecfa}
+.landing-intro:has(.geographic-map) {padding:clamp(12px,2vw,30px);border-radius:16px;
+  background:radial-gradient(ellipse at 65% 35%,#112e41 0%,#0f1b29 48%,#101822 100%)}
+.driver-voice[aria-pressed=true] {border-color:var(--cyan);color:var(--cyan)}
 .landing-scenarios {margin:28px 0 0;padding:0;border:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;min-width:0}
 .landing-scenarios legend {font-size:20px;font-weight:600;margin-bottom:12px}
 .scenario-option {padding:16px;display:grid;gap:8px;align-content:start;cursor:pointer}

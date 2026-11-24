@@ -52,8 +52,14 @@ export function routeGuidance(mission:Ambulance|undefined, scenario:Scenario|und
   const to = node.get(next.to);
   let turn = 'Continue';
   if (from && pivot && to) {
-    const a = [pivot.x-from.x,pivot.y-from.y];
-    const b = [to.x-pivot.x,to.y-pivot.y];
+    const entering=current&&scenario.edgeGeometry?.[current.id];
+    const leaving=scenario.edgeGeometry?.[next.id];
+    const vector=(start:[number,number],end:[number,number])=>[
+      (end[0]-start[0])*Math.cos(start[1]*Math.PI/180),start[1]-end[1],
+    ];
+    const a = entering&&entering.length>1
+      ? vector(entering[entering.length-2],entering[entering.length-1]) : [pivot.x-from.x,pivot.y-from.y];
+    const b = leaving&&leaving.length>1 ? vector(leaving[0],leaving[1]) : [to.x-pivot.x,to.y-pivot.y];
     const angle = Math.atan2(a[0]*b[1]-a[1]*b[0],a[0]*b[0]+a[1]*b[1]);
     turn = Math.abs(angle)>2.5 ? 'Make a U-turn' : angle>0.35 ? 'Turn right' : angle< -0.35 ? 'Turn left' : 'Continue straight';
   }
