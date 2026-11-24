@@ -2,7 +2,7 @@
 
 **Fact:** The runnable SMS Hospital demo uses 27 junctions and 41 directed corridor polylines from the supplied GeoPulse prototype’s cached OpenStreetMap/OSRM geometry. The simulation starts at Chandpole Gate. Each retained link keeps the original sampled direction and ordered curve. The archive does not identify the OSM extract date or a complete set of legal turn restrictions, so this is a curated demonstration graph.
 
-**Fact:** The Control Room, scenario preview, and Driver Navigation use those same local road shapes. Optional online geographic context comes from OpenFreeMap vector tiles (© OpenMapTiles, © OpenStreetMap contributors). The local road shapes and the server simulation still run when context tiles are unavailable. The moving dots in Simulation Truth represent simulated travelling traffic, with their count capped for readability.
+**Fact:** The Control Room, scenario preview, and Driver Navigation use those same local road shapes. The All Streets layer colors visible Jaipur driving streets from OpenFreeMap, including neighborhood and service roads, and samples animated dots for readability. This citywide traffic visualization is synthetic and separate from the backend corridor model. Simulation Truth shows the engine’s occupancy and queues alongside it. Local corridor roads and routing remain available if the OpenFreeMap context cannot load (© OpenMapTiles, © OpenStreetMap contributors).
 
 **Decision:** Use a bounded Jaipur road network from a dated OpenStreetMap extract for the first geographic demo. Keep the synthetic grid as the reference fixture for checking routing, queues and signal timing. Introduce Jaipur once those mechanics are integrated on the grid.
 

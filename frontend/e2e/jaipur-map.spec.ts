@@ -15,6 +15,14 @@ test('Jaipur map and driver voice use a server-authoritative mission',async({pag
   await expect(page.locator('.candidate.winner')).toBeVisible();
   await expect.poll(async()=>Number(await page.locator('.map-surface').getAttribute('data-road-count'))).toBeGreaterThan(0);
   const tilt=page.getByRole('button',{name:'3D view'});
+  const allStreets=page.getByRole('button',{name:'All Streets'});
+  await expect(allStreets).toHaveAttribute('aria-pressed','true');
+  await allStreets.click();
+  await expect(allStreets).toHaveAttribute('aria-pressed','false');
+  await page.getByRole('button',{name:'Corridor',exact:true}).click();
+  await page.getByRole('button',{name:'City',exact:true}).click();
+  await allStreets.click();
+  await expect(allStreets).toHaveAttribute('aria-pressed','true');
   await expect(tilt).toHaveAttribute('aria-pressed','true');
   await tilt.click();
   await expect(tilt).toHaveAttribute('aria-pressed','false');

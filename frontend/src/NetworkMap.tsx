@@ -8,6 +8,7 @@ import type {Ambulance, Coordinate, Explanation, Scenario, Signal, SimulationTru
 import {routingEdges, type MapMode} from './controlRoom';
 import {mapCoordinate as coord,queuedRoad,roadGeometry,sampleRoad} from './mapGeometry';
 import {jaipurStyle} from './jaipurMap';
+import {addCityTraffic,cityCenter,cityZoom,runCityTraffic} from './jaipurTraffic';
 import 'maplibre-gl/dist/maplibre-gl.css';
 const motionQuery = '(prefers-reduced-motion: reduce)';
 const reducedMotion = () => matchMedia(motionQuery).matches;
@@ -33,6 +34,9 @@ export function NetworkMap({scenario,fleet,selected,explanation,mode,closures,si
  drag.current=onDrag;edgeAction.current=onEdge;select.current=onAmbulance;selectedRef.current=selected;junctionAction.current=onJunction;
  const [ready,setReady]=useState(false),[failure,setFailure]=useState(''),[mapAttempt,setMapAttempt]=useState(0);
  const [tilted,setTilted]=useState(true),[contextUnavailable,setContextUnavailable]=useState(false);
+ const [allStreets,setAllStreets]=useState(true),[streetCount,setStreetCount]=useState(0);
+ const [inspectedStreet,setInspectedStreet]=useState<{name:string;kind:string;load:number}|null>(null);
+ const corridor=useRef<{center:maplibregl.LngLat;zoom:number}|null>(null);
  const failureRef=useRef(failure);failureRef.current=failure;
  useEffect(()=>{const retry=()=>{if(failureRef.current)setMapAttempt(n=>n+1);};window.addEventListener('online',retry);return()=>window.removeEventListener('online',retry);},[]);
  const position=(a:Ambulance|undefined)=>{
@@ -67,13 +71,13 @@ export function NetworkMap({scenario,fleet,selected,explanation,mode,closures,si
    const roads:FeatureCollection={type:'FeatureCollection',features:scenario.graph.edges.map(e=>({type:'Feature',properties:{id:e.id},geometry:{type:'LineString',coordinates:geometry.get(e.id)!}}))};
    instance.addSource('roads',{type:'geojson',data:roads});
    instance.addLayer({id:'roads-base',type:'line',source:'roads',layout:{'line-cap':'round','line-join':'round'},
-    paint:{'line-color':geographic?'#56768b':'#293949','line-width':geographic?5:12}});
+    paint:{'line-color':geographic?'#456179':'#293949','line-width':geographic?2.6:12}});
    instance.addLayer({id:'roads-predicted',type:'line',source:'roads',paint:{'line-color':'#7b6c9e','line-width':2,'line-dasharray':[2,2]}});
    instance.addLayer({id:'roads-live',type:'line',source:'roads',filter:['in',['get','id'],['literal',[]]],paint:{'line-color':'#a5b7c8','line-width':2}});
    instance.addLayer({id:'route-glow',type:'line',source:'roads',filter:['in',['get','id'],['literal',[]]],
-    layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#13d7ff','line-width':16,'line-blur':8,'line-opacity':.72}});
+    layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':geographic?'#07ebad':'#13d7ff','line-width':16,'line-blur':8,'line-opacity':.72}});
    instance.addLayer({id:'roads-route',type:'line',source:'roads',filter:['in',['get','id'],['literal',[]]],
-    layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#24dbff','line-width':geographic?6:4,'line-opacity':0.9}});
+    layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':geographic?'#16e8b0':'#24dbff','line-width':geographic?6:4,'line-opacity':0.9}});
    instance.moveLayer('route-glow','roads-predicted');
    instance.moveLayer('roads-route','roads-predicted');
    instance.addLayer({id:'roads-fallback',type:'line',source:'roads',paint:{'line-color':'#d8b4fe','line-width':3,'line-dasharray':[1,2]}},'roads-live');
@@ -104,21 +108,43 @@ export function NetworkMap({scenario,fleet,selected,explanation,mode,closures,si
    if(context){
     for(const [id,source] of Object.entries(context.sources))instance.addSource(id,source);
     for(const layer of context.layers.slice(1))instance.addLayer(layer,'roads-base');
+    addCityTraffic(instance);
+    for(const id of ['city-street-labels','city-districts','city-hospital-pins','city-hospital-names'])instance.moveLayer(id,'route-glow');
+    instance.on('click','city-traffic-lines',event=>{
+     if(instance.queryRenderedFeatures(event.point,{layers:['roads-base','nodes','ambulance']}).length)return;
+     const street=event.features?.[0]?.properties;
+     if(street)setInspectedStreet({name:String(street.name),kind:String(street.kind),load:Number(street.load)});
+    });
     const bounds=new maplibregl.LngLatBounds();
     for(const line of geometry.values())line.forEach(point=>bounds.extend(point));
     instance.fitBounds(bounds,{padding:45,duration:0,maxZoom:15});
     if(instance.getContainer().clientWidth>=650&&instance.getZoom()<13.25)instance.jumpTo({zoom:13.25});
+    corridor.current={center:instance.getCenter(),zoom:instance.getZoom()};
+    if(!navigation)instance.jumpTo({center:cityCenter,zoom:cityZoom});
    } else instance.fitBounds([coord({id:'',x:-80,y:480}),coord({id:'',x:480,y:-80})],{padding:70,duration:0});
    setReady(true);
   });
   return()=>{setReady(false);instance.remove();map.current=null;};
- },[scenario,mapAttempt,showNavigationControls,geographic,geometry]);
+ },[scenario,mapAttempt,showNavigationControls,geographic,geometry,navigation]);
  useEffect(()=>{
   const m=map.current;if(!ready||!geographic||!m?.getLayer('city-buildings'))return;
   m.setLayoutProperty('city-buildings','visibility',tilted?'visible':'none');
-  const camera={pitch:tilted?48:0,bearing:tilted?-12:0};
+  const camera={pitch:tilted?54:0,bearing:tilted?-14:0};
   if(reduced)m.jumpTo(camera);else m.easeTo({...camera,duration:320});
  },[ready,geographic,tilted,reduced]);
+ useEffect(()=>{
+  const m=map.current;
+  if(!ready||!geographic||!allStreets||!m?.getSource('city-traffic'))return;
+  return runCityTraffic(m,reduced,setStreetCount);
+ },[ready,geographic,allStreets,reduced,scenario]);
+ const focusMap=(city:boolean)=>{
+  const m=map.current;
+  const view=city?{center:cityCenter,zoom:cityZoom}:corridor.current;
+  if(!m||!view)return;
+  drag.current();
+  if(reduced)m.jumpTo(view);
+  else m.easeTo({...view,duration:400});
+ };
  const previous=useRef<Ambulance|undefined>(undefined);
  const lastLocate=useRef(0);
  useEffect(()=>{
@@ -232,12 +258,27 @@ export function NetworkMap({scenario,fleet,selected,explanation,mode,closures,si
   <div className="map-canvas" ref={container} aria-label={geographic?'Jaipur road network':'Synthetic road network'}/>
   {geographic&&<div className="geo-map-label">
    <span>Jaipur · Simulated traffic and signals</span>
+   {allStreets&&streetCount>0&&<span className="city-flow-key">
+    <b>{streetCount.toLocaleString('en-IN')} visible street segments</b>
+    <span><i className="flow-free"/>Light</span><span><i className="flow-moderate"/>Moderate</span><span><i className="flow-heavy"/>Heavy</span>
+   </span>}
    <small>{contextUnavailable&&'Context tiles unavailable · '}
     <a href="https://openfreemap.org/">OpenFreeMap</a> · <a href="https://openmaptiles.org/">© OpenMapTiles</a> · <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap</a>
    </small>
   </div>}
-  {geographic&&showNavigationControls&&<button className="map-tilt secondary" disabled={!ready}
-   aria-pressed={tilted} onClick={()=>setTilted(value=>!value)}>3D view</button>}
+  {geographic&&showNavigationControls&&<div className="geo-map-controls" role="group" aria-label="Jaipur map controls">
+   <button className="secondary" disabled={!ready} aria-pressed={allStreets}
+    onClick={()=>{setAllStreets(value=>!value);setInspectedStreet(null);}}>All Streets</button>
+   <button className="secondary" disabled={!ready} onClick={()=>focusMap(true)}>City</button>
+   <button className="secondary" disabled={!ready} onClick={()=>focusMap(false)}>Corridor</button>
+   <button className="secondary" disabled={!ready} aria-pressed={tilted} onClick={()=>setTilted(value=>!value)}>3D view</button>
+  </div>}
+  {geographic&&allStreets&&inspectedStreet&&<section className="geo-street-inspector" aria-label="Street traffic">
+   <button aria-label="Close street details" className="subtle" onClick={()=>setInspectedStreet(null)}>×</button>
+   <strong>{inspectedStreet.name}</strong>
+   <p>{inspectedStreet.kind.replaceAll('_',' ')} · {inspectedStreet.load>=.70?'Heavy':inspectedStreet.load>=.48?'Moderate':'Light'}</p>
+   <small>Simulated city traffic</small>
+  </section>}
   {failure&&<div className="map-failure">Map rendering unavailable: {failure}<button onClick={()=>setMapAttempt(n=>n+1)}>Retry map</button></div>}
  </div>;
 }
