@@ -1,21 +1,31 @@
 export type Node = {id:string;x:number;y:number;lat?:number|null;lng?:number|null};
 export type Edge = {id:string;from:string;to:string;length:number;freeSpeed:number};
-export type Scenario = {id:string;name:string;mode:string;graph:{nodes:Node[];edges:Edge[]};origin:string;destination:string};
+export type Scenario = {id:string;name:string;mode:string;graph:{nodes:Node[];edges:Edge[]};origin:string;destination:string;departureByAmbulance?:Record<string,string>};
 export type Estimate = {status:string;seconds:number|null;source:string;reason:string|null};
 export type Candidate = {edge:string;road:Estimate;junction:Estimate;pathSeconds:number|null;outcome:string;reason:string|null};
+export type Ambulance = {id:string;status:string;node:string;edge:string|null;progress:number;destination:string;route:string[];activatedAt:number|null;arrivedAt:number|null;replans:number;reroutes:number;reason:string|null;initialEta:number|null;estimatedArrival:number|null};
+export type Explanation = {routingRevision:string;time:number;incoming:string;candidates:Candidate[];liveEdges:string[];roads:Record<string,Estimate>};
+export type Signal = {approaches:string[];phase:string;permissions:number[];startedAt?:number;grantedAmbulance?:string|null;recoveryGreen?:boolean;requests?:Record<string,string>};
+export type MissionView = {ambulance:Ambulance;explanation:Explanation|null;priority:string;prioritySuspended:boolean;junctionWait:number};
+export type RoadTruth = {occupancy:number;queued:number;capacity:number};
+export type SimulationTruth = {stateRevision:string;simulationTimeSeconds:number;physicalEffects:Record<string,string[]>;roads:Record<string,RoadTruth>};
+export type OperationalReport = {id:string;ambulanceId:string;road:string;closure:boolean;submittedAt:number;status:string;reviewedAt:number|null};
 export type Snapshot = {
  scenarioId?:string;
  traffic?:{
    priority:string;
    totals:{travelling:number;queued:number;boundaryBacklog:number;junctionWaiting:number;boundaryWaiting:number;runningExcess:number};
-   signals:Record<string,{approaches:string[];phase:string;permissions:number[]}>;
+   signals:Record<string,Signal>;
  };
  priorityEnabled?:boolean;
  prioritySuspended?:boolean;
  ambulanceJunctionWait?:number;
  runId:string;stateRevision:string;latestEventSequence:string;simulationTimeSeconds:number;paused:boolean;speed:number;horizon:string;runStatus:string;
- ambulance:{id:string;status:string;node:string;edge:string|null;progress:number;destination:string;route:string[];activatedAt:number|null;arrivedAt:number|null;replans:number;reroutes:number;reason:string|null;initialEta:number|null;estimatedArrival:number|null};
- explanation:{routingRevision:string;time:number;incoming:string;candidates:Candidate[];liveEdges:string[];roads:Record<string,Estimate>}|null;
+ ambulance:Ambulance;
+ fleet?:Ambulance[];
+ explanation:Explanation|null;
  reportedClosures:string[];
+ reports?:Record<string,OperationalReport>;
+ acknowledgements?:Record<string,number>;
 };
 export type RunEvent={sequence:string;time:number;type:string;data:{message:string;commandId?:string}};

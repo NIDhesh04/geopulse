@@ -100,6 +100,7 @@ public final class RoutingSimulation {
     }
 
     public Map<String, Set<String>> physicalEffects() { return Map.copyOf(physical); }
+    public Map<String, TrafficWorld.RoadTruth> roadTruth() { return traffic == null ? Map.of() : traffic.roadTruth(); }
 
     public void activate(String id, String from, String to) {
         mission(id).activate(from, to);

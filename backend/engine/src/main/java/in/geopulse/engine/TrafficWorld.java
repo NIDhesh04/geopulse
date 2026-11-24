@@ -24,7 +24,9 @@ public final class TrafficWorld {
                          double boundaryBacklog, double junctionWaiting, double boundaryWaiting,
                          double runningExcess) {}
     public record SignalView(List<String> approaches, String phase, List<Integer> permissions,
-                             long startedAt, String grantedAmbulance, boolean recoveryGreen) {}
+                             long startedAt, String grantedAmbulance, boolean recoveryGreen,
+                             Map<String, String> requests) {}
+    public record RoadTruth(double occupancy, double queued, double capacity) {}
     public record View(Totals totals, Map<String, SignalView> signals, String priority) {}
     record Crossing(Movement movement, String priority) {}
     record FleetCrossing(Map<String, Movement> crossings, Map<String, String> priorities) {}
@@ -36,6 +38,7 @@ public final class TrafficWorld {
     private final Map<Movement, Double> queues = new TreeMap<>();
     private final Map<String, Double> backlog = new TreeMap<>();
     private final Map<String, State> signals = new TreeMap<>();
+    private final Map<String, Map<String, String>> signalRequests = new TreeMap<>();
     private Profile history;
     private final Map<String, QueuePosition> waitingAmbulances = new LinkedHashMap<>();
     private Map<String, Integer> occupiedByFleet = Map.of();
@@ -133,6 +136,7 @@ public final class TrafficWorld {
         copy.queues.putAll(queues);
         copy.backlog.putAll(backlog);
         copy.signals.putAll(signals);
+        copy.signalRequests.putAll(signalRequests);
         copy.history = history;
         copy.waitingAmbulances.putAll(waitingAmbulances);
         copy.occupiedByFleet = occupiedByFleet;
@@ -157,9 +161,21 @@ public final class TrafficWorld {
             State state = signals.get(id);
             views.put(id, new SignalView(junction.approaches(), state.phase().name(),
                     junction.service().permissions(state), state.startedAt(),
-                    state.grant() == null ? null : state.grant().ambulanceId(), state.recoveryGreen()));
+                    state.grant() == null ? null : state.grant().ambulanceId(), state.recoveryGreen(),
+                    signalRequests.getOrDefault(id, Map.of())));
         });
         return new View(totals(), Collections.unmodifiableMap(views), priority);
+    }
+
+    Map<String, RoadTruth> roadTruth() {
+        var truth = new TreeMap<String, RoadTruth>();
+        network.roads().keySet().forEach(id -> {
+            double queued = network.turns().get(id).stream().mapToDouble(m -> queues.getOrDefault(m, 0.0)).sum();
+            int fleet = occupiedByFleet.getOrDefault(id, 0);
+            truth.put(id, new RoadTruth(runningPopulation(id) + queued + fleet,
+                    queued + fleet - movingByFleet.getOrDefault(id, 0), STORAGE));
+        });
+        return Collections.unmodifiableMap(truth);
     }
 
     private static double sum(Map<?, Double> values) {
@@ -351,6 +367,7 @@ public final class TrafficWorld {
         Map<String, Double> arrivalsOnRoads = new TreeMap<>();
         Map<String, Movement> crossings = new TreeMap<>();
         Map<String, String> statuses = new TreeMap<>();
+        signalRequests.clear();
         // Each outgoing road has exactly one upstream junction, so each junction
         // allocates its receiving capacity once. Boundary demand uses the residual.
         for (var entry : network.junctions().entrySet()) {
@@ -370,6 +387,7 @@ public final class TrafficWorld {
                         rates, room, local);
                 result = contention.service();
                 statuses.putAll(contention.priorityByAmbulance());
+                signalRequests.put(node, contention.priorityByAmbulance());
             }
             signals.put(node, result.state());
             crossings.putAll(result.crossings());

@@ -37,7 +37,7 @@ public class RunService {
             loop=Executors.newSingleThreadScheduledExecutor(r->{Thread t=new Thread(r,"run-"+id);t.setDaemon(true);return t;});}
     }
     private record Published(Map<String, Object> operational, Map<String, RoutingSimulation.MissionView> fleet,
-                             Map<String, Set<String>> physicalEffects) {}
+                             Map<String, Set<String>> physicalEffects, Map<String, TrafficWorld.RoadTruth> roadTruth) {}
     public RunService(JdbcTemplate db,ObjectMapper json,TransactionTemplate tx,SimpMessagingTemplate messages){this.db=db;this.json=json;this.tx=tx;this.messages=messages;}
     private String encode(Object data){try{return json.writeValueAsString(data);}catch(Exception e){throw new IllegalStateException("Cannot encode state",e);}}
     @PostConstruct void startup(){
@@ -92,7 +92,8 @@ public class RunService {
     public Map<String,Object> simulationTruth(UUID id) {
         var published = require(id).published;
         return Map.of("stateRevision", published.operational().get("stateRevision"),
-                "physicalEffects", published.physicalEffects());
+                "simulationTimeSeconds", published.operational().get("simulationTimeSeconds"),
+                "physicalEffects", published.physicalEffects(), "roads", published.roadTruth());
     }
     public synchronized Map<String,Object> accept(UUID runId,Command command){
         if(command==null||command.commandId()==null||command.type()==null||command.payload()==null||!command.payload().isObject())throw new ApiException(400,"commandId, type and object payload are required");
@@ -225,7 +226,7 @@ public class RunService {
             view.put("priorityEnabled", r.priorityEnabled);
             view.put("prioritySuspended", sim.prioritySuspended());
         }
-        return new Published(Collections.unmodifiableMap(view), fleet, sim.physicalEffects());
+        return new Published(Collections.unmodifiableMap(view), fleet, sim.physicalEffects(), sim.roadTruth());
     }
     private void publishState(Run r){try{messages.convertAndSend("/topic/runs/"+r.id+"/state",snapshot(r.id));r.lastPublish=System.nanoTime();}catch(RuntimeException ignored){/* Next heartbeat or HTTP snapshot repairs delivery. */}}
 }

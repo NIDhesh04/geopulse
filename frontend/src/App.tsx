@@ -1,76 +1,197 @@
-import {useEffect,useState} from 'react';
-import {api} from './api';import {useRun} from './useRun';import {NetworkMap} from './NetworkMap';
-import type {Scenario} from './types';
-const clock=(seconds:number)=>`${Math.floor(seconds/60).toString().padStart(2,'0')}:${Math.floor(seconds%60).toString().padStart(2,'0')}`;
-const readable=(text:string)=>text.toLowerCase().replaceAll('_',' ');
-export function App(){
- const run=useRun();const [scenarios,setScenarios]=useState<Scenario[]>([]),[scenarioId,setScenarioId]=useState("routing-only-5x5"),[priority,setPriority]=useState(true),[loadError,setLoadError]=useState('');
- const [horizon,setHorizon]=useState('2'),[selected,setSelected]=useState(true),[locate,setLocate]=useState(0),[follow,setFollow]=useState(false);
- const [road,setRoad]=useState(''),[effect,setEffect]=useState('ENTRY_CLOSED'),[reported,setReported]=useState(true),[tab,setTab]=useState<'alerts'|'events'>('events');
- useEffect(()=>{api<Scenario[]>('/scenarios').then(s=>{setScenarios(s);setRoad(s[0].graph.edges[0].id);}).catch(e=>setLoadError(String(e)));},[]);
- const state=run.snapshot,a=state?.ambulance;
- const scenario=scenarios.find(item=>item.id===(state?.scenarioId??scenarioId))??scenarios[0];
- const traffic=state?.traffic;
- const junction=a?.edge?scenario?.graph.edges.find(edge=>edge.id===a.edge)?.to:a?.node;
- const signal=junction?traffic?.signals[junction]:undefined;
- const nextRunTraffic=scenarioId==='traffic-signals-5x5';
- const act=(type:string,payload:Record<string,unknown>={})=>{void run.send(type,payload).catch(()=>{});};
- const eta=state&&!run.connected?'Stale':!a?'—':a.arrivedAt!==null?'Arrived':a.estimatedArrival===null?'ETA unavailable':a.estimatedArrival<(state?.simulationTimeSeconds??0)?'Estimate exceeded':`${Math.ceil(a.estimatedArrival-(state?.simulationTimeSeconds??0))}s`;
- const events=run.events.filter(e=>tab==='events'||e.type==='OPERATOR_ALERT'||e.type==='COMMAND_REJECTED');
- const remaining=scenario&&a?a.route.reduce((sum,id)=>sum+(scenario.graph.edges.find(e=>e.id===id)?.length??0),0)-a.progress:0;
- return <main className="app-shell">
-  <header className="topbar"><a className="brand" href="#"><span className="brand-mark">G<span/></span><span>GeoPulse<small>TRAFFIC INTELLIGENCE</small></span></a>
-   <div className="workspace-title"><span className="eyebrow">OPERATIONS / CENTRAL DISTRICT</span><strong>Control room</strong></div>
-   <div className="top-status"><span className="tag">SYNTHETIC NETWORK</span><span className={run.connected?'connection':'connection offline'}><i/>{run.connected?'Connected':state?'Connection stale':'Not connected'}</span></div>
-  </header>
-  <section className="workspace-bar"><div><span className="eyebrow">ROUTING LABORATORY</span><h1>Every turn, explained.</h1><p>One ambulance. A changing network. A decision at every junction.</p></div><div className="clock"><span className="eyebrow">SIMULATION TIME</span><strong>{clock(state?.simulationTimeSeconds??0)}</strong><span>{state?readable(state.runStatus):'Ready to begin'}</span></div></section>
-  {(run.error||loadError)&&<div className="error-banner" role="alert">{run.error||loadError}{loadError&&' · Start the backend and reload this page.'}</div>}
-  <div className="workspace">
-   <aside className="fleet-panel panel"><div className="panel-heading"><h2>Mission control</h2><span className="count">01</span></div>
-    <div className="scenario-card"><span className="eyebrow">ACTIVE SCENARIO</span><h3>Central district</h3><p>5 × 5 synthetic grid</p><div className="scenario-stats"><span><b>25</b> junctions</span><span><b>80</b> road segments</span></div><span className="mode-tag">{traffic?'M2 · Traffic and signals':'M1 · Routing only'}</span></div>
-    <label className="field-label" htmlFor="scenario">Scenario for next run</label>
-    <select id="scenario" value={scenarioId} onChange={e=>setScenarioId(e.target.value)}>
-     {scenarios.map(item=><option key={item.id} value={item.id}>{item.mode==='TRAFFIC_SIGNALS'?'Traffic and signals':'Routing only'}</option>)}
-    </select>
-    {nextRunTraffic&&<label className="check"><input type="checkbox" checked={priority} onChange={e=>setPriority(e.target.checked)}/> Ambulance signal priority</label>}
-    <label className="field-label" htmlFor="horizon">Live information horizon</label><select id="horizon" value={horizon} onChange={e=>setHorizon(e.target.value)}><option value="0">Historical only · 0 hops</option><option value="2">Hybrid · 2 hops</option><option value="all">All reachable roads</option></select>
-    <button className="secondary full" disabled={!!run.pending||!scenario} onClick={()=>{if(!state||confirm('Create a new run? The current run will be paused and its history retained.'))void run.create(horizon,scenarioId,priority);}}>{state?'New run':'Create run'}</button>
-    <div className="section-label">FLEET <span>1 ambulance</span></div>
-    <button className={`ambulance-card ${selected?'selected':''}`} onClick={()=>setSelected(true)}><span className="vehicle-icon">✚</span><span><strong>AMB–001</strong><small>{a?readable(a.status):'Awaiting mission'}</small></span><span className="card-chevron">›</span></button>
-    <div className="mission-details"><div><span className="point station"/><span><small>DEPARTURE</small>Station 01</span></div><div><span className="point hospital"/><span><small>DESTINATION</small>City Hospital</span></div></div>
-    <button className="primary full" disabled={!state||!!run.pending||a?.status!=='IDLE'} onClick={()=>act('ACTIVATE',{origin:scenario?.origin,destination:scenario?.destination})}>Activate mission</button>
-    <details className="scenario-tools"><summary>Scenario controls</summary><p>Change a physical road condition. Reporting makes a closure known to the router.</p><label className="field-label" htmlFor="road">Road segment</label><select id="road" value={road} onChange={e=>setRoad(e.target.value)}>{scenario?.graph.edges.map(e=><option key={e.id} value={e.id}>{e.from} → {e.to}</option>)}</select>
-     <label className="field-label" htmlFor="effect">Physical effect</label><select id="effect" value={effect} onChange={e=>setEffect(e.target.value)}><option value="ENTRY_CLOSED">Entry closure</option><option value="IMPASSABLE">Fully impassable</option><option value="SLOW">Slow to 2 m/s</option>{traffic&&<><option value="DISCHARGE_REDUCED">Reduce discharge</option><option value="DEMAND_SURGE">Increase boundary demand</option></>}<option value="OPEN">Restore road</option></select>
-     <label className="check"><input type="checkbox" checked={reported} onChange={e=>setReported(e.target.checked)}/> Report closure / reopening</label><button className="secondary full" disabled={!state||!!run.pending} onClick={()=>act('INCIDENT',{edge:road,effect,reported})}>Apply road condition</button>
-    </details>
-    <div className="scope-note">{traffic?<><strong>Synthetic traffic</strong><p>Queue {traffic.totals.queued.toFixed(1)} veh-eq · Boundary backlog {traffic.totals.boundaryBacklog.toFixed(1)} veh-eq</p>
-     <p>Civilian delay {(traffic.totals.junctionWaiting+traffic.totals.boundaryWaiting+traffic.totals.runningExcess).toFixed(0)} vehicle-seconds</p></>:<><strong>Routing-only demonstration</strong><p>Junction waiting is zero in this fixture.</p></>}</div>
-   </aside>
-   <section className="map-panel panel"><div className="map-top"><div><span className="eyebrow">NETWORK VIEW</span><strong>Ambulance routing</strong></div><div className="map-actions"><button className="subtle" disabled={!state} onClick={()=>setLocate(n=>n+1)}>Locate</button><button className={follow?'subtle active':'subtle'} disabled={!state} aria-pressed={follow} onClick={()=>setFollow(v=>!v)}>Follow</button></div></div>
-    <div className="map-wrap">{scenario?<NetworkMap scenario={scenario} snapshot={state} locate={locate} follow={follow} onDrag={()=>setFollow(false)} onEdge={setRoad} onAmbulance={()=>setSelected(true)}/>:<div className="map-empty">{loadError?'Backend unavailable':'Loading network…'}</div>}
-     <div className="map-caption"><span className="mode-tag">SYNTHETIC</span><span>{state?.explanation?`Routing decision at ${clock(state.explanation.time)}`:'Activate a mission to inspect live coverage'}</span></div>
-     <div className="map-legend"><span><i className="legend-line live"/>Live</span><span><i className="legend-line historical"/>Historical</span><span><i className="legend-line route"/>Selected route</span></div>
+import {useEffect, useState} from 'react';
+import {api} from './api';
+import {useRun} from './useRun';
+import {NetworkMap} from './NetworkMap';
+import {clock, filterFleet, modes, readable, zoneFor, type MapMode} from './controlRoom';
+import {useProjection} from './useProjection';
+import {RoadControls, RunActivity} from './Operations';
+import type {MissionView, Scenario, SimulationTruth} from './types';
+import './controlRoom.css';
+
+const scenarioLabels: Record<string,string> = {
+  ROUTING_ONLY:'Routing only', TRAFFIC_SIGNALS:'Traffic and signals', FLEET_TRAFFIC:'Ten ambulance conflict',
+};
+
+export function App() {
+  const run = useRun();
+  const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [scenarioId, setScenarioId] = useState('routing-only-5x5');
+  const [priority, setPriority] = useState(true);
+  const [horizon, setHorizon] = useState('2');
+  const [loadError, setLoadError] = useState('');
+  const [selectedId, setSelectedId] = useState('AMB-001');
+  const [inspectedJunction, setInspectedJunction] = useState<string>();
+  const [road, setRoad] = useState('');
+  const [search, setSearch] = useState('');
+  const [zone, setZone] = useState('All zones');
+  const [mode, setMode] = useState<MapMode>('operational');
+  const [locate, setLocate] = useState(0);
+  const [follow, setFollow] = useState(false);
+
+  useEffect(() => {
+    api<Scenario[]>('/scenarios').then(items => {
+      setScenarios(items);
+      setRoad(items[0]?.graph.edges[0]?.id ?? '');
+    }).catch(error => setLoadError(String(error)));
+  }, []);
+
+  const state = run.snapshot;
+  const scenario = scenarios.find(item => item.id === (state?.scenarioId ?? scenarioId)) ?? scenarios[0];
+  const next = scenarios.find(item => item.id === scenarioId);
+  const traffic = state?.traffic;
+  const fleet = state?.fleet ?? (state ? [state.ambulance] : []);
+  const filteredFleet = filterFleet(fleet,search,zone,scenario);
+  const selected = fleet.find(vehicle => vehicle.id === selectedId) ?? fleet[0];
+  const id = selected?.id;
+  const missionPath = state && id && state.fleet ? `/runs/${state.runId}/ambulances/${id}/snapshot` : null;
+  const mission = useProjection<MissionView>(missionPath, state?.stateRevision);
+  const truthPath = state && mode === 'truth' ? `/runs/${state.runId}/simulation-truth` : null;
+  const truthResult = useProjection<SimulationTruth>(truthPath, state?.stateRevision);
+  const truth = mode === 'truth' ? truthResult?.data : undefined;
+  const explanation = mode === 'routing' ? mission?.data?.explanation ?? state?.explanation : undefined;
+  const junction = inspectedJunction ?? (selected?.edge
+    ? scenario?.graph.edges.find(edge => edge.id === selected.edge)?.to : selected?.node);
+  const signal = junction ? traffic?.signals[junction] : undefined;
+  const departure = (id ? scenario?.departureByAmbulance?.[id] : undefined) ?? scenario?.origin;
+  const elapsed = state?.simulationTimeSeconds ?? 0;
+  const pending = Boolean(run.pending);
+  const prioritySuspended = mission?.data?.prioritySuspended ?? (id === 'AMB-001' && state?.prioritySuspended);
+  const priorityState = prioritySuspended ? 'suspended' : state?.priorityEnabled
+    ? readable(mission?.data?.priority ?? (id === 'AMB-001' ? traffic?.priority : undefined) ?? 'NONE') : 'disabled';
+  const eta = !selected || !run.connected || selected.estimatedArrival === null ? '—'
+    : selected.arrivedAt !== null ? 'Arrived' : selected.estimatedArrival < elapsed ? 'Estimate exceeded'
+    : `${Math.ceil(selected.estimatedArrival - elapsed)}s`;
+  const act = (type:string, payload:Record<string,unknown> = {}) => {void run.send(type,payload).catch(() => {});};
+  const select = (vehicleId:string) => {setSelectedId(vehicleId);setInspectedJunction(undefined);};
+  const selectOnMap = (vehicleId:string) => {select(vehicleId);setSearch('');setZone('All zones');};
+  const create = () => {
+    if (state && !confirm('Create a new run? The current run will be paused and its history retained.')) return;
+    setSelectedId('AMB-001');setInspectedJunction(undefined);setSearch('');setZone('All zones');setFollow(false);
+    void run.create(horizon, scenarioId, priority);
+  };
+  const canAdvance = !!state && !pending && state.runStatus !== 'COMPLETED';
+
+  return <main className="app-shell">
+    <header className="topbar">
+      <a className="brand" href="#"><span className="brand-mark">G</span>GeoPulse</a>
+      <div className="workspace-title"><strong>Police Control Room</strong></div>
+      <div className="top-status"><span className="tag">SYNTHETIC NETWORK</span>
+        <span className={run.connected?'connection':'connection offline'}><i/>{run.connected?'Connected':state?'Connection stale':'Not connected'}</span>
+      </div>
+    </header>
+    <section className="workspace-bar">
+      <div><h1>Police Control Room</h1><p>{scenario?.name ?? 'Select a scenario to begin'}</p></div>
+      <div className="clock"><span className="eyebrow">Simulation time</span><strong>{clock(elapsed)}</strong><span>{state?readable(state.runStatus):'Ready'}</span></div>
+    </section>
+    {(run.error || loadError) && <div className="error-banner" role="alert">{run.error || loadError}</div>}
+    <div className="workspace">
+      <aside className="fleet-panel panel">
+        <div className="panel-heading"><h2>Mission control</h2></div>
+        <label className="field-label" htmlFor="scenario">Scenario for next run</label>
+        <select id="scenario" value={scenarioId} onChange={e=>setScenarioId(e.target.value)}>
+          {scenarios.map(item=><option key={item.id} value={item.id}>{scenarioLabels[item.mode] ?? item.name}</option>)}
+        </select>
+        {next && next.mode !== 'ROUTING_ONLY' && <label className="check"><input type="checkbox" checked={priority} onChange={e=>setPriority(e.target.checked)}/> Ambulance signal priority</label>}
+        <label className="field-label" htmlFor="horizon">Live information horizon</label>
+        <select id="horizon" value={horizon} onChange={e=>setHorizon(e.target.value)}>
+          <option value="0">Historical only</option><option value="2">Hybrid · 2 hops</option><option value="all">All reachable roads</option>
+        </select>
+        <button className="secondary full" disabled={pending || !scenarios.length} onClick={create}>{state?'New run':'Create run'}</button>
+
+        <div className="section-label">FLEET <span>{fleet.length} {fleet.length===1?'ambulance':'ambulances'}</span></div>
+        <label className="field-label" htmlFor="fleet-search">Search fleet</label>
+        <input id="fleet-search" type="search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Ambulance ID"/>
+        <label className="field-label" htmlFor="fleet-zone">Zone</label>
+        <select id="fleet-zone" value={zone} onChange={e=>setZone(e.target.value)}>
+          {['All zones','North','Central','South'].map(item=><option key={item}>{item}</option>)}
+        </select>
+        <div className="fleet-list">
+          {filteredFleet.map(vehicle=><button key={vehicle.id}
+            className={`ambulance-card ${vehicle.id===id?'selected':''}`} aria-pressed={vehicle.id===id} onClick={()=>select(vehicle.id)}>
+            <span className="vehicle-icon" aria-hidden="true">✚</span><span><strong>{vehicle.id}</strong>
+            <small>{readable(vehicle.status)} · {zoneFor(vehicle.node,scenario)}</small></span>
+          </button>)}
+          {fleet.length>0 && !filteredFleet.length && <p className="scope-note">No ambulances match these filters.</p>}
+        </div>
+        {selected && <>
+          <div className="mission-details"><div><span className="point"/><span><small>DEPARTURE</small>{departure}</span></div>
+          <div><span className="point hospital"/><span><small>DESTINATION</small>{selected.activatedAt===null?scenario?.destination:selected.destination}</span></div></div>
+          <button className="primary full" disabled={pending || selected.status!=='IDLE' || !departure || !scenario} onClick={()=>
+            act('ACTIVATE',{ambulanceId:id,origin:departure,destination:scenario?.destination})}>Activate mission</button>
+        </>}
+      </aside>
+
+      <section className="map-panel panel">
+        <div className="map-top"><div className="mode-switch" aria-label="Map information mode">
+          {(Object.keys(modes) as MapMode[]).map(item=><button key={item} className={`subtle ${mode===item?'active':''}`}
+            aria-pressed={mode===item} onClick={()=>setMode(item)}>{modes[item]}</button>)}
+        </div><div className="map-actions">
+          <button className="subtle" disabled={!selected} onClick={()=>setLocate(n=>n+1)}>Locate</button>
+          <button className="subtle" disabled={!selected} aria-pressed={follow} onClick={()=>setFollow(value=>!value)}>Follow</button>
+        </div></div>
+        <div className="map-wrap">
+          {scenario && <NetworkMap scenario={scenario} fleet={fleet} selected={selected} mode={mode} explanation={explanation}
+            closures={state?.reportedClosures??[]} signals={traffic?.signals} truth={truth} locate={locate} follow={follow}
+            onDrag={()=>setFollow(false)} onEdge={setRoad} onAmbulance={selectOnMap} onJunction={setInspectedJunction}/>}
+          <div className="map-caption"><span className="mode-tag">{mode==='truth'?'SIMULATOR VIEW':modes[mode]}</span>
+            <span>{mode==='truth' ? truth ? `Actual state at ${clock(truth.simulationTimeSeconds)}` : truthResult?.error ?? 'Waiting for simulation truth'
+              : mode==='routing' ? explanation ? `${id} · Decision ${explanation.routingRevision} at ${clock(explanation.time)}` : mission?.error ?? 'Activate a mission to see routing estimates'
+              : `Confirmed reports and signal observations at ${clock(elapsed)}`}</span></div>
+          <div className="map-legend" aria-label="Map legend">
+            {mode==='routing' ? <><span><i className="legend-line live"/>Live</span><span><i className="legend-line historical"/>Historical</span>
+              <span><i className="legend-line fallback"/>Fallback</span><span><i className="legend-line route"/>Selected route</span>
+              <span><i className="legend-line exception"/>Known closure</span></>
+              : mode==='truth' ? <><span><i className="legend-line congestion"/>Occupancy · low to high</span>
+                <span><i className="legend-line queue"/>Queued vehicles</span><span><i className="legend-line exception"/>Physical effect</span></>
+              : <><span><i className="legend-line live"/>Road network</span><span><i className="legend-line exception"/>Confirmed closure</span>
+                {traffic && <span><i className="signal-key"/>Observed signal</span>}</>}
+          </div>
+        </div>
+        <div className="playback"><div className="play-buttons">
+          <button className="primary" disabled={!canAdvance} onClick={()=>act(state?.paused?'PLAY':'PAUSE')}>{!state||state.paused?'▶ Play':'Ⅱ Pause'}</button>
+          <button className="secondary" disabled={!canAdvance||!state?.paused} onClick={()=>act('STEP')}>Step 1s</button>
+        </div><label className="speed-label">Playback<select aria-label="Playback speed" value={state?.speed??1} disabled={!state||pending}
+          onChange={e=>act('SET_SPEED',{speed:Number(e.target.value)})}>{[1,5,10,30,60].map(speed=><option key={speed} value={speed}>{speed}×</option>)}</select></label>
+          <span className="revision">{run.pending?`Pending: ${readable(run.pending)}`:`Revision ${state?.stateRevision??'—'}`}</span>
+        </div>
+      </section>
+
+      <aside className="inspector panel">
+        <div className="panel-heading"><h2>Inspector</h2>{id&&<span className="small-tag">{id}</span>}</div>
+        {selected && <>
+          <div className="metrics"><div><span>ETA remaining</span><strong>{eta}</strong></div>
+            <div><span>Mission status</span><strong className="mission-status">{readable(selected.status)}</strong></div></div>
+          {selected.reason && <div className="stop-alert"><strong>{readable(selected.reason)}</strong>
+            <button className="secondary full" disabled={pending || !!selected.edge} onClick={()=>act('RETRY_ROUTE',{ambulanceId:id})}>Retry route</button></div>}
+          {traffic && <div className="scope-note"><strong>Priority {priorityState}</strong>
+            <p>Junction wait {mission?.data?.junctionWait??(id==='AMB-001'? state?.ambulanceJunctionWait??0:0)}s</p>
+            {state?.priorityEnabled && <button className="secondary full" disabled={pending}
+              onClick={()=>act('SUSPEND_PRIORITY',{ambulanceId:id,suspended:!prioritySuspended})}>{prioritySuspended?'Resume priority':'Suspend priority'}</button>}
+          </div>}
+        </>}
+        {signal && <section className="inspector-section"><h3>Junction {junction}</h3>
+          <p>{readable(signal.phase)}{signal.recoveryGreen?' · Recovery green':''}
+            {signal.startedAt!==undefined && signal.startedAt>=0 && ` · Since ${clock(signal.startedAt)}`}</p>
+          {signal.permissions.includes(1)&&<p>Green approach {signal.approaches[signal.permissions.indexOf(1)]}</p>}
+          <p>Active grant {signal.grantedAmbulance ?? '—'}</p>
+          <p>Pending and competing requests</p>
+          {Object.entries(signal.requests??{}).filter(([,status])=>status!=='GRANTED').length===0 ? <p>None</p>
+            : <ul>{Object.entries(signal.requests??{}).filter(([,status])=>status!=='GRANTED').map(([vehicle,status])=>
+              <li key={vehicle}>{vehicle} · {readable(status)}</li>)}</ul>}
+        </section>}
+        {mode==='routing' && <section className="inspector-section"><h3>Why this turn?</h3>
+          <p>{explanation?`Decision ${explanation.routingRevision} at ${clock(explanation.time)} · ${state?.horizon==='all'?'All live':`${state?.horizon}-hop window`}`:'Awaiting a routing decision'}</p>
+          {explanation?.roads[road]?.source==='HISTORICAL_FALLBACK'&&<p>Selected road uses historical fallback. {explanation.roads[road].reason}</p>}
+          {explanation?.candidates.map(candidate=><details className={`candidate ${candidate.outcome==='SELECTED'?'winner':''}`} key={candidate.edge}>
+            <summary><span>{scenario?.graph.edges.find(edge=>edge.id===candidate.edge)?.to ?? candidate.edge}<small>{readable(candidate.road.source)}</small></span>
+              <span className="candidate-cost">{candidate.pathSeconds!==null?`${candidate.pathSeconds.toFixed(1)}s`:readable(candidate.outcome)}</span></summary>
+            <div className="candidate-breakdown"><p>Road travel {candidate.road.seconds?.toFixed(1)??'—'}s · Junction wait {candidate.junction.seconds?.toFixed(1)??'—'}s</p>
+              <p>{candidate.road.reason ?? candidate.reason ?? readable(candidate.junction.source)}</p></div>
+          </details>)}
+        </section>}
+        <RoadControls mode={mode} scenario={scenario} state={state} truth={truth} events={run.events} road={road} setRoad={setRoad} pending={pending} act={act}/>
+      </aside>
     </div>
-    <div className="playback"><div className="play-buttons"><button className="primary" disabled={!state||!!run.pending||a?.status==='ARRIVED'} onClick={()=>act(state?.paused?'PLAY':'PAUSE')}>{!state||state.paused?'▶ Play':'Ⅱ Pause'}</button><button className="secondary" disabled={!state||!state.paused||!!run.pending||a?.status==='ARRIVED'} onClick={()=>act('STEP')}>Step 1s</button></div><label className="speed-label">Playback<select aria-label="Playback speed" value={state?.speed??1} disabled={!state||!!run.pending} onChange={e=>act('SET_SPEED',{speed:Number(e.target.value)})}>{[1,5,10,30,60].map(s=><option key={s} value={s}>{s}×</option>)}</select></label><span className="revision">{run.pending?`Pending: ${readable(run.pending)}`:`Revision ${state?.stateRevision??'—'}`}</span></div>
-   </section>
-   <aside className="inspector panel"><div className="panel-heading"><h2>Mission inspector</h2><span className="small-tag">AMB–001</span></div>
-    <div className="inspector-title"><span className="eyebrow">HOSPITAL-BOUND JOURNEY</span><h2>City Hospital</h2><p>{a?readable(a.status):'No active mission'}</p></div>
-    <div className="metrics"><div><span>Estimated remaining</span><strong>{eta}</strong></div><div><span>Distance remaining</span><strong>{Math.max(0,remaining)}<small> m</small></strong></div></div>
-    <div className="metric-strip"><span>Re-plans <b>{a?.replans??0}</b></span><span>Reroutes <b>{a?.reroutes??0}</b></span></div>
-    {a?.reason&&<div className="stop-alert" role="status"><strong>{readable(a.reason)}</strong><button className="secondary full" disabled={!!a.edge||!!run.pending} onClick={()=>act('RETRY_ROUTE')}>Retry route</button></div>}
-    {traffic&&<div className="scope-note">
-     <strong>Priority {state?.prioritySuspended?'suspended':state?.priorityEnabled?readable(traffic.priority):'disabled'}</strong>
-     {signal&&<p>{junction} · {readable(signal.phase)} · [{signal.permissions.join(', ')}]</p>}
-     <p>Ambulance junction wait {state?.ambulanceJunctionWait??0}s</p>
-     {state?.priorityEnabled&&<button className="secondary full" disabled={!!run.pending} onClick={()=>act('SUSPEND_PRIORITY',{suspended:!state.prioritySuspended})}>{state.prioritySuspended?'Resume priority':'Suspend priority'}</button>}
-    </div>}
-    <div className="why-heading"><span className="eyebrow">DECISION EXPLAINER</span><h2>Why this turn?</h2><p>{state?.explanation?`Decision ${state.explanation.routingRevision} at ${clock(state.explanation.time)} · ${state.horizon==='all'?'All-live':state.horizon+'-hop live window'}`:'The next routing decision will appear here.'}</p></div>
-    <div className="candidate-list">{state?.explanation?.candidates.map(c=><details className={`candidate ${c.outcome==='SELECTED'?'winner':''}`} key={c.edge}><summary><span>{scenario?.graph.edges.find(e=>e.id===c.edge)?.to}<small>{c.road.source==='LIVE'?'Live observation':c.road.source==='HISTORICAL_FALLBACK'?'Historical fallback':c.road.status==='BLOCKED'?'Known closure':c.road.source==='UNKNOWN'?'Estimate unavailable':'Historical estimate'}</small></span><span className="candidate-cost">{c.pathSeconds!==null?`${c.pathSeconds}s`:readable(c.outcome)}<small>{c.outcome==='SELECTED'?'SELECTED':'PATH COST'}</small></span></summary><div className="candidate-breakdown"><span>Road traversal <b>{c.road.seconds??'—'}s</b></span><span>Junction waiting <b>{c.junction.seconds??'—'}s</b></span><p>{c.junction.source}</p><p>{c.reason??c.road.reason??'Total path cost includes all remaining road and junction estimates.'}</p></div></details>)}</div>
-    {!state?.explanation&&<div className="empty-explanation"><span>◇</span><p>Live nearby. Historical farther away.<br/>One complete route to the destination.</p></div>}
-    {a?.arrivedAt!==null&&a?.arrivedAt!==undefined&&<div className="arrival"><strong>Journey completed</strong><span>{a.arrivedAt-(a.activatedAt??0)} seconds actual travel time</span></div>}
-   </aside>
-  </div>
-  <details className="event-panel panel" open><summary>Run activity <span>{run.events.length} recorded events</span></summary><div className="event-toolbar"><button className={tab==='alerts'?'tab active':'tab'} onClick={()=>setTab('alerts')}>Alerts</button><button className={tab==='events'?'tab active':'tab'} onClick={()=>setTab('events')}>Events</button><span>Ordered by server sequence · no automatic scrolling</span></div><div className="events" role="log" aria-live="off">{events.length?events.map(e=><div className="event" key={e.sequence}><time>{clock(e.time)}</time><span className={e.type.includes('ALERT')||e.type.includes('REJECTED')?'event-kind warning':'event-kind'}>{readable(e.type)}</span><span>{e.data.message}</span><small>#{e.sequence}</small></div>):<p className="empty-events">{tab==='alerts'?'No alerts recorded.':'Create a run to begin recording its decisions.'}</p>}</div></details>
-  <footer>GEOPULSE <span>Deterministic simulation · Seed 108 · No real traffic data</span><span>{traffic?'M2 / Traffic and signals':'M1 / Routing laboratory'}</span></footer>
- </main>;
+    <RunActivity key={state?.runId} state={state} events={run.events} pending={pending} act={act}/>
+  </main>;
 }
