@@ -28,6 +28,7 @@ export function DriverNavigation() {
   const [reportId,setReportId] = useState<string>();
   const [accepted,setAccepted] = useState(false);
   const reportRoad = useRef<HTMLSelectElement>(null);
+  const reportTrigger = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     let current = true;
@@ -36,6 +37,10 @@ export function DriverNavigation() {
     return () => {current = false;};
   },[]);
   useEffect(() => {if(reportOpen)reportRoad.current?.focus();},[reportOpen]);
+  const closeReport = () => {
+    setReportOpen(false);
+    requestAnimationFrame(()=>reportTrigger.current?.focus({preventScroll:true}));
+  };
 
   const missionPath = state && id ? `/runs/${state.runId}/ambulances/${encodeURIComponent(id)}/snapshot` : null;
   const projection = useProjection<MissionView>(missionPath,state?.stateRevision);
@@ -75,7 +80,7 @@ export function DriverNavigation() {
     try {
       await run.send('SUBMIT_OBSTRUCTION',{reportId:submittedId,ambulanceId:id,edge:road,closure:true});
       setAccepted(true);
-      setReportOpen(false);
+      closeReport();
     } catch {/* The command error stays visible with the form. */}
   }
 
@@ -128,9 +133,11 @@ export function DriverNavigation() {
         {selected?.reason&&<p className="driver-alert" role="alert">{stopReason(selected.reason)}</p>}
         {!!selected?.reroutes&&<p className="driver-reroute" role="status">Route updated · Reroutes {selected.reroutes}</p>}
         <section className="panel driver-card" aria-label="Obstruction reports">
-          {!reportOpen&&<button className="primary full" disabled={!selected||!scenario||!run.connected} onClick={openReport}>Report Obstruction</button>}
+          {!reportOpen&&<button ref={reportTrigger} className="primary full" disabled={!selected||!scenario||!run.connected} onClick={openReport}>Report Obstruction</button>}
           {(accepted||savedReport)&&!reportOpen&&<p className="driver-reroute" role="status">{reportFeedback}</p>}
-          {reportOpen&&<form onSubmit={event=>void submitReport(event)}>
+          {reportOpen&&<form onSubmit={event=>void submitReport(event)} onKeyDown={event=>{
+            if(event.key==='Escape'&&!run.pending){event.preventDefault();closeReport();}
+          }}>
             <h2>Report obstruction</h2>
             <label className="field-label" htmlFor="report-road">Road segment</label>
             <select id="report-road" ref={reportRoad} required value={road} onChange={event=>{setRoad(event.target.value);setRoadEdited(true);setReportId(undefined);}}>
@@ -139,7 +146,7 @@ export function DriverNavigation() {
             </select>
             <div className="action-pair">
               <button className="primary" disabled={!road||!run.connected||!!run.pending} type="submit">{run.pending?'Submitting…':'Submit report'}</button>
-              <button className="secondary" disabled={!!run.pending} type="button" onClick={()=>setReportOpen(false)}>Cancel</button>
+              <button className="secondary" disabled={!!run.pending} type="button" onClick={closeReport}>Cancel</button>
             </div>
           </form>}
         </section>

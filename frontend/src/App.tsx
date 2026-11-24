@@ -6,7 +6,7 @@ import {clock, filterFleet, modes, readable, zoneFor, type MapMode} from './cont
 import {useProjection} from './useProjection';
 import {RoadControls, RunActivity} from './Operations';
 import type {MissionView, Scenario, SimulationTruth} from './types';
-import './controlRoom.css';
+import {isDrawer, useWorkspaceDrawers, type Drawer} from './workspaceDrawers';
 
 const scenarioLabels: Record<string,string> = {
   ROUTING_ONLY:'Routing only', TRAFFIC_SIGNALS:'Traffic and signals', FLEET_TRAFFIC:'Ten ambulance conflict',
@@ -15,7 +15,7 @@ const scenarioLabels: Record<string,string> = {
 export function App() {
   const run = useRun();
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
-  const [scenarioId, setScenarioId] = useState('routing-only-5x5');
+  const [scenarioId, setScenarioId] = useState(()=>new URLSearchParams(location.search).get('scenario')??'routing-only-5x5');
   const [priority, setPriority] = useState(true);
   const [horizon, setHorizon] = useState('2');
   const [loadError, setLoadError] = useState('');
@@ -27,10 +27,18 @@ export function App() {
   const [mode, setMode] = useState<MapMode>('operational');
   const [locate, setLocate] = useState(0);
   const [follow, setFollow] = useState(false);
+  const drawers = useWorkspaceDrawers();
+  const showSetup = new URLSearchParams(location.search).has('setup');
+
+  useEffect(()=>{
+    if (showSetup && !isDrawer(drawers.layout,'fleet')) return;
+    if (showSetup) drawers.show('fleet');
+  },[showSetup,drawers.layout]);
 
   useEffect(() => {
     api<Scenario[]>('/scenarios').then(items => {
       setScenarios(items);
+      setScenarioId(current=>items.some(item=>item.id===current)?current:items[0]?.id??'');
       setRoad(items[0]?.graph.edges[0]?.id ?? '');
     }).catch(error => setLoadError(String(error)));
   }, []);
@@ -63,17 +71,21 @@ export function App() {
     : `${Math.ceil(selected.estimatedArrival - elapsed)}s`;
   const act = (type:string, payload:Record<string,unknown> = {}) => {void run.send(type,payload).catch(() => {});};
   const select = (vehicleId:string) => {setSelectedId(vehicleId);setInspectedJunction(undefined);};
-  const selectOnMap = (vehicleId:string) => {select(vehicleId);setSearch('');setZone('All zones');};
+  const selectOnMap = (vehicleId:string) => {select(vehicleId);setSearch('');setZone('All zones');drawers.show('inspector');};
   const create = () => {
     if (state && !confirm('Create a new run? The current run will be paused and its history retained.')) return;
     setSelectedId('AMB-001');setInspectedJunction(undefined);setSearch('');setZone('All zones');setFollow(false);
     void run.create(horizon, scenarioId, priority);
   };
   const canAdvance = !!state && !pending && state.runStatus !== 'COMPLETED';
+  const panels:Record<Drawer,string> = {fleet:'Fleet',inspector:'Inspector',activity:'Run activity'};
+  const closeButton = (panel:Drawer) => isDrawer(drawers.layout,panel) && <button className="subtle drawer-close"
+    ref={element=>drawers.closeRef(panel,element)} aria-label={`Close ${panels[panel].toLowerCase()}`}
+    onClick={()=>drawers.close(panel)}>Close</button>;
 
-  return <main className="app-shell">
+  return <main className="app-shell" data-layout={drawers.layout}>
     <header className="topbar">
-      <a className="brand" href="#"><span className="brand-mark">G</span>GeoPulse</a>
+      <a className="brand" href="/welcome"><span className="brand-mark" aria-hidden="true">G</span>GeoPulse</a>
       <div className="workspace-title"><strong>Police Control Room</strong></div>
       <div className="top-status"><span className="tag">SYNTHETIC NETWORK</span>
         <span className={run.connected?'connection':'connection offline'}><i/>{run.connected?'Connected':state?'Connection stale':'Not connected'}</span>
@@ -84,9 +96,14 @@ export function App() {
       <div className="clock"><span className="eyebrow">Simulation time</span><strong>{clock(elapsed)}</strong><span>{state?readable(state.runStatus):'Ready'}</span></div>
     </section>
     {(run.error || loadError) && <div className="error-banner" role="alert">{run.error || loadError}</div>}
-    <div className="workspace">
-      <aside className="fleet-panel panel">
-        <div className="panel-heading"><h2>Mission control</h2></div>
+    {drawers.layout!=='desktop'&&<nav className="drawer-toolbar" aria-label="Control room panels">
+      {(Object.keys(panels) as Drawer[]).filter(panel=>isDrawer(drawers.layout,panel)).map(panel=><button type="button"
+        key={panel} className="secondary" aria-controls={`panel-${panel}`} aria-expanded={drawers.active===panel}
+        ref={element=>drawers.triggerRef(panel,element)} onClick={()=>drawers.toggle(panel)}>{panels[panel]}</button>)}
+    </nav>}
+    <div className="workspace" data-fleet-open={drawers.visible('fleet')}>
+      <aside className="fleet-panel panel" id="panel-fleet" aria-labelledby="fleet-heading" hidden={!drawers.visible('fleet')}>
+        <div className="panel-heading"><h2 id="fleet-heading">Mission control</h2>{closeButton('fleet')}</div>
         <label className="field-label" htmlFor="scenario">Scenario for next run</label>
         <select id="scenario" value={scenarioId} onChange={e=>setScenarioId(e.target.value)}>
           {scenarios.map(item=><option key={item.id} value={item.id}>{scenarioLabels[item.mode] ?? item.name}</option>)}
@@ -133,7 +150,8 @@ export function App() {
         <div className="map-wrap">
           {scenario && <NetworkMap scenario={scenario} fleet={fleet} selected={selected} mode={mode} explanation={explanation}
             closures={state?.reportedClosures??[]} signals={traffic?.signals} truth={truth} locate={locate} follow={follow}
-            onDrag={()=>setFollow(false)} onEdge={setRoad} onAmbulance={selectOnMap} onJunction={setInspectedJunction}/>}
+            onDrag={()=>setFollow(false)} onEdge={edge=>{setRoad(edge);drawers.show('inspector');}} onAmbulance={selectOnMap}
+            onJunction={node=>{setInspectedJunction(node);drawers.show('inspector');}}/>}
           <div className="map-caption"><span className="mode-tag">{mode==='truth'?'SIMULATOR VIEW':modes[mode]}</span>
             <span>{mode==='truth' ? truth ? `Actual state at ${clock(truth.simulationTimeSeconds)}` : truthResult?.error ?? 'Waiting for simulation truth'
               : mode==='routing' ? explanation ? `${id} · Decision ${explanation.routingRevision} at ${clock(explanation.time)}` : mission?.error ?? 'Activate a mission to see routing estimates'
@@ -157,8 +175,13 @@ export function App() {
         </div>
       </section>
 
-      <aside className="inspector panel">
-        <div className="panel-heading"><h2>Inspector</h2>{id&&<span className="small-tag">{id}</span>}</div>
+      <aside className="inspector panel" id="panel-inspector" aria-labelledby="inspector-heading" hidden={!drawers.visible('inspector')}>
+        <div className="panel-heading"><h2 id="inspector-heading">Inspector</h2>{id&&<span className="small-tag">{id}</span>}{closeButton('inspector')}</div>
+        <label className="field-label" htmlFor="inspect-junction">Inspect junction</label>
+        <select id="inspect-junction" value={inspectedJunction??''} onChange={event=>setInspectedJunction(event.target.value||undefined)}>
+          <option value="">Selected ambulance’s next junction</option>
+          {scenario?.graph.nodes.map(node=><option key={node.id} value={node.id}>{node.id}</option>)}
+        </select>
         {selected && <>
           <div className="metrics"><div><span>ETA remaining</span><strong>{eta}</strong></div>
             <div><span>Mission status</span><strong className="mission-status">{readable(selected.status)}</strong></div></div>
@@ -180,9 +203,16 @@ export function App() {
             : <ul>{Object.entries(signal.requests??{}).filter(([,status])=>status!=='GRANTED').map(([vehicle,status])=>
               <li key={vehicle}>{vehicle} · {readable(status)}</li>)}</ul>}
         </section>}
+        {junction&&!signal&&<section className="inspector-section"><h3>Junction {junction}</h3><p>No signal observations available.</p></section>}
         {mode==='routing' && <section className="inspector-section"><h3>Why this turn?</h3>
           <p>{explanation?`Decision ${explanation.routingRevision} at ${clock(explanation.time)} · ${state?.horizon==='all'?'All live':`${state?.horizon}-hop window`}`:'Awaiting a routing decision'}</p>
-          {explanation?.roads[road]?.source==='HISTORICAL_FALLBACK'&&<p>Selected road uses historical fallback. {explanation.roads[road].reason}</p>}
+          <label className="field-label" htmlFor="route-road">Inspect road estimate</label>
+          <select id="route-road" value={road} onChange={event=>setRoad(event.target.value)}>
+            {scenario?.graph.edges.map(edge=><option key={edge.id} value={edge.id}>{edge.from} → {edge.to}</option>)}
+          </select>
+          {explanation?.roads[road]&&<p>{readable(explanation.roads[road].source)} · {readable(explanation.roads[road].status)}
+            {explanation.roads[road].seconds!==null&&` · ${explanation.roads[road].seconds?.toFixed(1)}s`}
+            {explanation.roads[road].reason&&` · ${explanation.roads[road].reason}`}</p>}
           {explanation?.candidates.map(candidate=><details className={`candidate ${candidate.outcome==='SELECTED'?'winner':''}`} key={candidate.edge}>
             <summary><span>{scenario?.graph.edges.find(edge=>edge.id===candidate.edge)?.to ?? candidate.edge}<small>{readable(candidate.road.source)}</small></span>
               <span className="candidate-cost">{candidate.pathSeconds!==null?`${candidate.pathSeconds.toFixed(1)}s`:readable(candidate.outcome)}</span></summary>
@@ -193,6 +223,9 @@ export function App() {
         <RoadControls mode={mode} scenario={scenario} state={state} truth={truth} events={run.events} road={road} setRoad={setRoad} pending={pending} act={act}/>
       </aside>
     </div>
-    <RunActivity key={state?.runId} state={state} events={run.events} pending={pending} act={act}/>
+    <section id="panel-activity" className="activity-wrapper" aria-label="Run activity" hidden={!drawers.visible('activity')}>
+      {closeButton('activity')}
+      <RunActivity key={state?.runId} state={state} events={run.events} pending={pending} act={act}/>
+    </section>
   </main>;
 }

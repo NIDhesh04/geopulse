@@ -78,7 +78,7 @@ export function RunActivity({state,events,pending,act}:{
       </div>)}
       {!alerts.length&&!pendingReports.length&&<p className="empty-events">No unresolved alerts or pending reports.</p>}
     </div>
-    <div className="events" role="log" aria-live="off" hidden={tab!=='events'}>
+    <div className="events" role="log" tabIndex={0} aria-label="Recorded events" aria-live="off" hidden={tab!=='events'}>
       {events.map(event=><div className="event" key={event.sequence}><time>{clock(event.time)}</time>
         <span className="event-kind">{readable(event.type)}</span><span>{event.data.message}</span><small>#{event.sequence}</small>
       </div>)}

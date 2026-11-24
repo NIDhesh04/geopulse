@@ -55,6 +55,11 @@ test('fleet map modes keep physical incidents separate from driver report review
   await expect(driver.getByText(`Current road ${current}`,{exact:true})).toBeVisible();
   const reportButton = driver.getByRole('button',{name:'Report Obstruction',exact:true});
   expect((await reportButton.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+  await expect(driver.locator('.driver-eta dd').first()).toHaveCSS('font-variant-numeric','tabular-nums');
+  await expect(driver.locator('.driver-map-canvas button')).toHaveCount(0);
+  const banner=(await driver.getByRole('region',{name:'Next maneuver'}).boundingBox())!;
+  const canvas=(await driver.locator('canvas.maplibregl-canvas').boundingBox())!;
+  expect(banner.y+banner.height).toBeLessThan(canvas.y);
   expect(await driver.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await reportButton.click();
   await expect(driver.getByLabel('Road segment')).toHaveValue(current);

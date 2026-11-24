@@ -1,4 +1,4 @@
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useRef,useState,useSyncExternalStore} from 'react';
 import * as maplibregl from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 maplibregl.setWorkerUrl(workerUrl);
@@ -8,6 +8,13 @@ import type {Ambulance, Explanation, Scenario, Signal, SimulationTruth} from './
 import {routingEdges, type MapMode} from './controlRoom';
 import 'maplibre-gl/dist/maplibre-gl.css';
 const coord=(n:{x:number;y:number;lat?:number|null;lng?:number|null}):[number,number]=>n.lat!=null&&n.lng!=null?[n.lng,n.lat]:[75.78+n.x/100000,26.92-n.y/100000];
+const motionQuery = '(prefers-reduced-motion: reduce)';
+const reducedMotion = () => matchMedia(motionQuery).matches;
+const subscribeMotion = (listener:()=>void) => {
+ const query=matchMedia(motionQuery);
+ query.addEventListener('change',listener);
+ return ()=>query.removeEventListener('change',listener);
+};
 type Props = {
  scenario:Scenario; fleet:Ambulance[]; selected?:Ambulance; explanation?:Explanation|null; mode:MapMode;
  closures:string[]; signals?:Record<string,Signal>; truth?:SimulationTruth;
@@ -16,6 +23,7 @@ type Props = {
  showNavigationControls?:boolean;
 };
 export function NetworkMap({scenario,fleet,selected,explanation,mode,closures,signals,truth,locate,follow,onDrag,onEdge,onAmbulance,onJunction,showNavigationControls=true}:Props){
+ const reduced=useSyncExternalStore(subscribeMotion,reducedMotion);
  const container=useRef<HTMLDivElement>(null),map=useRef<maplibregl.Map|null>(null),selectedRef=useRef(selected);
  const drag=useRef(onDrag),edgeAction=useRef(onEdge),select=useRef(onAmbulance),junctionAction=useRef(onJunction);
  drag.current=onDrag;edgeAction.current=onEdge;select.current=onAmbulance;selectedRef.current=selected;junctionAction.current=onJunction;
@@ -130,7 +138,6 @@ export function NetworkMap({scenario,fleet,selected,explanation,mode,closures,si
    return;
   }
   const to=position(selected),from=position(previous.current);
-  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const animate=!!selected.edge&&selected.id===previous.current?.id&&selected.edge===previous.current.edge&&!reduced;
   const start=performance.now();
   const draw=(now:number)=>{
@@ -140,14 +147,19 @@ export function NetworkMap({scenario,fleet,selected,explanation,mode,closures,si
   };
   frame=requestAnimationFrame(draw);
   previous.current=selected;
-  if(follow)m.easeTo({center:to,duration:reduced?0:180});
+  if(follow){
+   if(reduced)m.jumpTo({center:to});
+   else m.easeTo({center:to,duration:180});
+  }
   return()=>cancelAnimationFrame(frame);
- },[fleet,selected,ready,follow]);
+ },[fleet,selected,ready,follow,reduced]);
  useEffect(()=>{
   if(ready&&selectedRef.current&&locate!==lastLocate.current){
    lastLocate.current=locate;
-   map.current?.easeTo({center:position(selectedRef.current),duration:matchMedia('(prefers-reduced-motion: reduce)').matches?0:300});
+   const center=position(selectedRef.current);
+   if(reduced)map.current?.jumpTo({center});
+   else map.current?.easeTo({center,duration:300});
   }
- },[locate,ready]);
+ },[locate,ready,reduced]);
  return <div className="map-surface" ref={container} aria-label="Synthetic road network">{failure&&<div className="map-failure">Map rendering unavailable: {failure}<button onClick={()=>setMapAttempt(n=>n+1)}>Retry map</button></div>}</div>;
 }

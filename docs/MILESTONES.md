@@ -1,4 +1,4 @@
-# Milestones — M3 verified
+# Milestones — M4 in progress
 
 **Fact:** Prepared on 2026-11-23 after consolidation of Topics 1–10 and the design risk review. M1 through M3 have been verified. M4–M6 remain proposals.
 
@@ -106,3 +106,5 @@
 ## M4 — product polish and scenario calibration
 
 **Assumption (planned milestone):** Polish the control room and driver experience, including responsive and keyboard behavior, inspector and report review details, and the concise landing experience. Calibrate time-indexed historical profiles against scenario demand with predictable bottlenecks, then freeze them before M5 evaluation.
+
+**Fact:** M4 Part 1 adds the landing page at `/welcome`, scenario selection, and responsive control room drawers. Keyboard selection exposes the same junction and road inspectors as map selection. Drawer dismissal restores focus. Incoming events append without moving keyboard focus or the current reading position. Historical profile calibration is M4 Part 2.
