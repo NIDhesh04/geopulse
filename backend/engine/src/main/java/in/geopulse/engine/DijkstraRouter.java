@@ -1,12 +1,9 @@
 package in.geopulse.engine;
 import java.util.*;
-public final class DijkstraRouter {
+public final class DijkstraRouter implements RoutingPolicy {
     private record State(String node,String incoming){}
     private record Entry(State state,double cost,List<String> path){}
-    public record Route(boolean reachable,List<String> edges,Double seconds){
-        public Route{edges=List.copyOf(edges);}
-    }
-    public record Candidate(String edge,Estimate road,Estimate junction,Double pathSeconds,String outcome,String reason){}
+    @Override
     public Route route(Graph g,String start,String incoming,String destination,RoutingSnapshot snapshot){
         g.node(start);g.node(destination);
         Comparator<Entry> order=Comparator.comparingDouble(Entry::cost).thenComparing(e->e.state().node()).thenComparing(e->e.state().incoming());
@@ -26,6 +23,7 @@ public final class DijkstraRouter {
             }
         }return new Route(false,List.of(),null);
     }
+    @Override
     public List<Candidate> explain(Graph g,String start,String incoming,String destination,RoutingSnapshot snapshot,Route selected){
         List<Candidate> out=new ArrayList<>();
         for(var e:g.outgoing(start)){

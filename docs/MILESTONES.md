@@ -1,6 +1,6 @@
-# Milestones — M1 approved
+# Milestones — M2 started
 
-**Fact:** Prepared on 2026-11-23 after consolidation of Topics 1–10 and the design risk review. M1 was explicitly approved by the user on 2026-11-23; later milestones remain proposals. Original phase names are Phase 1 Design, Phase 2 Plan, Phase 3 Build.
+**Fact:** Prepared on 2026-11-23 after consolidation of Topics 1–10 and the design risk review. M1 was explicitly approved by the user on 2026-11-23; M2 was subsequently authorized; M3–M6 remain proposals. Original phase names are Phase 1 Design, Phase 2 Plan, Phase 3 Build.
 
 ## Delivery approach
 
@@ -10,7 +10,7 @@
 | Milestone | Demonstrable result | Acceptance and test focus | Deliberately deferred |
 |---|---|---|---|
 | **Decision: M1 approved** | One ambulance follows explainable hybrid routes on a synthetic map | Scaffold builds; real PostgreSQL/Flyway; deterministic routing; HTTP/STOMP controls and event history; no-signal fixture explicitly identified | Background flow, production junction forecasts, priority, multi-ambulance contention, polished driver screen |
-| **Assumption: M2** | Ordinary traffic queues and signals affect a single ambulance | Conservation/storage/credits; signal timings and clearance; reported versus physical incidents; bounded forecasts; actual delays | Multi-ambulance conflict workflow and full benchmark suite |
+| **Decision: M2 authorized** | Ordinary traffic queues and signals affect a single ambulance | Conservation/storage/credits; signal timings and clearance; reported versus physical incidents; bounded forecasts; actual delays | Multi-ambulance conflict workflow and full benchmark suite |
 | **Assumption: M3** | Multiple ambulances share junctions correctly | 10-ambulance contention, deterministic ordering, active-grant commitment, suspension and recovery; fleet/driver state isolation | 30-ambulance performance claim and external integration |
 | **Assumption: M4** | Complete polished control-room/driver product | Approved information modes, inspectors, report review, ETA states, responsive/keyboard behavior, local synthetic map, concise landing | Real operational deployment, individual civilian physics, auth expansion |
 | **Assumption: M5** | Reproducible comparison report and scale results | Paired schedules/warm starts, seven scenarios, completion-aware delays, exact recovery, seed summaries, 30-ambulance profiling | Claims about CoSiCoSt superiority or real-world accuracy |
@@ -66,4 +66,11 @@
 - **Fact:** Frontend TypeScript/production build and 2 stream-reconciliation tests passed. One Chromium walkthrough passed mission activation, rendered roads, routing explanations, closure/reroute, all-outgoing-blocked stop, reopening, step/play/pause, reload, disconnect/reconnect and 390 px layout checks. Desktop screenshot inspection confirmed that the map renders after reconnect.
 - **Fact:** Verification fixed explicit MapLibre worker bundling and a replacement-map readiness race. The frontend requires Node 22.12+; this environment was verified with a temporary Node 22 runtime.
 - **Fact:** Vite reports a large map-containing JavaScript chunk. This is a remaining frontend optimization, not a failed build.
-- **Decision:** This checkpoint remains the routing-only M1 fixture. It does not establish signal, civilian-flow, multi-ambulance or benchmark readiness. Later milestones remain unapproved.
+- **Decision:** This checkpoint remains the routing-only M1 fixture. It does not establish signal, civilian-flow, multi-ambulance or benchmark readiness. M3 and later milestones remain unapproved.
+
+
+## M2 — first engine checkpoint
+
+- **Decision:** Implement and test ordinary signal timing before coupling it to queue transfers. The same normal-service rules will be available to bounded junction forecasts.
+- **Fact:** This checkpoint adds minimum and maximum green, amber and all-red clearance, stable approach rotation, and a permission vector that includes station entries. Queue discharge, forecasts, priority and the M2 demo still need integration.
+- **Decision:** Keep the synthetic grid for repeatable tests. Track the Jaipur road network as a separate demo scenario in [JAIPUR_MAP.md](JAIPUR_MAP.md).

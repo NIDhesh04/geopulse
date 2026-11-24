@@ -5,8 +5,9 @@ public final class RoutingSimulation {
     public record Ambulance(String id,String status,String node,String edge,double progress,String destination,List<String> route,
         Long activatedAt,Long arrivedAt,long replans,long reroutes,String reason,Double initialEta,Double estimatedArrival){}
     public record Event(long time,String type,String message){}
-    public record Explanation(String routingRevision,long time,String incoming,List<DijkstraRouter.Candidate> candidates,Set<String> liveEdges,Map<String,Estimate> roads){}
+    public record Explanation(String routingRevision,long time,String incoming,List<RoutingPolicy.Candidate> candidates,Set<String> liveEdges,Map<String,Estimate> roads){}
     private final Graph graph;private final int horizon;private final JunctionDelayEstimator junctionDelay;
+    private final RoutingPolicy router;
     private long time,replans,reroutes;private Long activatedAt,arrivedAt;private Double initialEta,estimatedArrival;
     private String node="n00_00",destination="n04_04",incoming="station-entry",edge,status="IDLE",reason;
     private double progress;private boolean needsPlan,planned;
@@ -14,9 +15,14 @@ public final class RoutingSimulation {
     private final Map<String,String> physical=new TreeMap<>();private final Set<String> reported=new TreeSet<>();
     private final List<Event> pending=new ArrayList<>();
     public RoutingSimulation(Graph graph,int horizon){this(graph,horizon,new M1ZeroJunctionDelay());}
-    public RoutingSimulation(Graph graph,int horizon,JunctionDelayEstimator junctionDelay){this.junctionDelay=Objects.requireNonNull(junctionDelay);this.graph=graph;this.horizon=horizon;if(!Set.of(0,2,-1).contains(horizon))throw new IllegalArgumentException("Horizon must be 0, 2 or all");}
+    public RoutingSimulation(Graph graph,int horizon,JunctionDelayEstimator junctionDelay){
+        this(graph, horizon, junctionDelay, new DijkstraRouter());
+    }
+    public RoutingSimulation(Graph graph,int horizon,JunctionDelayEstimator junctionDelay,RoutingPolicy router){
+        this.router=Objects.requireNonNull(router);
+        this.junctionDelay=Objects.requireNonNull(junctionDelay);this.graph=graph;this.horizon=horizon;if(!Set.of(0,2,-1).contains(horizon))throw new IllegalArgumentException("Horizon must be 0, 2 or all");}
     public RoutingSimulation copy(){
-        var c=new RoutingSimulation(graph,horizon,junctionDelay);c.time=time;c.replans=replans;c.reroutes=reroutes;c.activatedAt=activatedAt;c.arrivedAt=arrivedAt;c.initialEta=initialEta;c.estimatedArrival=estimatedArrival;
+        var c=new RoutingSimulation(graph,horizon,junctionDelay,router);c.time=time;c.replans=replans;c.reroutes=reroutes;c.activatedAt=activatedAt;c.arrivedAt=arrivedAt;c.initialEta=initialEta;c.estimatedArrival=estimatedArrival;
         c.node=node;c.destination=destination;c.incoming=incoming;c.edge=edge;c.status=status;c.reason=reason;c.progress=progress;c.needsPlan=needsPlan;c.planned=planned;c.route=new ArrayList<>(route);c.explanation=explanation;
         c.physical.putAll(physical);c.reported.addAll(reported);c.pending.addAll(pending);return c;
     }
@@ -47,7 +53,7 @@ public final class RoutingSimulation {
         RoadWeightProvider live=(road,t)->closed(road.id())?Estimate.blocked("Observed closure"):Estimate.available(road.length()/speed(road),"LIVE");
         RoadWeightProvider historical=(road,t)->Estimate.available(road.length()/road.freeSpeed(),"HISTORICAL");
         var snap=new RoutingSnapshot(graph,node,horizon,time,live,historical,junctionDelay,reported);
-        var router=new DijkstraRouter();var result=router.route(graph,node,incoming,destination,snap);
+        var result=router.route(graph,node,incoming,destination,snap);
         if(planned)replans++;explanation=new Explanation(Long.toString(replans+1),time,incoming,router.explain(graph,node,incoming,destination,snap,result),snap.liveEdges(),Map.copyOf(snap.roads()));
         if(result.reachable()){
             if(planned&&!route.isEmpty()&&!route.equals(result.edges())){reroutes++;emit("REROUTED","Route changed at "+node);}
