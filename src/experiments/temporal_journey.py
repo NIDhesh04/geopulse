@@ -104,6 +104,12 @@ class TemporalJourneyResult:
     execution_time_s: float
     traversed_edge_path: List[Edge] = field(default_factory=list)
     decision_trace: List[Dict[str, Any]] = field(default_factory=list)
+    arrival_timestamp: str = ""
+    route_changes: int = 0
+    forced_single_edge_decisions: int = 0
+    incomplete_decisions: int = 0
+    max_decision_latency_ms: Optional[float] = None
+    max_two_edge_decision_latency_ms: Optional[float] = None
 
     def to_dict(self) -> Dict[str, Any]:
         row = asdict(self)
@@ -112,6 +118,22 @@ class TemporalJourneyResult:
         row.pop("traversed_edge_path", None)
         row.pop("decision_trace", None)
         return row
+
+
+class _FilteredAdjacencyView:
+    """Lazy read-only adjacency view excluding blocked nodes without copying the graph."""
+
+    def __init__(self, base: Mapping[str, List[Tuple[str, int]]], blocked: Set[str]):
+        self._base = base
+        self._blocked = blocked
+
+    def get(self, node: str, default: Any = None) -> List[Tuple[str, int]]:
+        if node in self._blocked:
+            return [] if default is None else default
+        transitions = self._base.get(node)
+        if not transitions:
+            return [] if default is None else default
+        return [(v, key) for v, key in transitions if v not in self._blocked]
 
 
 class TemporalJourneyEngine:
@@ -202,9 +224,15 @@ class TemporalJourneyEngine:
         blocked_nodes: Iterable[str] = (),
     ) -> DijkstraResult:
         blocked = {str(node) for node in blocked_nodes} - {str(source)}
+        adjacency = (
+            _FilteredAdjacencyView(self.weight_manager.adjacency, blocked)
+            if blocked
+            else self.weight_manager.adjacency
+        )
+        weight_dict = weights if isinstance(weights, dict) else dict(weights)
         return custom_dijkstra(
-            self._adjacency_avoiding(blocked),
-            dict(weights),
+            adjacency,
+            weight_dict,
             str(source),
             str(destination),
         )
@@ -468,9 +496,12 @@ class TemporalJourneyEngine:
         counts = {
             "intersection_decisions": 0,
             "two_edge_alternative_selections": 0,
+            "forced_single_edge_decisions": 0,
             "prediction_updates_applied": 0,
             "dijkstra_reroutes": 0,
+            "route_changes": 0,
             "dijkstra_fallback_steps": 0,
+            "incomplete_decisions": 0,
         }
         failure = ""
         success = False
@@ -488,6 +519,7 @@ class TemporalJourneyEngine:
             route_result = self._route(origin, destination, weights)
             if not route_result.is_reached:
                 failure = "destination_unreachable_at_departure"
+                counts["incomplete_decisions"] += 1
             elif origin == destination:
                 vehicle = Vehicle("phase4", origin, destination, departure.isoformat())
                 vehicle.begin_temporal_journey([origin], [], departure.isoformat())
@@ -525,6 +557,7 @@ class TemporalJourneyEngine:
                     if strategy == "static_dijkstra":
                         if route_cursor >= len(route_result.edge_path):
                             failure = "fixed_route_exhausted_before_destination"
+                            counts["incomplete_decisions"] += 1
                             break
                         selected_edge = route_result.edge_path[route_cursor]
                         route_cursor += 1
@@ -538,6 +571,7 @@ class TemporalJourneyEngine:
                                 reroute = self._route(current, destination, weights)
                             if not reroute.is_reached or not reroute.edge_path:
                                 failure = "destination_unreachable_after_traffic_update"
+                                counts["incomplete_decisions"] += 1
                                 event.update(event="reroute_failed", selected_edge=None)
                                 trace.append(event)
                                 break
@@ -545,6 +579,7 @@ class TemporalJourneyEngine:
                             last_prediction_index = frame_index
                             if planned_edges != old_edges:
                                 counts["dijkstra_reroutes"] += 1
+                                counts["route_changes"] += 1
                             route_nodes = self._nodes_for_edges(current, planned_edges)
                             vehicle.set_temporal_plan(
                                 route_nodes, planned_edges, current_time.isoformat(),
@@ -557,6 +592,7 @@ class TemporalJourneyEngine:
                             )
                         if not planned_edges:
                             failure = "dynamic_route_exhausted_before_destination"
+                            counts["incomplete_decisions"] += 1
                             break
                         selected_edge = planned_edges.pop(0)
                         event.setdefault("event", "dynamic_route_step")
@@ -566,6 +602,7 @@ class TemporalJourneyEngine:
                             counts["prediction_updates_applied"] += 1
                             last_prediction_index = frame_index
                             event["traffic_update_applied_at_intersection"] = True
+                        prior_planned = list(planned_edges)
                         selected_edge, new_plan, choice, forced, is_decision = self._two_edge_choice(
                             current, destination, planned_edges, weights, visited
                         )
@@ -575,6 +612,7 @@ class TemporalJourneyEngine:
                                 fallback = self._route(current, destination, weights)
                             if not fallback.is_reached or not fallback.edge_path:
                                 failure = "no_reachable_two_edge_candidate_or_fallback"
+                                counts["incomplete_decisions"] += 1
                                 event.update(event="two_edge_dead_end", selected_edge=None)
                                 trace.append(event)
                                 break
@@ -597,8 +635,15 @@ class TemporalJourneyEngine:
                                 )
                                 if selected_edge == choice.get("candidate_b"):
                                     counts["two_edge_alternative_selections"] += 1
+                            else:
+                                counts["forced_single_edge_decisions"] += 1
                             if forced:
                                 event["forced_continuation"] = True
+                        if prior_planned and new_plan != prior_planned:
+                            counts["route_changes"] += 1
+                            event["route_changed"] = True
+                        else:
+                            event["route_changed"] = False
                         planned_edges = list(new_plan)
                         route_nodes = self._nodes_for_edges(current, planned_edges)
                         vehicle.set_temporal_plan(
@@ -608,9 +653,11 @@ class TemporalJourneyEngine:
 
                     if selected_edge is None:
                         failure = failure or "no_next_edge"
+                        counts["incomplete_decisions"] += 1
                         break
                     if str(selected_edge[0]) != current:
                         failure = f"non_contiguous_selected_edge:{selected_edge!r}"
+                        counts["incomplete_decisions"] += 1
                         break
                     latency_ms = (perf_counter() - started) * 1000.0
                     if strategy != "static_dijkstra":
@@ -619,6 +666,7 @@ class TemporalJourneyEngine:
                         edge_time_s, arrival_time = self._traverse_realized(selected_edge, current_time)
                     except (RuntimeError, ValueError) as exc:
                         failure = f"realized_traffic_unavailable:{exc}"
+                        counts["incomplete_decisions"] += 1
                         event["selected_edge"] = selected_edge
                         event["decision_latency_ms"] = latency_ms
                         trace.append(event)
@@ -656,16 +704,18 @@ class TemporalJourneyEngine:
                     trace.append(event)
                 else:
                     failure = "maximum_edge_steps_exceeded"
+                    counts["incomplete_decisions"] += 1
 
                 if current == destination and not success:
                     vehicle.finish_temporal_journey(current_time.isoformat())
                     success = True
         except (ValueError, KeyError, RuntimeError) as exc:
             failure = failure or f"simulation_error:{exc}"
+            counts["incomplete_decisions"] += 1
             vehicle = locals().get("vehicle")
 
         elapsed = perf_counter() - start_clock
-        if "vehicle" in locals():
+        if "vehicle" in locals() and vehicle is not None:
             travel_time_s = float(vehicle.elapsed_travel_time_s)
             distance_m = float(vehicle.accumulated_distance_m)
             traversed_edges = len(vehicle.temporal_traversed_edges)
@@ -713,4 +763,12 @@ class TemporalJourneyEngine:
             execution_time_s=elapsed,
             traversed_edge_path=traversed_path,
             decision_trace=trace,
+            arrival_timestamp=current_time.isoformat(),
+            route_changes=counts["route_changes"],
+            forced_single_edge_decisions=counts["forced_single_edge_decisions"],
+            incomplete_decisions=counts["incomplete_decisions"],
+            max_decision_latency_ms=float(np.max(latency_samples)) if latency_samples else None,
+            max_two_edge_decision_latency_ms=(
+                float(np.max(two_edge_latency_samples)) if two_edge_latency_samples else None
+            ),
         )
