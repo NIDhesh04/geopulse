@@ -21,12 +21,12 @@
   "threshold_seconds": 10.0,
   "threshold_percent": 3.0,
   "execution_times_ms": {
-    "cloud_prediction_broadcast_ms": 1.033,
-    "edge_weight_synthesis_ms": 12.653,
-    "edge_initial_dijkstra_ms": 60.305,
-    "edge_traffic_ingest_ms": 9.021,
-    "edge_reroute_dijkstra_ms": 20.327,
+    "cloud_prediction_broadcast_ms": 5.308,
+    "edge_weight_synthesis_ms": 29.105,
+    "edge_initial_dijkstra_ms": 56.349,
+    "edge_traffic_ingest_ms": 18.627,
+    "edge_reroute_dijkstra_ms": 29.159,
     "edge_decision_evaluation_ms": 0.003,
-    "total_edge_decision_ms": 20.391
+    "total_edge_decision_ms": 29.289
   }
 }

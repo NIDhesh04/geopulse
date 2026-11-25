@@ -29,12 +29,20 @@ try:
     import pydeck as pdk
 except ImportError:
     # Stub pydeck for headless testing – provide minimal classes used in code
+    import types
     class _DeckStub:
         def __init__(self, *args, **kwargs):
             pass
         def to_html(self):
             return ""
-    pdk = _DeckStub()
+    class _LayerStub:
+        def __init__(self, *args, **kwargs):
+            pass
+    class _ViewStateStub:
+        def __init__(self, *args, **kwargs):
+            pass
+    # Create a simple namespace mimicking the pydeck module API
+    pdk = types.SimpleNamespace(Deck=_DeckStub, Layer=_LayerStub, ViewState=_ViewStateStub)
 
 
 
