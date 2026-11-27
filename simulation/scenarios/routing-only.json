@@ -1,0 +1,1 @@
+{"id":"routing-only-5x5","version":1,"mode":"ROUTING_ONLY","gridSize":5,"lengthMetres":100,"speedMetresPerSecond":10,"origin":"n00_00","destination":"n04_04","seed":108,"junctionEstimator":"M1_ZERO_WAIT"}
